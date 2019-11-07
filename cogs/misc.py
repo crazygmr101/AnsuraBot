@@ -40,7 +40,7 @@ class Misc(commands.Cog):
         await ctx.send(user.avatar_url)
 
     @commands.command()
-    async def user(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def info(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
         if user is None:
             user = ctx.author
         e = discord.Embed()
