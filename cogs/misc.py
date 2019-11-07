@@ -1,3 +1,5 @@
+from typing import Union
+
 import discord
 from discord.ext import commands
 import core.util.HelpEntries as HE
@@ -31,6 +33,11 @@ class Misc(commands.Cog):
         await msg_o.delete()
         await ctx.send(embed=e)
 
+    @commands.command(aliases=["av"])
+    async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+        if user is None:
+            user = ctx.author
+        await ctx.send(user.avatar_url)
 
 
 
@@ -40,3 +47,4 @@ def setup(bot):
                             "Placeblock chicken. Never forget.\nNOTE: This is NOT *placeblovk fhivkrn*.\n"
                             "Aliases: pbc, chicken")
     HE.HelpEntries.register("maddify", "%maddify message", "It's ëpïc")
+    HE.HelpEntries.register("avatar", "%avatar @user", "Gets avatar for user", "Aliases: av")
