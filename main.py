@@ -18,7 +18,7 @@ def get_prefix(bot, message):
 bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.serverhelp', 'cogs.map', 'cogs.help',
-                      'cogs.administration','cogs.misc']
+                      'cogs.administration', 'cogs.misc', 'cogs.minecraft']
 if __name__ == '__main__':
     for ext in initial_extensions:
         bot.load_extension(ext)
