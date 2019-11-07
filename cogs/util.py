@@ -85,8 +85,8 @@ class Util(commands.Cog):
         if ctx.author.id == 267499094090579970:
             quit()
 
-    @commands.command(pass_context=True,aliases=["revs","rs","who"])
-    async def revsearch(self, ctx: discord.ext.commands.Context, tag: str):
+    @commands.command(pass_context=True)
+    async def who(self, ctx: discord.ext.commands.Context, tag: str):
         db = self.db
         records = db.get_all()
         #id, mojang, xbox, youtube, twitch, mixer
@@ -122,3 +122,4 @@ def setup(bot):
     HE.HelpEntries.register("youtubeadd", "%youtubeadd username", "Sets your youtube username", "Aliases: youtube, yt, yta")
     HE.HelpEntries.register("twitchadd", "%twitchadd username", "Sets your twitch username", "Aliases: twitch, twa")
     HE.HelpEntries.register("gametags", "%gametags @user", "Look up a user's gamertags", "Alias: gt")
+    HE.HelpEntries.register("who","%who tag","Find a user#1234 by gamertag")
