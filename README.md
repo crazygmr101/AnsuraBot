@@ -1,1 +1,1 @@
-AnsuraBot
+Ansura

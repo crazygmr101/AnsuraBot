@@ -1,0 +1,8 @@
+
+.idea/
+venv/
+*.pyc
+
+users.db-journal
+users.db
+*.db
