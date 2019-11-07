@@ -39,6 +39,24 @@ class Misc(commands.Cog):
             user = ctx.author
         await ctx.send(user.avatar_url)
 
+    @commands.command()
+    async def user(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+        if user is None:
+            user = ctx.author
+        e = discord.Embed()
+        e.title = user.name + "#" + user.discriminator
+        e.set_thumbnail(url=user.avatar_url)
+        e.add_field(name="ID", value=user.id)
+        if type(user) == discord.Member:
+            e.add_field(name="Display Name", value=user.display_name)
+            e.add_field(name="Top Role", value=user.top_role.name + " (" + str(user.top_role.id) + ")")
+            e.add_field(name="Created on", value=user.created_at)
+            e.add_field(name="Joined on", value=user.joined_at)
+            e.add_field(name="Mobile", value=str(user.is_on_mobile()))
+            e.colour = user.color
+        await ctx.send(embed=e)
+
+
 
 
 def setup(bot):
@@ -48,3 +66,4 @@ def setup(bot):
                             "Aliases: pbc, chicken")
     HE.HelpEntries.register("maddify", "%maddify message", "It's ëpïc")
     HE.HelpEntries.register("avatar", "%avatar @user", "Gets avatar for user", "Aliases: av")
+    HE.HelpEntries.register("info", "%info @user", "Displays info for a user")
