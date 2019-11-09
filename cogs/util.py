@@ -16,27 +16,27 @@ class Util(commands.Cog):
     @commands.command(aliases=["xbox","xba"])
     async def xboxadd(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "xboxlive", username)
-        await ctx.send("Set")
+        await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["mojang","mja"])
     async def mojangadd(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
-        await ctx.send("Set")
+        await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["youtube", "yta", "yt"])
     async def youtubeadd(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
-        await ctx.send("Set")
+        await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["mxa", "mixer"])
     async def mixeradd(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "mixer", username)
-        await ctx.send("Set")
+        await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["twa", "twitch"])
     async def twitchadd(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "twitch", username)
-        await ctx.send("Set")
+        await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["gt"])
     async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
