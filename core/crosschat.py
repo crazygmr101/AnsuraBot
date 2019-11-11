@@ -21,5 +21,5 @@ async def crosschat(message: discord.Message, bot: commands.Bot):
     for k in channels.keys():
         if k == channel.id:
             continue
-        c: discord.TextChannel = await bot.get_channel(channels[k])
+        c: discord.TextChannel = bot.get_channel(channels[k])
         await c.send(embed=e)
