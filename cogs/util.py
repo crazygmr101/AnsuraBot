@@ -13,28 +13,28 @@ class Util(commands.Cog):
         self.tracker = MT.MessageTracker(bot)
         self.db = AD.AnsuraDatabase()
 
-    @commands.command(aliases=["xbox","xba"])
-    async def xboxadd(self, ctx: discord.ext.commands.Context, username):
+    @commands.command()
+    async def xbox(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "xboxlive", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command(aliases=["mojang","mja"])
-    async def mojangadd(self, ctx: discord.ext.commands.Context, username):
+    @commands.command()
+    async def mojang(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command(aliases=["youtube", "yta", "yt"])
-    async def youtubeadd(self, ctx: discord.ext.commands.Context, username):
+    @commands.command()
+    async def youtube(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command(aliases=["mxa", "mixer"])
-    async def mixeradd(self, ctx: discord.ext.commands.Context, username):
+    @commands.command()
+    async def mixer(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "mixer", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command(aliases=["twa", "twitch"])
-    async def twitchadd(self, ctx: discord.ext.commands.Context, username):
+    @commands.command()
+    async def twitch(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "twitch", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
@@ -116,10 +116,10 @@ class Util(commands.Cog):
 def setup(bot):
     bot.add_cog(Util(bot))
     HE.HelpEntries.register("ping", "%ping", "Checks bot latency")
-    HE.HelpEntries.register("xboxadd", "%xboxadd username", "Sets your xbox username","Aliases: xbox, xba")
-    HE.HelpEntries.register("mojangadd", "%mojangadd username", "Sets your mojang username","Aliases: mojang, mja")
-    HE.HelpEntries.register("mixeradd", "%mixeradd username", "Sets your mixer username", "Aliases: mixer, mxa")
-    HE.HelpEntries.register("youtubeadd", "%youtubeadd username", "Sets your youtube username", "Aliases: youtube, yt, yta")
-    HE.HelpEntries.register("twitchadd", "%twitchadd username", "Sets your twitch username", "Aliases: twitch, twa")
+    HE.HelpEntries.register("xbox", "%xbox username", "Sets your xbox username")
+    HE.HelpEntries.register("mojang", "%mojang username", "Sets your mojang username")
+    HE.HelpEntries.register("mixer", "%mixer username", "Sets your mixer username")
+    HE.HelpEntries.register("youtube", "%youtube username", "Sets your youtube username")
+    HE.HelpEntries.register("twitch", "%twitch username", "Sets your twitch username")
     HE.HelpEntries.register("gametags", "%gametags @user", "Look up a user's gamertags", "Alias: gt")
     HE.HelpEntries.register("who","%who tag","Find a user#1234 by gamertag")
