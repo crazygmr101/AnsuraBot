@@ -28,6 +28,8 @@ lex = Lexical()
 
 @bot.event
 async def on_ready():
+    ch: discord.TextChannel = bot.get_channel(604823602973376525)
+    await ch.send("I'm alive :3")
     print("Bot ready!")
 
 @bot.event
@@ -58,5 +60,3 @@ async def on_message(message: discord.Message):
 
 
 bot.run(os.getenv("ANSURA"))
-ch: discord.TextChannel = await bot.get_channel(604823602973376525)
-await ch.send("I'm alive :3")
