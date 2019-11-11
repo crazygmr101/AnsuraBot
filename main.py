@@ -4,6 +4,8 @@ import re
 import random
 import logging
 import os
+import discord
+from core.crosschat import crosschat
 
 logging.basicConfig(level=logging.WARN)
 
@@ -26,13 +28,17 @@ lex = Lexical()
 
 @bot.event
 async def on_ready():
+    ch: discord.TextChannel = bot.get_channel(604823602973376525)
+    await ch.send("I'm alive :3")
     print("Bot ready!")
 
-
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author.bot:
         return
+
+    await crosschat(message, bot)
+
     if message.content == "/placeblock chicken":
         message.content = "%placeblock_chicken"
         await bot.process_commands(message)
