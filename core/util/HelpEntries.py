@@ -9,7 +9,7 @@ class HelpEntries:
         cls.cmds.append(core.util.HelpEntries.HelpEntry(command, usage, helpmsg, notes))
         print("Help command registered: ")
         print("  [C] " + command)
-        print("  [U] " + usage)
+        print("  [U] " + str(usage))
         print("  [H] " + helpmsg)
         if notes != "N/A":
             print("  [N] " + notes)
@@ -31,7 +31,7 @@ class HelpEntries:
         else:
             e.title = entry.cmd
             e.colour = 0x00ff00
-            if entry.usage is list:
+            if type(entry.usage) is list:
                 e.add_field(name="Usage", value="```" + "```\n```".join(entry.usage) + "```", inline=False)
             else:
                 e.add_field(name="Usage", value="```"+entry.usage+"```",inline=False)
