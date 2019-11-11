@@ -48,7 +48,7 @@ async def on_message(message):
     if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
         await message.channel.send("Hi, " + message.author.mention + " :3")
         return
-    if message.content.startswith("?"):
+    if message.content.startswith("?") and False:
         await lex.answer(message)
     await bot.process_commands(message)
 
