@@ -6,3 +6,5 @@ venv/
 users.db-journal
 users.db
 *.db
+
+core/ping-mc.py
