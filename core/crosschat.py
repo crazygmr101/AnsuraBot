@@ -20,7 +20,7 @@ async def crosschat(message: discord.Message, bot: commands.Bot):
     e.colour = author.colour
     user: discord.User = message.author
     e.set_thumbnail(url=user.avatar_url)
-    e.add_field(name=user.name + "#" + user.discriminator, value=message.content)
+    e.add_field(name=user.name + user.discriminator[0::1] + "xx", value=message.content)
     for k in channels.keys():
         if channels[k] == channel.id:
             continue
