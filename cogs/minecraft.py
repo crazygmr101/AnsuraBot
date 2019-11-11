@@ -3,6 +3,7 @@ import mcstatus
 from discord import Embed
 from discord.ext import commands
 import re
+import socket
 
 class Minecraft(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
@@ -10,7 +11,7 @@ class Minecraft(commands.Cog):
         print("Minecraft cog loaded")
 
     @commands.command(pass_context=True)
-    async def mcping(self, ctx: discord.ext.commands.Context, url: str, arg1: str = None):
+    async def jping(self, ctx: discord.ext.commands.Context, url: str):
         server = mcstatus.MinecraftServer.lookup(url)
         status = server.status()
         e = Embed()
@@ -21,6 +22,27 @@ class Minecraft(commands.Cog):
         e.add_field(name="Version", value=status.version.name)
         e.add_field(name="Protocol", value="v" + str(status.version.protocol))
         await ctx.send(embed=e)
+
+    @commands.command(pass_context=True)
+    async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(bytearray.fromhex(
+                "0100000000003c6d0d00ffff00fefefefefdfdfdfd12345678"), (url, port))
+            data, addr = sock.recvfrom(255)
+            status = data[35::].decode("ISO-8859-1").split(";")
+            e = Embed()
+            e.title = url
+            e.description = re.sub("§.", "", status[1])
+            e.add_field(name="Players", value=status[4] + "/" + status[5])
+            e.add_field(name="Version", value=status[3])
+            e.add_field(name="Protocol", value="v" + status[2])
+            e.add_field(name="World Name",value=re.sub("§.", "", status[7]))
+            e.add_field(name="Default Gamemode",value=status[8])
+            await ctx.send(embed=e)
+        except:
+            await ctx.send("Error")
+
 
 def setup(bot):
     bot.add_cog(Minecraft(bot))
