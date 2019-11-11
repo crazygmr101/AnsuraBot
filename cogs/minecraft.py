@@ -3,6 +3,7 @@ import mcstatus
 from discord import Embed
 from discord.ext import commands
 import re
+import core.util.HelpEntries as HE
 import socket
 
 class Minecraft(commands.Cog):
@@ -33,7 +34,7 @@ class Minecraft(commands.Cog):
             status = data[35::].decode("ISO-8859-1").split(";")
             e = Embed()
             e.title = url
-            e.description = re.sub("§.", "", status[1])
+            e.description = re.sub("[§Â].", "", status[1])
             e.add_field(name="Players", value=status[4] + "/" + status[5])
             e.add_field(name="Version", value=status[3])
             e.add_field(name="Protocol", value="v" + status[2])
@@ -46,3 +47,5 @@ class Minecraft(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Minecraft(bot))
+    HE.HelpEntries.register("jping", ["%jping server","%jping server:port"], "Pings a java server")
+    HE.HelpEntries.register("bping", "%bping server port", "Pings a bedrock server")
