@@ -7,7 +7,7 @@ async def crosschat(message: discord.Message, bot: commands.Bot):
         604823602973376522: 643522630934069259,  # ansura test
         523136895245615124: 643519574674898964,  # hustlers
         586199960198971409: 643519468928237568,  # united
-        570393863559315456: 643540235644567583 # uwus r us
+        570393863559315456: 643540235644567583  # uwus r us
     }
     channel: discord.TextChannel = message.channel
     if channel.id not in channels.values():
