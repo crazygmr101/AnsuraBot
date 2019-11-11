@@ -55,7 +55,8 @@ async def on_message(message: discord.Message):
     if message.content.startswith("?") and False:
         await lex.answer(message)
     await bot.process_commands(message)
-    await (await bot.get_channel(604823602973376525)).send("I'm alive!")
 
 
 bot.run(os.getenv("ANSURA"))
+ch: discord.TextChannel = await bot.get_channel(604823602973376525)
+await ch.send("I'm alive :3")
