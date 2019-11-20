@@ -4,6 +4,7 @@ import discord
 
 class Crosschat:
     def __init__(self):
+        pass
 
     async def crosschat(message: discord.Message, bot: commands.Bot):
         channels = {

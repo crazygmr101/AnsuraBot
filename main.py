@@ -5,7 +5,7 @@ import random
 import logging
 import os
 import discord
-from core.crosschat import crosschat
+from core.crosschat import Crosschat
 
 logging.basicConfig(level=logging.WARN)
 
@@ -37,7 +37,7 @@ async def on_message(message: discord.Message):
     if message.author.bot:
         return
 
-    await crosschat(message, bot)
+    await Crosschat.crosschat(message, bot)
 
     if message.content == "/placeblock chicken":
         message.content = "%placeblock_chicken"
