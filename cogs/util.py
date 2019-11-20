@@ -100,6 +100,7 @@ class Util(commands.Cog):
             await ctx.send("Tag " + tag + " not found in the database.")
             return
         s = "```\nSearch results for " + tag + "\n"
+        not_in_guild = []
         for i in users:
             u: discord.User = (await self.bot.fetch_user(int(i[0])))
             s += u.name + "#" + u.discriminator + " - " + i[1] + ": " + i[2] + "\n"
@@ -111,6 +112,7 @@ class Util(commands.Cog):
         print(str(ctx.command) + " command called with " + str(ctx.invoked_with))
         print("\tUser: " + str(ctx.message.author.id))
         print("\t>>>>> " + ctx.message.content)
+
 
 
 def setup(bot):

@@ -8,3 +8,5 @@ users.db
 *.db
 
 core/ping-mc.py
+
+Assets/crosschat.txt
