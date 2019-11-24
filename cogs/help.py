@@ -53,9 +53,6 @@ class Help(commands.Cog):
             e.title = "Command list"
             e.description = "Do `%help command_name` for detailed help"
             e.add_field(name="Commands", value=", ".join(a))
-            e.add_field(name="Ask Ansura", value="Prefix a question with `?` to ask me things. "
-                                                 "I'm still being coded a lot in that department, "
-                                                 "so I can't answer much :frowning:")
             await ctx.send(embed=e)
         else:
             e: discord.Embed = HE.HelpEntries.get_embed(cmd)
