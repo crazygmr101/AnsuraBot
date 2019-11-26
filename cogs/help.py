@@ -63,8 +63,3 @@ class Help(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Help(bot))
-    HE.HelpEntries.register(
-        command="helps",
-        usage="%helps search_term",
-        helpmsg="Searches help pages"
-    )
