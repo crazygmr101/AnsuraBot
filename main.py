@@ -1,11 +1,10 @@
 from discord.ext import commands
-from lexical import Lexical
 import re
 import random
 import logging
 import os
 import discord
-from core.crosschat import crosschat
+from core.crosschat import Crosschat
 
 logging.basicConfig(level=logging.WARN)
 
@@ -24,7 +23,6 @@ initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
 if __name__ == '__main__':
     for ext in initial_extensions:
         bot.load_extension(ext)
-lex = Lexical()
 
 @bot.event
 async def on_ready():
@@ -37,7 +35,7 @@ async def on_message(message: discord.Message):
     if message.author.bot:
         return
 
-    await crosschat(message, bot)
+    await Crosschat.crosschat(message, bot)
 
     if message.content == "/placeblock chicken":
         message.content = "%placeblock_chicken"
@@ -54,8 +52,6 @@ async def on_message(message: discord.Message):
     if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
         await message.channel.send("Hi, " + message.author.mention + " :3")
         return
-    if message.content.startswith("?") and False:
-        await lex.answer(message)
     await bot.process_commands(message)
 
 

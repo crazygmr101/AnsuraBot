@@ -7,12 +7,14 @@ class HelpEntries:
     @classmethod
     def register(cls, command, usage, helpmsg, notes="N/A"):
         cls.cmds.append(core.util.HelpEntries.HelpEntry(command, usage, helpmsg, notes))
+        """
         print("Help command registered: ")
         print("  [C] " + command)
         print("  [U] " + str(usage))
         print("  [H] " + helpmsg)
         if notes != "N/A":
             print("  [N] " + notes)
+        """
 
     @classmethod
     def lookup(cls, cmd):

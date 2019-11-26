@@ -23,7 +23,7 @@ class Util(commands.Cog):
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command()
+    @commands.command(aliases=["yt"])
     async def youtube(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
@@ -100,6 +100,7 @@ class Util(commands.Cog):
             await ctx.send("Tag " + tag + " not found in the database.")
             return
         s = "```\nSearch results for " + tag + "\n"
+        not_in_guild = []
         for i in users:
             u: discord.User = (await self.bot.fetch_user(int(i[0])))
             s += u.name + "#" + u.discriminator + " - " + i[1] + ": " + i[2] + "\n"
@@ -111,6 +112,7 @@ class Util(commands.Cog):
         print(str(ctx.command) + " command called with " + str(ctx.invoked_with))
         print("\tUser: " + str(ctx.message.author.id))
         print("\t>>>>> " + ctx.message.content)
+
 
 
 def setup(bot):
