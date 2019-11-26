@@ -23,7 +23,7 @@ class Util(commands.Cog):
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
-    @commands.command()
+    @commands.command(aliases=["yt"])
     async def youtube(self, ctx: discord.ext.commands.Context, username):
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
