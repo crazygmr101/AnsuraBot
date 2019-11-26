@@ -24,7 +24,7 @@ class Crosschat:
         e.colour = author.colour
         user: discord.User = message.author
         e.set_thumbnail(url=user.avatar_url)
-        e.add_field(name=user.name + "#" + str(user.discriminator)[0::1] + "xx", value=message.content)
+        e.add_field(name=user.name + "#" + str(user.discriminator)[0:2] + "xx", value=message.content)
         for k in channels.keys():
             if channels[k] == channel.id:
                 continue
