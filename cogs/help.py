@@ -27,7 +27,7 @@ class Help(commands.Cog):
             if cmd.lower() in i.help.lower() or \
                cmd.lower() in i.cmd.lower() or \
                cmd.lower() in i.notes.lower() or \
-               cmd.lower() in i.usage.lower():
+               cmd.lower() in " ".join(i.usage).lower():
                 cmds.append(i)
         if len(cmds) == 1:
             await self.help_(ctx,cmds[0].cmd)
@@ -63,8 +63,3 @@ class Help(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Help(bot))
-    HE.HelpEntries.register(
-        command="helps",
-        usage="%helps search_term",
-        helpmsg="Searches help pages"
-    )

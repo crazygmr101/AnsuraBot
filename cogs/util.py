@@ -121,7 +121,7 @@ def setup(bot):
     HE.HelpEntries.register("xbox", "%xbox username", "Sets your xbox username")
     HE.HelpEntries.register("mojang", "%mojang username", "Sets your mojang username")
     HE.HelpEntries.register("mixer", "%mixer username", "Sets your mixer username")
-    HE.HelpEntries.register("youtube", "%youtube username", "Sets your youtube username")
+    HE.HelpEntries.register("youtube", "%youtube username", "Sets your youtube username", "Alias: yt")
     HE.HelpEntries.register("twitch", "%twitch username", "Sets your twitch username")
     HE.HelpEntries.register("gametags", "%gametags @user", "Look up a user's gamertags", "Alias: gt")
     HE.HelpEntries.register("who","%who tag","Find a user#1234 by gamertag")
