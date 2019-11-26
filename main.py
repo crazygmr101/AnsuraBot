@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.WARN)
 
 
 def get_prefix(bot, message):
-    prefixes = ['%']
+    prefixes = ['%','>']
     if not message.guild:
         return '%'
     return commands.when_mentioned_or(*prefixes)(bot,message)
