@@ -27,7 +27,7 @@ class Help(commands.Cog):
             if cmd.lower() in i.help.lower() or \
                cmd.lower() in i.cmd.lower() or \
                cmd.lower() in i.notes.lower() or \
-               cmd.lower() in i.usage.lower():
+               cmd.lower() in " ".join(i.usage).lower():
                 cmds.append(i)
         if len(cmds) == 1:
             await self.help_(ctx,cmds[0].cmd)
