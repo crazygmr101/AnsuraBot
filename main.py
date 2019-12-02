@@ -20,7 +20,7 @@ bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
-                      'cogs.fun']
+                      'cogs.fun', 'cogs.owner']
 if __name__ == '__main__':
     for ext in initial_extensions:
         bot.load_extension(ext)
