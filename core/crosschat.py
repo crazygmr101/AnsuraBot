@@ -6,9 +6,12 @@ class Crosschat:
     def __init__(self, bot: commands.Bot):
         self.channels = {}
         ch: str = open("Assets/crosschat.txt",'r').read()
+        print(ch)
         chl = ch.split("\n")
+        print(chl)
         chl = [x.lstrip().rstrip() for x in chl]
         for i in chl:
+            print(i)
             ar = i.split(":")
             self.channels[int(ar[0])] = int(ar[1])
         self.bot = bot
