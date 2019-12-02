@@ -45,9 +45,9 @@ class Fun(commands.Cog):
             return [s[:half], s[half:]]
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=["xc"])
     async def xchat(self, ctx: commands.Context):
-        ctx.message.content = ctx.message.content[7:]
+        ctx.message.content = " ".join(ctx.message.content.split(" ")[1:])
         await self.cxchat.xchat(ctx.message)
 
 
@@ -55,4 +55,4 @@ class Fun(commands.Cog):
 def setup(bot):
     bot.add_cog(Fun(bot))
     HE.HelpEntries.register("ship", "%ship @person1 @person2", "Ship <3")
-    HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers")
+    HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers", "Alias: xc")
