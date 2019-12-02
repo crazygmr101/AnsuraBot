@@ -5,10 +5,14 @@ import discord
 import core.util.HelpEntries as HE
 import re
 
+from core.crosschat import Crosschat
+
+
 class Fun(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Fun cog loaded")
+        self.cxchat = Crosschat(bot)
 
     @commands.command(pass_context=True)
     async def ship(self, ctx: commands.Context, user1: discord.Member, user2: discord.Member):
@@ -41,6 +45,14 @@ class Fun(commands.Cog):
             return [s[:half], s[half:]]
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
+    @commands.command(pass_context=True)
+    async def xchat(self, ctx: commands.Context):
+        ctx.message.content = ctx.message.content[7:]
+        await self.cxchat.xchat(ctx.message)
+
+
+
 def setup(bot):
     bot.add_cog(Fun(bot))
     HE.HelpEntries.register("ship", "%ship @person1 @person2", "Ship <3")
+    HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers")
