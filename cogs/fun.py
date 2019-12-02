@@ -55,3 +55,4 @@ class Fun(commands.Cog):
 def setup(bot):
     bot.add_cog(Fun(bot))
     HE.HelpEntries.register("ship", "%ship @person1 @person2", "Ship <3")
+    HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers")
