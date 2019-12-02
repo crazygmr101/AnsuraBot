@@ -31,12 +31,13 @@ async def on_ready():
     await ch.send("I'm alive :3")
     print("Bot ready!")
 
+
 @bot.event
 async def on_message(message: discord.Message):
     if message.author.bot:
         return
 
-    await Crosschat.crosschat(message, bot)
+
 
     if message.content == "/placeblock chicken":
         message.content = "%placeblock_chicken"

@@ -3,18 +3,20 @@ import discord
 
 
 class Crosschat:
-    def __init__(self):
-        pass
+    def __init__(self, bot: commands.Bot):
+        self.channels = {}
+        ch: str = open("Assets/crosschat.txt",'r').read()
+        chl = ch.split("\n")
+        chl = [x.lstrip().rstrip() for x in chl]
+        for i in chl:
+            ar = i.split(":")
+            self.channels[int(ar[0])] = int(ar[1])
+        self.bot = bot
+        print(self.channels)
 
-    async def crosschat(message: discord.Message, bot: commands.Bot):
-        channels = {
-            604823602973376522: 643522630934069259,  # ansura test
-            523136895245615124: 643519574674898964,  # hustlers
-            586199960198971409: 643519468928237568,  # united
-            570393863559315456: 643540235644567583  # uwus r us
-        }
+    async def xchat(self, message: discord.Message):
         channel: discord.TextChannel = message.channel
-        if channel.id not in channels.values():
+        if channel.id not in self.channels.values():
             return
 
         guild: discord.Guild = channel.guild
@@ -25,8 +27,9 @@ class Crosschat:
         user: discord.User = message.author
         e.set_thumbnail(url=user.avatar_url)
         e.add_field(name=user.name + "#" + str(user.discriminator)[0:2] + "xx", value=message.content)
-        for k in channels.keys():
-            if channels[k] == channel.id:
+        for k in self.channels.keys():
+            if self.channels[k] == channel.id:
                 continue
-            c: discord.TextChannel = bot.get_channel(channels[k])
-            await c.send(embed=e)
+            c: discord.TextChannel = self.bot.get_channel(self.channels[k])
+            if c is not None:
+                await c.send(embed=e)
