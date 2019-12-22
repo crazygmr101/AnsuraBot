@@ -10,3 +10,9 @@ users.db
 core/ping-mc.py
 
 Assets/crosschat.txt
+
+*.pickle
+
+*.sqlite3
+
+Assets/
