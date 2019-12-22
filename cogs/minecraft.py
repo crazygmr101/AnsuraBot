@@ -5,6 +5,7 @@ from discord.ext import commands
 import re
 import core.util.HelpEntries as HE
 import socket
+import json
 
 class Minecraft(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
@@ -43,6 +44,30 @@ class Minecraft(commands.Cog):
             await ctx.send(embed=e)
         except:
             await ctx.send("Error")
+
+    @commands.command(pass_context=True)
+    async def recipe(self, ctx: discord.ext.commands.Context, item: str):
+        try:
+            print(item)
+            r: str = open("Assets/behavior/recipes/" + item + ".json", 'r').read()
+            data = json.loads(r)
+            if data["minecraft:recipe_shaped"]:
+                data = data["minecraft:recipe_shaped"]
+                if "crafting_table" in data["tags"]:
+                    await ctx.send("```" +
+                                   "\n".join(data["pattern"]) +
+                                   "\n\n" +
+                                   "\n".join(
+                                       [
+                                           k + ": " + data["key"][k]["item"] +
+                                           (":" + str(data["key"][k].get("data")) if "data" in data["key"][k] else "")
+                                           for k in data["key"].keys()
+                                       ]
+                                   ) +
+                                   "```"
+                                   )
+        except FileNotFoundError:
+            await ctx.send("Oops! Recipe not found")
 
 
 def setup(bot):
