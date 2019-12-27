@@ -10,7 +10,7 @@ class AnsuraDatabase:
         self.cursor: sqlite3.Cursor = self.conn.cursor()
 
     def add_gaming_record(self, userid: int):
-        self.cursor.execute("insert into gaming values (?,?,?,?,?,?)", (userid, None, None, None, None, None))
+        self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?)", (userid, None, None, None, None, None, None, None))
         print("Empty record added for user " + str(userid))
         self.conn.commit()
 

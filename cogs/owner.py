@@ -1,4 +1,5 @@
-from typing import List
+import re
+from typing import List, Union
 
 from discord.ext import commands
 import discord
@@ -47,5 +48,10 @@ class Owner(commands.Cog):
         await g.leave()
 
 
+
+    @commands.command()
+    async def die(self, ctx:discord.ext.commands.Context):
+        if ctx.author.id == 267499094090579970:
+            quit()
 def setup(bot):
     bot.add_cog(Owner(bot))
