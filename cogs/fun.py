@@ -52,16 +52,19 @@ class Fun(commands.Cog):
         await self.cxchat.xchat(ctx.message)
 
     @commands.command(pass_context=True)
+    @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def summon(self, ctx: commands.Context):
         await ctx.author.voice.channel.connect()
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
+    @commands.is_owner()
     async def leave(self, ctx: commands.Context):
         await ctx.guild.voice_client.disconnect()
 
     @commands.command(pass_context=True)
+    @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def say(self, ctx: commands.Context, text):
         message = gtts.gTTS(text)
