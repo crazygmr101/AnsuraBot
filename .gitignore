@@ -16,3 +16,5 @@ Assets/crosschat.txt
 *.sqlite3
 
 Assets/
+
+*.mp3
