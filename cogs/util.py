@@ -1,4 +1,7 @@
-from typing import Union
+import datetime
+import operator
+import re
+from typing import Union, List
 
 from discord.ext import commands
 import discord
@@ -79,11 +82,6 @@ class Util(commands.Cog):
         while (s != "quit"):
             await ctx.send("`CONSOLE:` " + s)
             s = input(">")
-
-    @commands.command()
-    async def die(self, ctx:discord.ext.commands.Context):
-        if ctx.author.id == 267499094090579970:
-            quit()
 
     @commands.command(pass_context=True)
     async def who(self, ctx: discord.ext.commands.Context, tag: str):
