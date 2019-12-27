@@ -4,6 +4,7 @@ from discord.ext import commands
 import discord
 import core.util.HelpEntries as HE
 import re
+import gtts
 
 from core.crosschat import Crosschat
 
@@ -49,6 +50,24 @@ class Fun(commands.Cog):
     async def xchat(self, ctx: commands.Context):
         ctx.message.content = " ".join(ctx.message.content.split(" ")[1:])
         await self.cxchat.xchat(ctx.message)
+
+    @commands.command(pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def summon(self, ctx: commands.Context):
+        await ctx.author.voice.channel.connect()
+
+    @commands.command(pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def leave(self, ctx: commands.Context):
+        await ctx.guild.voice_client.disconnect()
+
+    @commands.command(pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def say(self, ctx: commands.Context, text):
+        message = gtts.gTTS(text)
+        message.save('tts.mp3')
+        ctx.guild.voice_client.play(discord.FFmpegPCMAudio('tts.mp3'))
+
 
 
 
