@@ -83,6 +83,17 @@ class Util(commands.Cog):
             await ctx.send("`CONSOLE:` " + s)
             s = input(">")
 
+    @commands.command()
+    async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+        e = discord.Embed()
+        e.title = "Role: " + r.name
+        e.colour = r.colour
+        e.add_field(name="Members", value=" ".join([
+            m.mention for m in r.members
+        ]))
+        await ctx.send(embed=e)
+
+
     @commands.command(pass_context=True)
     async def who(self, ctx: discord.ext.commands.Context, tag: str):
         db = self.db
