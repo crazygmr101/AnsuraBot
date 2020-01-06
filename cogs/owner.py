@@ -3,6 +3,8 @@ from typing import List, Union
 
 from discord.ext import commands
 import discord
+import random
+
 import core.util.HelpEntries as HE
 
 
@@ -53,6 +55,22 @@ class Owner(commands.Cog):
     async def die(self, ctx:discord.ext.commands.Context):
         if ctx.author.id == 267499094090579970:
             quit()
+
+    @commands.command()
+    async def snick(self, ctx: discord.ext.commands.Context):
+        if ctx.author.id != 267499094090579970:
+            return
+        g = ctx.guild
+        a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
+        b: List[Union[discord.Member, discord.User]] = [x for x in g.members]
+        random.shuffle(a)
+        for u in range(len(b)):
+            try:
+                await b[u].edit(nick=a[u].name)
+                print(b[u].name + " , " + b[u].nick)
+            except:
+                pass
+
 
     @commands.command()
     async def nick(self, ctx: discord.ext.commands.Context, name: str):
