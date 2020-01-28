@@ -46,10 +46,10 @@ class Fun(commands.Cog):
             return [s[:half], s[half:]]
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
-    @commands.command(pass_context=True, aliases=["xc"])
-    async def xchat(self, ctx: commands.Context):
-        ctx.message.content = " ".join(ctx.message.content.split(" ")[1:])
-        await self.cxchat.xchat(ctx.message)
+    #@commands.command(pass_context=True, aliases=["xc"])
+    #async def xchat(self, ctx: commands.Context):
+    #    ctx.message.content = " ".join(ctx.message.content.split(" ")[1:])
+    #    await self.cxchat.xchat(ctx.message)
 
     @commands.command(pass_context=True)
     @commands.is_owner()
