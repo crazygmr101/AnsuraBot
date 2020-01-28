@@ -18,6 +18,7 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
+xchat = Crosschat(bot)
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
                       'cogs.fun', 'cogs.owner']
@@ -54,6 +55,7 @@ async def on_message(message: discord.Message):
     if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
         await message.channel.send("Hi, " + message.author.mention + " :3")
         return
+    await xchat.xchat(message)
     await bot.process_commands(message)
 
 
