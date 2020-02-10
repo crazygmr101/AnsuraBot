@@ -16,7 +16,7 @@ class Owner(commands.Cog):
 
     @commands.command(pass_context=True)
     async def guilds(self, ctx: commands.Context):
-        if ctx.author.id != 267499094090579970:
+        if ctx.author.id != self.bot.owner_id:
             return
         g: discord.Guild
         i = 0
@@ -27,7 +27,7 @@ class Owner(commands.Cog):
 
     @commands.command(pass_context=True)
     async def ginfo(self, ctx: commands.Context, n: int):
-        if ctx.author.id != 267499094090579970:
+        if ctx.author.id != self.bot.owner_id:
             return
         if n < 0 or n >= len(self.guilds):
             await ctx.send("Invalid number")
@@ -44,7 +44,7 @@ class Owner(commands.Cog):
 
     @commands.command(pass_context=True)
     async def guild_leave(self, ctx: commands.Context, id: int):
-        if ctx.author.id != 267499094090579970:
+        if ctx.author.id != self.bot.owner_id:
             return
         g: discord.Guild = await self.bot.fetch_guild(id)
         await g.leave()
@@ -53,12 +53,12 @@ class Owner(commands.Cog):
 
     @commands.command()
     async def die(self, ctx:discord.ext.commands.Context):
-        if ctx.author.id == 267499094090579970:
+        if ctx.author.id == self.bot.owner_id:
             quit()
 
     @commands.command()
     async def snick(self, ctx: discord.ext.commands.Context):
-        if ctx.author.id != 267499094090579970:
+        if ctx.author.id != self.bot.owner_id:
             return
         g = ctx.guild
         a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
@@ -74,7 +74,7 @@ class Owner(commands.Cog):
 
     @commands.command()
     async def nick(self, ctx: discord.ext.commands.Context, name: str):
-        if ctx.author.id != 267499094090579970:
+        if ctx.author.id != self.bot.owner_id:
             return
         await ctx.send("Nicknaming " + str())
         g: discord.Guild = ctx.guild
