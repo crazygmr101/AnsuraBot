@@ -19,6 +19,7 @@ def get_prefix(bot, message):
 bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
 xchat = Crosschat(bot)
+
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
                       'cogs.fun', 'cogs.owner']
@@ -28,8 +29,7 @@ if __name__ == '__main__':
 
 @bot.event
 async def on_ready():
-    ch: discord.TextChannel = bot.get_channel(604823602973376525)
-    await ch.send("I'm alive :3")
+    await xchat.init_channels()
     print("Bot ready!")
 
 
@@ -37,8 +37,6 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author.bot:
         return
-
-
 
     if message.content == "/placeblock chicken":
         message.content = "%placeblock_chicken"
