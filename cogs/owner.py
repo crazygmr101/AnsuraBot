@@ -5,6 +5,8 @@ from discord.ext import commands
 import discord
 import random
 
+from discord.ext.commands import check
+
 import core.util.HelpEntries as HE
 
 
@@ -15,9 +17,8 @@ class Owner(commands.Cog):
         self.guilds: List[discord.Guild] = []
 
     @commands.command(pass_context=True)
+    @commands.is_owner()
     async def guilds(self, ctx: commands.Context):
-        if ctx.author.id != self.bot.owner_id:
-            return
         g: discord.Guild
         i = 0
         for g in self.bot.guilds:
@@ -26,9 +27,8 @@ class Owner(commands.Cog):
             i += 1
 
     @commands.command(pass_context=True)
+    @commands.is_owner()
     async def ginfo(self, ctx: commands.Context, n: int):
-        if ctx.author.id != self.bot.owner_id:
-            return
         if n < 0 or n >= len(self.guilds):
             await ctx.send("Invalid number")
             return
@@ -43,23 +43,21 @@ class Owner(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True)
+    @commands.is_owner()
     async def guild_leave(self, ctx: commands.Context, id: int):
-        if ctx.author.id != self.bot.owner_id:
-            return
         g: discord.Guild = await self.bot.fetch_guild(id)
         await g.leave()
 
 
 
     @commands.command()
+    @commands.is_owner()
     async def die(self, ctx:discord.ext.commands.Context):
-        if ctx.author.id == self.bot.owner_id:
-            quit()
+        quit()
 
     @commands.command()
+    @commands.is_owner()
     async def snick(self, ctx: discord.ext.commands.Context):
-        if ctx.author.id != self.bot.owner_id:
-            return
         g = ctx.guild
         a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
         b: List[Union[discord.Member, discord.User]] = [x for x in g.members]
@@ -71,11 +69,9 @@ class Owner(commands.Cog):
             except:
                 pass
 
-
     @commands.command()
+    @commands.is_owner()
     async def nick(self, ctx: discord.ext.commands.Context, name: str):
-        if ctx.author.id != self.bot.owner_id:
-            return
         await ctx.send("Nicknaming " + str())
         g: discord.Guild = ctx.guild
         s = 0

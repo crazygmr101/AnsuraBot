@@ -47,11 +47,13 @@ async def on_message(message: discord.Message):
     print("\t" + message.content)
     print("\tin " + str(message.channel.id) + " by " + str(message.author.id))
     """
-    hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@603640674234925107>)[!\.]*\s*$"
-    if message.content == "<@603640674234925107>":
+    hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(bot.user.id) + ">)[!\.]*\s*$"
+    if message.content == "<@!" + str(bot.user.id) + ">":
         await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
     if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
-        await message.channel.send("Hi, " + message.author.mention + " :3")
+        await message.channel.send(random.choice(["Hi, " + message.author.mention + " :3",
+                                                  "Hey, " + message.author.display_name,
+                                                  "Hello :D"]))
         return
     await xchat.xchat(message)
     await bot.process_commands(message)

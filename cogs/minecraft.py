@@ -26,9 +26,14 @@ class Minecraft(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True)
-    async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int):
+    async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int = 19132):
         try:
+            if len(url.split(":")) == 2:
+                port = int(url.split(":")[1])
+                url = url.split(":")[0]
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.setblocking(False)
+            sock.settimeout(10)
             sock.sendto(bytearray.fromhex(
                 "0100000000003c6d0d00ffff00fefefefefdfdfdfd12345678"), (url, port))
             data, addr = sock.recvfrom(255)
@@ -42,8 +47,15 @@ class Minecraft(commands.Cog):
             e.add_field(name="World Name",value=re.sub("§.", "", status[7]))
             e.add_field(name="Default Gamemode",value=status[8])
             await ctx.send(embed=e)
-        except:
-            await ctx.send("Error")
+        except socket.timeout as t:
+            await ctx.send("*Oops ):*\n Looks like the ping I made to " + url + ":" + str(port) + " timed out. "
+                            "Either the server is down, not responding, or I was given a wrong URL or port.")
+        except socket.gaierror as e:
+            await ctx.send("I can't figure out how to reach that URL. ): Double check that it's correct.")
+            return
+        except Exception as e:
+            await ctx.send("*Uh-oh D:*\n An error happened while I was pinging the server.")
+            print(e)
 
     @commands.command(pass_context=True)
     async def recipe(self, ctx: discord.ext.commands.Context, item: str):
