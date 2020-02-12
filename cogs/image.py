@@ -1,11 +1,8 @@
-import asyncio
 import os
-from typing import List
 
 from PIL import ImageOps, ImageFilter
 from discord.ext import commands
 import discord
-import core.util.HelpEntries as HE
 import PIL
 from PIL.Image import Image
 

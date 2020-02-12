@@ -5,10 +5,6 @@ from discord.ext import commands
 import discord
 import random
 
-from discord.ext.commands import check
-
-import core.util.HelpEntries as HE
-
 
 class Owner(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):

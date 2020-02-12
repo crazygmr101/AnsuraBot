@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 from core.geoloc import Geolocation
 from core.map_image import Map_Imager
-import core.util.HelpEntries as HE
+import core.help as HE
 
 class Map(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):

@@ -2,10 +2,7 @@ from typing import Union
 
 from discord.ext import commands
 import discord
-import time
-import core.util.HelpEntries as HE
-import cogs.help as HLP
-import core.database as AD
+import core.help as HE
 import cogs.util
 
 class Administration(commands.Cog):

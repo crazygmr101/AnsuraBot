@@ -1,12 +1,7 @@
-from typing import List
-
 from discord.ext import commands
 import discord
-import core.util.HelpEntries as HE
-import re
+import core.help as HE
 import gtts
-
-from core.crosschat import Crosschat
 
 
 class Fun(commands.Cog):
