@@ -18,3 +18,4 @@ Assets/crosschat.txt
 Assets/
 
 *.mp3
+/attachments/
