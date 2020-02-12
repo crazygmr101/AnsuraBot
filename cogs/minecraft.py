@@ -3,7 +3,7 @@ import mcstatus
 from discord import Embed
 from discord.ext import commands
 import re
-import core.util.HelpEntries as HE
+import core.help as HE
 import socket
 import json
 

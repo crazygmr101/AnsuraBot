@@ -1,12 +1,12 @@
-import core.util
 from discord import Embed
+import core
 
 class HelpEntries:
     cmds = []
 
     @classmethod
     def register(cls, command, usage, helpmsg, notes="N/A"):
-        cls.cmds.append(core.util.HelpEntries.HelpEntry(command, usage, helpmsg, notes))
+        cls.cmds.append(core.help.HelpEntry(command, usage, helpmsg, notes))
         """
         print("Help command registered: ")
         print("  [C] " + command)

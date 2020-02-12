@@ -2,7 +2,7 @@ from typing import List
 
 from discord.ext import commands
 import discord
-import core.util.HelpEntries as HE
+import core.help as HE
 
 class Help(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):

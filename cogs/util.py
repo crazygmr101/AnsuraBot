@@ -1,11 +1,8 @@
-import datetime
-import operator
-import re
-from typing import Union, List
+from typing import Union
 
 from discord.ext import commands
 import discord
-import core.util.HelpEntries as HE
+import core.help as HE
 import core.messages as MT
 import core.database as AD
 
