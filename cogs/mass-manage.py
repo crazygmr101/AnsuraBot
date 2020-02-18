@@ -1,19 +1,21 @@
 import re
 from typing import List, Union
-
+import core.help as help
 from discord.ext import commands
 import discord
 import random
-
+from discord.permissions import Permissions as perms
 
 class MassManage(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        print("Mass User Management cog loaded")
+        print("Server Management cog loaded")
 
     @commands.command()
     @commands.is_owner()
-    async def nick(self, ctx: discord.ext.commands.Context, name: str):
+    @commands.has_permissions(manage_guild=True, manage_nicknames=True)
+    @commands.bot_has_permissions(manage_guild=True, manage_nicknames=True)
+    async def nick_all(self, ctx: discord.ext.commands.Context, name: str):
         await ctx.send("Nicknaming " + str())
         g: discord.Guild = ctx.guild
         s = 0
@@ -40,7 +42,9 @@ class MassManage(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def snick(self, ctx: discord.ext.commands.Context):
+    @commands.has_permissions(manage_guild=True, manage_nicknames=True)
+    @commands.bot_has_permissions(manage_guild=True, manage_nicknames=True)
+    async def shufflenicks(self, ctx: discord.ext.commands.Context):
         g = ctx.guild
         a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
         b: List[Union[discord.Member, discord.User]] = [x for x in g.members]
@@ -54,7 +58,9 @@ class MassManage(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def arole(self, ctx: discord.ext.commands.Context, role: str):
+    @commands.has_permissions(manage_guild=True, manage_roles=True)
+    @commands.bot_has_permissions(manage_guild=True, manage_roles=True)
+    async def role_all(self, ctx: discord.ext.commands.Context, role: str):
         g: discord.Guild = ctx.guild
         s = 0
         f = 0
@@ -73,8 +79,16 @@ class MassManage(commands.Cog):
                 print("Failed on " + str(i.display_name))
                 print(e)
                 pass
-        await ctx.send("Nicked " + str(s) + " (" + str(f) + " failed)")
+        await ctx.send("Gave " + r.mention + " to " + str(s) + " (" + str(f) + " failed)")
 
 
 def setup(bot):
     bot.add_cog(MassManage(bot))
+    help.HelpEntries.register("nick_all", "%nick_all nickname-pattern", "Nicknames all the members of a server according to a pattern",
+                              "*Replacements*\n"
+                              "<join-num> - the order someone joined the server\n"
+                              "<join-num100> - same as <join-num>, but padded to 3 digits\n"
+                              "<disc> - the user's discriminator\n"
+                              "<name> - the user's username, without discriminator")
+    help.HelpEntries.register("role_all", "%role_all rolename", "Gives a role to everyone in a server")
+    help.HelpEntries.register("shuffle_nicks", "%shuffle_nicks", "Shuffles nicknames in a server")
