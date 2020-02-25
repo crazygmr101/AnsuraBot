@@ -28,7 +28,7 @@ class MessageTracker:
                 msg = m
         return m
 
-    async def get_last_message_embed(self, member: Union[discord.Member, discord.User]):
+    async def get_last_message_embed(self, member: Union[discord.Member,discord.User]):
         e = discord.Embed()
         e.title = "Last message by " + member.display_name
         msg = await self.get_last_message(member)

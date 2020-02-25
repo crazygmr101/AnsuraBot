@@ -54,9 +54,32 @@ class Minecraft(commands.Cog):
             await ctx.send("I can't figure out how to reach that URL. ): Double check that it's correct.")
             return
         except Exception as e:
-            await ctx.send("*Uh-oh D:*\n An error happened"
-                           " while I was pinging the server.")
+            await ctx.send("*Uh-oh D:*\n An error happened while I was pinging the server.")
             print(e)
+
+    @commands.command(pass_context=True)
+    async def recipe(self, ctx: discord.ext.commands.Context, item: str):
+        try:
+            print(item)
+            r: str = open("Assets/behavior/recipes/" + item + ".json", 'r').read()
+            data = json.loads(r)
+            if data["minecraft:recipe_shaped"]:
+                data = data["minecraft:recipe_shaped"]
+                if "crafting_table" in data["tags"]:
+                    await ctx.send("```" +
+                                   "\n".join(data["pattern"]) +
+                                   "\n\n" +
+                                   "\n".join(
+                                       [
+                                           k + ": " + data["key"][k]["item"] +
+                                           (":" + str(data["key"][k].get("data")) if "data" in data["key"][k] else "")
+                                           for k in data["key"].keys()
+                                       ]
+                                   ) +
+                                   "```"
+                                   )
+        except FileNotFoundError:
+            await ctx.send("Oops! Recipe not found")
 
 
 def setup(bot):
