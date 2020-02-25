@@ -22,7 +22,8 @@ xchat = Crosschat(bot)
 
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
-                      'cogs.fun', 'cogs.owner', 'cogs.image']
+                      'cogs.fun', 'cogs.owner', 'cogs.image',
+                      'cogs.streamer']
 if __name__ == '__main__':
     for ext in initial_extensions:
         bot.load_extension(ext)
