@@ -55,7 +55,7 @@ class Util(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx: discord.ext.commands.Context):
-        await ctx.send(self.bot.latency)
+        await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
     @commands.command(pass_context=True)
     async def seen(self, ctx: discord.ext.commands.Context, user: Union[discord.Member,discord.User]):
