@@ -19,3 +19,5 @@ Assets/
 
 *.mp3
 /attachments/
+
+config.yaml

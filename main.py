@@ -23,15 +23,18 @@ xchat = Crosschat(bot)
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
                       'cogs.fun', 'cogs.owner', 'cogs.image', 'cogs.mass-manage',
-                      'cogs.error-handler', 'cogs.streamer']
+                      'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler']
 if __name__ == '__main__':
     for ext in initial_extensions:
+        print("= Adding " + ext + " =")
         bot.load_extension(ext)
 
 @bot.event
 async def on_ready():
     await xchat.init_channels()
     print("Bot ready!")
+    print(bot.cfg)
+    await bot.cfg.start()
 
 
 @bot.event
