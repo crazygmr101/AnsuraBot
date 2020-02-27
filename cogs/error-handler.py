@@ -26,5 +26,8 @@ class ErrorHandler(commands.Cog):
             await ctx.send("Oops. Doesn't look like I was given the proper permissions for that!\n" +
                            str(error))
 
+        else:
+            raise error
+
 def setup(bot):
     bot.add_cog(ErrorHandler(bot))

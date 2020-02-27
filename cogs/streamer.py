@@ -1,5 +1,5 @@
 import os
-
+import cogs
 import requests
 from discord.ext import commands
 import discord
@@ -39,6 +39,23 @@ class Streamer(commands.Cog):
         embed.set_thumbnail(url=j['user']['avatarUrl'])
         await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.check_any(
+        commands.has_permissions(manage_roles=True, manage_guild=True),
+        commands.is_owner(),
+        commands.has_permissions(administrator=True)
+    )
+    async def setstreamrole(self, ctx: commands.Context, role: discord.Role):
+        cfg: cogs.confighandler.ConfigHandler = self.bot.cfg
+        cfg.data[ctx.guild.id]["streamer-role"] = role.id
+        cfg.save()
+        await ctx.send(embed=discord.Embed(title="Role set",description=f"Streamer role set to {role.mention}"))
+
+    @commands.command()
+    async def getstreamrole(self, ctx: commands.Context):
+        cfg: cogs.confighandler.ConfigHandler = self.bot.cfg
+        role = cfg.data[ctx.guild.id]["streamer-role"]
+        await ctx.send(embed=discord.Embed(title="Role set",description=f"Streamer role set to <@&{role}>"))
 
 def setup(bot):
     bot.add_cog(Streamer(bot))
