@@ -1,3 +1,6 @@
+import random
+from typing import Union
+
 from discord.ext import commands
 import discord
 import core.help as HE
@@ -60,6 +63,25 @@ class Fun(commands.Cog):
         message.save('tts.mp3')
         ctx.guild.voice_client.play(discord.FFmpegPCMAudio('tts.mp3'))
 
+    @commands.command()
+    async def cake(self, ctx: commands.Context):
+        if random.randint(1, 5) == 1:
+            msg = 'nah, {0.author.mention}'.format(ctx.message)
+        else:
+            msg = '*gives :cake: to {0.author.mention}*'.format(ctx.message)
+        await ctx.send(msg)
+        await ctx.message.delete()
+
+    @commands.command()
+    async def givecake(self, ctx: commands.Context, user: Union[discord.User,discord.Member]):
+        await ctx.send('*takes :cake: from {0.author.mention} and gives it to {1}*'.format(ctx.message, user.name))
+        await ctx.message.delete()
+
+    @commands.command()
+    async def hug(self, ctx: commands.Context, user: Union[discord.User,discord.Member]):
+        await ctx.send('*{0.author.mention} hugs {1}*'.format(ctx, user.name))
+        await ctx.message.delete()
+
 
 
 
@@ -67,3 +89,6 @@ def setup(bot):
     bot.add_cog(Fun(bot))
     HE.HelpEntries.register("ship", "%ship @person1 @person2", "Ship <3")
     HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers", "Alias: xc")
+    HE.HelpEntries.register("cake", "%cake", "Try to get cake")
+    HE.HelpEntries.register("givecake", "%givecake @user", "Give cake, cuz sharing is caring :D")
+    HE.HelpEntries.register("hug", "%hug @user", "HUGGGGGGGGGGGGGGGGGGGGGGGGGGG")
