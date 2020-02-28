@@ -77,7 +77,7 @@ class Util(commands.Cog):
             return
         s = input(">")
         while (s != "quit"):
-            await ctx.send("`CONSOLE:` " + s)
+            await ctx.send(s)
             s = input(">")
 
     @commands.command()
