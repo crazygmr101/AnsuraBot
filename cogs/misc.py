@@ -30,8 +30,8 @@ class Misc(commands.Cog):
         e.colour = author.color
         e.title = author.display_name
         e.description = msg
-        await msg_o.delete()
         await ctx.send(embed=e)
+        await msg_o.delete()
 
     @commands.command(aliases=["av"])
     async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
