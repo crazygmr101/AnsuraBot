@@ -66,13 +66,35 @@ class Util(commands.Cog):
 
     @commands.command()
     async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+        def val_or_space(val: str): return "-" if val == "" else val
         e = discord.Embed()
         e.title = "Role: " + r.name
         e.colour = r.colour
-        e.add_field(name="Members", value=" ".join([
-            m.mention for m in r.members
-        ]))
+        online = []
+        offline = []
+        m: discord.Member
+        for m in r.members:
+            if m.status == discord.Status.offline:
+                if len(offline) < 30: offline.append(m)
+            else:
+                if len(online) < 30: online.append(m)
+            if len(offline) > 29 and len(online) > 29:
+                break
+        if len(r.members) == 0:
+            e.description = f"No members with role"
+        else:
+            e.description = f"Listing {len(online) + len(offline)} of {len(r.members)}"
+            e.add_field(name=f"Online ({len(online)})", value=val_or_space("".join([m.mention for m in online])))
+            e.add_field(name=f"Offline ({len(offline)})", value=val_or_space("".join([m.mention for m in offline])))
         await ctx.send(embed=e)
+
+    @role.error
+    async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
+        if isinstance(error, discord.ext.commands.ConversionError) or\
+           isinstance(error, discord.ext.commands.BadArgument):
+            await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
+        else:
+            raise error
 
 
     @commands.command(pass_context=True)
