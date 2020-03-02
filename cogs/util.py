@@ -3,14 +3,12 @@ from typing import Union
 from discord.ext import commands
 import discord
 import core.help as HE
-import core.messages as MT
 import core.database as AD
 
 class Util(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Util cog loaded")
-        self.tracker = MT.MessageTracker(bot)
         self.db = AD.AnsuraDatabase()
 
     @commands.command()
@@ -56,20 +54,6 @@ class Util(commands.Cog):
     @commands.command()
     async def ping(self, ctx: discord.ext.commands.Context):
         await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
-
-    @commands.command(pass_context=True)
-    async def seen(self, ctx: discord.ext.commands.Context, user: Union[discord.Member,discord.User]):
-        async with ctx.channel.typing():
-            try:
-                if user is discord.User:
-                    raise Exception
-                await ctx.send(embed=await self.tracker.get_last_message_embed(user))
-            except:
-                e = discord.Embed()
-                e.color = 0xff0000
-                e.title = "Uh oh..."
-                e.description = "Something oofed. Is the user in the server?"
-                await ctx.send(embed=e)
 
     @commands.command()
     async def tthru(self, ctx:discord.ext.commands.Context):
