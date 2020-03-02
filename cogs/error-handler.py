@@ -8,7 +8,7 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
-        if hasattr(ctx.command, 'on_error'):
+        if hasattr(ctx.command, 'error'):
             return
 
         ignored = (commands.CommandNotFound, commands.UserInputError)

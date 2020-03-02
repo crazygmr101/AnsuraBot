@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 import core.help as HE
 import gtts
+import requests
 
 
 class Fun(commands.Cog):
@@ -79,7 +80,10 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def hug(self, ctx: commands.Context, user: Union[discord.User,discord.Member]):
-        await ctx.send('*{0.author.mention} hugs {1}*'.format(ctx, user.name))
+        e = discord.Embed()
+        e.title = f'{ctx.author.name} hugs {user.name}'
+        e.set_image(url=requests.get("https://nekos.life/api/v2/img/hug").json()["url"])
+        await ctx.send(embed=e)
         await ctx.message.delete()
 
 

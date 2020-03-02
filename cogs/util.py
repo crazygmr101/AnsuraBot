@@ -3,14 +3,12 @@ from typing import Union
 from discord.ext import commands
 import discord
 import core.help as HE
-import core.messages as MT
 import core.database as AD
 
 class Util(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Util cog loaded")
-        self.tracker = MT.MessageTracker(bot)
         self.db = AD.AnsuraDatabase()
 
     @commands.command()
@@ -57,20 +55,6 @@ class Util(commands.Cog):
     async def ping(self, ctx: discord.ext.commands.Context):
         await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
-    @commands.command(pass_context=True)
-    async def seen(self, ctx: discord.ext.commands.Context, user: Union[discord.Member,discord.User]):
-        async with ctx.channel.typing():
-            try:
-                if user is discord.User:
-                    raise Exception
-                await ctx.send(embed=await self.tracker.get_last_message_embed(user))
-            except:
-                e = discord.Embed()
-                e.color = 0xff0000
-                e.title = "Uh oh..."
-                e.description = "Something oofed. Is the user in the server?"
-                await ctx.send(embed=e)
-
     @commands.command()
     async def tthru(self, ctx:discord.ext.commands.Context):
         if ctx.author.id != 267499094090579970:
@@ -82,13 +66,35 @@ class Util(commands.Cog):
 
     @commands.command()
     async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+        def val_or_space(val: str): return "-" if val == "" else val
         e = discord.Embed()
         e.title = "Role: " + r.name
         e.colour = r.colour
-        e.add_field(name="Members", value=" ".join([
-            m.mention for m in r.members
-        ]))
+        online = []
+        offline = []
+        m: discord.Member
+        for m in r.members:
+            if m.status == discord.Status.offline:
+                if len(offline) < 30: offline.append(m)
+            else:
+                if len(online) < 30: online.append(m)
+            if len(offline) > 29 and len(online) > 29:
+                break
+        if len(r.members) == 0:
+            e.description = f"No members with role"
+        else:
+            e.description = f"Listing {len(online) + len(offline)} of {len(r.members)}"
+            e.add_field(name=f"Online ({len(online)})", value=val_or_space("".join([m.mention for m in online])))
+            e.add_field(name=f"Offline ({len(offline)})", value=val_or_space("".join([m.mention for m in offline])))
         await ctx.send(embed=e)
+
+    @role.error
+    async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
+        if isinstance(error, discord.ext.commands.ConversionError) or\
+           isinstance(error, discord.ext.commands.BadArgument):
+            await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
+        else:
+            raise error
 
 
     @commands.command(pass_context=True)
