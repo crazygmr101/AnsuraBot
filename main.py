@@ -33,6 +33,13 @@ if __name__ == '__main__':
 async def on_ready():
     await xchat.init_channels()
     print("Bot ready!")
+    await bot.change_presence(
+        status=discord.Status.online,
+        activity=discord.Activity(
+            name=str(len(bot.guilds)) + " servers | %help",
+            type=discord.ActivityType.watching
+        )
+    )
     print(bot.cfg)
     await bot.cfg.start()
 
