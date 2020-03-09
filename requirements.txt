@@ -1,4 +1,4 @@
-
+dblpy==0.3.4
 Click==7.0
 Pillow==7.0.0
 Pint==0.9
