@@ -122,8 +122,10 @@ class Util(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     @commands.has_permissions(manage_messages=True)
-    async def embed(self, ctx: discord.ext.commands.Context, ch: discord.TextChannel,
-                    title: str, desc: str, color: discord.Colour, id: int = 0):
+    async def embed(self, ctx: discord.ext.commands.Context, title: str, desc: str, ch: discord.TextChannel = None,
+                    color: discord.Colour = None, id: int = 0):
+        color = ctx.author.color if color is None else color
+        ch = ctx.channel if ch is None else ch
         e = discord.Embed()
         e.title = title
         e.description = desc
@@ -155,4 +157,6 @@ def setup(bot):
     HE.HelpEntries.register("gametags", "%gametags @user", "Look up a user's gamertags", "Alias: gt")
     HE.HelpEntries.register("who","%who tag","Find a user#1234 by gamertag")
     HE.HelpEntries.register("role", "%role rolename", "Lists users in a role")
-    HE.HelpEntries.register("embed", "%embed #channel title description color <id if editing>", "Sends of edits an embed")
+    HE.HelpEntries.register("embed", "%embed title description channel color <id if editing>",
+                            "Sends or edits an embed", "`channel` defaults to current channel\n"
+                                                       "`color` defaults to author's role color")
