@@ -119,6 +119,22 @@ class Util(commands.Cog):
         s += "```"
         await ctx.send(s)
 
+    @commands.command()
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.has_permissions(manage_messages=True)
+    async def embed(self, ctx: discord.ext.commands.Context, ch: discord.TextChannel,
+                    title: str, desc: str, color: discord.Colour, id: int = 0):
+        e = discord.Embed()
+        e.title = title
+        e.description = desc
+        e.colour = color
+        if id == 0:
+            await ch.send(embed=e)
+            await ctx.send()
+        else:
+            message = await ch.fetch_message(id)
+            await message.edit(embed=e)
+
     @commands.Cog.listener()
     async def on_command(self, ctx: discord.ext.commands.Context):
         print(str(ctx.command) + " command called with " + str(ctx.invoked_with))
@@ -138,3 +154,4 @@ def setup(bot):
     HE.HelpEntries.register("gametags", "%gametags @user", "Look up a user's gamertags", "Alias: gt")
     HE.HelpEntries.register("who","%who tag","Find a user#1234 by gamertag")
     HE.HelpEntries.register("role", "%role rolename", "Lists users in a role")
+    HE.HelpEntries.register("embed", "%embed #channel title description color <id if editing>", "Sends of edits an embed")
