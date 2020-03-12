@@ -128,6 +128,7 @@ class Util(commands.Cog):
         e.title = title
         e.description = desc
         e.colour = color
+        e.set_author(icon_url=ctx.author.avatar_url, name=ctx.author.name)
         if id == 0:
             await ch.send(embed=e)
             await ctx.send()
