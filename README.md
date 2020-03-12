@@ -1,3 +1,6 @@
+# Invite Link
+[Click here](https://discordapp.com/api/oauth2/authorize?client_id=603640674234925107&permissions=0&redirect_uri=https%3A%2F%2Fdiscordapp.com%2Fapi%2Foauth2%2Fauthorize&scope=bot) to invite me.
+
 # Image Commands - %image
 Usage - `%image filter_list`<br><br>
 Valid Filters

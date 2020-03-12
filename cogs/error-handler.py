@@ -16,7 +16,7 @@ class ErrorHandler(commands.Cog):
         error = getattr(error, 'original', error)
 
         if isinstance(error, ignored):
-            return
+            print(error)
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send("You can't do that! >.>\n" +
@@ -27,7 +27,7 @@ class ErrorHandler(commands.Cog):
                            str(error))
 
         else:
-            raise error
+            print(error)
 
 def setup(bot):
     bot.add_cog(ErrorHandler(bot))
