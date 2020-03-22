@@ -9,6 +9,26 @@ class AnsuraDatabase:
         self.conn: sqlite3.Connection = sqlite3.connect("users.db")
         self.cursor: sqlite3.Cursor = self.conn.cursor()
 
+    def lookup_timezone(self, userid: int):
+        if not self.has_timezone(userid):
+            self.add_timezone(userid)
+        return self.cursor.execute("select * from timezones where user=?", (userid,)).fetchone()
+
+    def add_timezone(self, userid: int):
+        self.cursor.execute("insert into timezones values (?,?)", (userid, None))
+        print("Empty tz record added for user " + str(userid))
+        self.conn.commit()
+
+    def set_timezone(self, userid: int, tz: str):
+        if not self.has_timezone(userid):
+            self.add_timezone(userid)
+        self.cursor.execute("update timezones set timezone=? where user=?", (tz, userid))
+        self.conn.commit()
+
+    def has_timezone(self, userid: int):
+        assert userid is not None
+        return self.cursor.execute("select * from timezones where user=?", (userid,)).fetchone() is not None
+
     def add_gaming_record(self, userid: int):
         self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?)", (userid, None, None, None, None, None, None, None))
         print("Empty record added for user " + str(userid))

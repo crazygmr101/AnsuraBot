@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import Union
 
+import pytz
 from discord.ext import commands
 import discord
 import core.help as HE
@@ -9,7 +11,8 @@ class Util(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Util cog loaded")
-        self.db = AD.AnsuraDatabase()
+        bot.db = AD.AnsuraDatabase()
+        self.db = bot.db
 
     @commands.command()
     async def xbox(self, ctx: discord.ext.commands.Context, username):
@@ -44,11 +47,16 @@ class Util(commands.Cog):
         e = discord.Embed()
         e.colour = user.color
         e.title = user.display_name
+        tz = self.db.lookup_timezone(user.id)[1]
+        if tz is not None:
+            now_utc = datetime.now(pytz.timezone("UTC"))
+            offset = now_utc.astimezone(pytz.timezone(tz)).strftime("%z")
         e.add_field(name="XBox", value=rec[2] if rec[2] is not None else "N/A")
         e.add_field(name="Mojang", value=rec[1] if rec[1] is not None else "N/A")
         e.add_field(name="Youtube", value=rec[3] if rec[3] is not None else "N/A")
         e.add_field(name="Twitch", value=rec[4] if rec[4] is not None else "N/A")
         e.add_field(name="Mixer", value=rec[5] if rec[5] is not None else "N/A")
+        e.add_field(name="Time Zone", value=f"{tz} ({offset})" if tz is not None else "N/A")
         await ctx.send(embed=e)
 
     @commands.command()
