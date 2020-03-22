@@ -33,6 +33,7 @@ if __name__ == '__main__':
 @bot.event
 async def on_ready():
     await xchat.init_channels()
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game("%help"))
     print("Bot ready!")
     print(bot.cfg)
     await bot.cfg.start()
