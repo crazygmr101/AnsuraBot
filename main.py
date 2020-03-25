@@ -22,7 +22,7 @@ xchat = Crosschat(bot)
 
 initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
                       'cogs.administration', 'cogs.misc', 'cogs.minecraft',
-                      'cogs.fun', 'cogs.owner', 'cogs.image',
+                      'cogs.fun', 'cogs.owner', 'cogs.image', 'cogs.neko-life',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
                       'cogs.dbl', 'cogs.timezones']
 if __name__ == '__main__':

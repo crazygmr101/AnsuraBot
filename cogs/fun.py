@@ -79,14 +79,6 @@ class Fun(commands.Cog):
         await ctx.send('*takes :cake: from {0.author.mention} and gives it to {1}*'.format(ctx.message, user.name))
         await ctx.message.delete()
 
-    @commands.command()
-    async def hug(self, ctx: commands.Context, user: Union[discord.User,discord.Member]):
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} hugs {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/hug").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
-
     @commands.command(aliases=["pbc", "chicken"])
     async def placeblock_chicken(self, ctx: commands.Context):
         await ctx.send(random.choice("🐔,🐤,🐥,🐣".split(",")))
