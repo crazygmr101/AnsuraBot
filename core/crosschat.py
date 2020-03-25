@@ -3,7 +3,7 @@ from typing import List
 from discord import Guild, TextChannel
 from discord.ext import commands
 import discord
-
+import discord.errors
 
 class Crosschat:
     def __init__(self, bot: commands.Bot):
@@ -43,11 +43,16 @@ class Crosschat:
         e.colour = self.colors[int(guild.id)]
         user: discord.User = message.author
         e.description = message.content
-        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx", icon_url=user.avatar_url)
+        err_s = ""
+        try:
+            await message.delete()
+        except discord.errors.Forbidden as err:
+            if err.status == 403:
+                err_s = " | Could not delete from source server"
+        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s, icon_url=user.avatar_url)
         for k in self.channels.keys():
             if self.channels[k] == channel.id:
                 pass
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
             if c is not None:
                 await c.send(embed=e)
-        await message.delete()
