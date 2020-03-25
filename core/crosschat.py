@@ -42,8 +42,8 @@ class Crosschat:
         e.title = f"Chat from {guild.name}"
         e.colour = self.colors[int(guild.id)]
         user: discord.User = message.author
-        e.set_thumbnail(url=user.avatar_url)
-        e.add_field(name=user.name + "#" + str(user.discriminator)[0:2] + "xx", value=message.content)
+        e.description = message.content
+        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx", icon_url=user.avatar_url)
         for k in self.channels.keys():
             if self.channels[k] == channel.id:
                 pass
