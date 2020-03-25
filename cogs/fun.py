@@ -111,4 +111,3 @@ def setup(bot):
     HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers", "Alias: xc")
     HE.HelpEntries.register("cake", "%cake", "Try to get cake")
     HE.HelpEntries.register("givecake", "%givecake @user", "Give cake, cuz sharing is caring :D")
-    HE.HelpEntries.register("hug", "%hug @user", "HUGGGGGGGGGGGGGGGGGGGGGGGGGGG")
