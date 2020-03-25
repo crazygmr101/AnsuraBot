@@ -39,7 +39,7 @@ class Crosschat:
         guild: discord.Guild = channel.guild
         author: discord.Member = message.author
         e = discord.Embed()
-        e.title = f"Chat from {guild.name}"
+        e.title = f"Chat from *{guild.name}*"
         e.colour = self.colors[int(guild.id)]
         user: discord.User = message.author
         e.description = message.content
