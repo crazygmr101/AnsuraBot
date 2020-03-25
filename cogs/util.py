@@ -81,19 +81,20 @@ class Util(commands.Cog):
         online = []
         offline = []
         m: discord.Member
-        for m in r.members:
-            if m.status == discord.Status.offline:
-                if len(offline) < 30: offline.append(m)
-            else:
-                if len(online) < 30: online.append(m)
-            if len(offline) > 29 and len(online) > 29:
-                break
         if len(r.members) == 0:
             e.description = f"No members with role"
-        else:
-            e.description = f"Listing {len(online) + len(offline)} of {len(r.members)}"
-            e.add_field(name=f"Online ({len(online)})", value=val_or_space("".join([m.mention for m in online])))
-            e.add_field(name=f"Offline ({len(offline)})", value=val_or_space("".join([m.mention for m in offline])))
+            await ctx.send(embed=e)
+            return
+        for m in r.members:
+            if m.status == discord.Status.offline:
+                offline.append(m)
+            else:
+                online.append(m)
+        online_t = [x for x in (online[0::29] if len(online) > 29 else online)]
+        offline_t = [x for x in (offline[0::29] if len(offline) > 29 else offline)]
+        e.description = f"Listing {len(online) + len(offline)} of {len(r.members)}"
+        e.add_field(name=f"Online ({len(online_t)} of {len(online)})", value=val_or_space(" ".join([m.mention for m in online])))
+        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})", value=val_or_space(" ".join([m.mention for m in offline])))
         await ctx.send(embed=e)
 
     @role.error
