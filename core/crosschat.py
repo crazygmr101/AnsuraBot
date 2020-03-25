@@ -49,6 +49,8 @@ class Crosschat:
         except discord.errors.Forbidden as err:
             if err.status == 403:
                 err_s = " | Could not delete from source server"
+        except discord.errors.NotFound as e:
+            pass
         e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s, icon_url=user.avatar_url)
         for k in self.channels.keys():
             if self.channels[k] == channel.id:
