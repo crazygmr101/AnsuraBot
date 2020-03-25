@@ -60,19 +60,6 @@ class Util(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ping(self, ctx: discord.ext.commands.Context):
-        await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
-
-    @commands.command()
-    async def tthru(self, ctx:discord.ext.commands.Context):
-        if ctx.author.id != 267499094090579970:
-            return
-        s = input(">")
-        while (s != "quit"):
-            await ctx.send(s)
-            s = input(">")
-
-    @commands.command()
     async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
         def val_or_space(val: str): return "-" if val == "" else val
         e = discord.Embed()

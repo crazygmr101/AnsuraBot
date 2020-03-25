@@ -33,7 +33,9 @@ class Misc(commands.Cog):
             e.colour = user.color
         await ctx.send(embed=e)
 
-
+    @commands.command()
+    async def ping(self, ctx: discord.ext.commands.Context):
+        await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
 
 def setup(bot):
