@@ -1,3 +1,4 @@
+import math
 import random
 from typing import Union
 
@@ -23,8 +24,8 @@ class Fun(commands.Cog):
             if len(s.split(" ")) > 1:
                 ar = s.split(" ")
                 return [
-                    " ".join(ar[:1]),
-                    " ".join(ar[1:])
+                    " ".join(ar[:math.floor(len(s.split(" "))/2)]),
+                    " ".join(ar[math.floor(len(s.split(" "))/2):])
                 ]
             if len(s.split("_")) > 1:
                 ar = s.split("_")
@@ -78,13 +79,28 @@ class Fun(commands.Cog):
         await ctx.send('*takes :cake: from {0.author.mention} and gives it to {1}*'.format(ctx.message, user.name))
         await ctx.message.delete()
 
+    @commands.command(aliases=["pbc", "chicken"])
+    async def placeblock_chicken(self, ctx: commands.Context):
+        await ctx.send(random.choice("🐔,🐤,🐥,🐣".split(",")))
+
     @commands.command()
-    async def hug(self, ctx: commands.Context, user: Union[discord.User,discord.Member]):
+    async def maddify(self, ctx: commands.Context):
         e = discord.Embed()
-        e.title = f'{ctx.author.name} hugs {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/hug").json()["url"])
+        msg: str = ctx.message.content
+        msg_o : discord.Message = ctx.message
+        msg = " ".join(msg.split(" ")[1::])
+        replacements = [
+            "a,e,i,o,u,A,E,I,O,U".split(","),
+            "ä,ë,ï,ö,ü,Ä,Ë,Ï,Ö,Ü".split(",")
+        ]
+        for i in range(len(replacements[0])):
+            msg = msg.replace(replacements[0][i], replacements[1][i])
+        author: discord.Member = ctx.author
+        e.colour = author.color
+        e.title = author.display_name
+        e.description = msg
         await ctx.send(embed=e)
-        await ctx.message.delete()
+        await msg_o.delete()
 
 
 

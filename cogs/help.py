@@ -37,9 +37,8 @@ class Help(commands.Cog):
         e.add_field(name="Term",value=cmd)
         if len(cmds) > 0:
             e.add_field(name="Commands",
-                        value="\n".join(i.cmd for i in cmds))
-            e.add_field(name="Do %help for the command to view help",
-                        value="-")
+                        value=", ".join(i.cmd for i in cmds))
+            e.description = "Do %help for the command to view help"
         await ctx.send(embed=e)
 
 
