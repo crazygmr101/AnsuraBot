@@ -2,6 +2,7 @@ import discord
 import requests
 from discord.ext import commands
 import random
+from core.help import HelpEntries as help
 
 class NekoLife(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -62,3 +63,6 @@ class NekoLife(commands.Cog):
 
 def setup(bot):
     bot.add_cog(NekoLife(bot))
+    for x in ["hug", "kiss", "pat", "poke", "cuddle"]:
+        help.register(x, f"%{x} @user", f"{x} a user :)")
+    help.register("meow", "%meow", "Cute cat pics, who doesn't like those?")
