@@ -23,6 +23,7 @@ def ping(url: str):
             return ar[-7].strip(","), ar[-4].strip(",")
     except Exception as e:
         print(e)
+        return "ERR", "ERR"
 
 
 class Minecraft(commands.Cog):
@@ -100,9 +101,35 @@ class Minecraft(commands.Cog):
             c += 1
         await m.edit(content="", embed=embed)
 
+    @commands.command()
+    async def owping(self, ctx: discord.ext.commands.Context):
+        embed = discord.Embed()
+        lol_ips = {
+            "US West": "24.105.30.129",
+            "US Central": "24.105.62.129",
+            "Europe 1": "185.60.112.157",
+            "Europe 2": "185.60.114.159",
+            "Korea": "211.234.110.1",
+            "Taiwan": "203.66.81.98"
+        }
+        m: discord.Message = await ctx.send("Pinging...")
+        c = 1
+        embed.description = "Note: These pings are from Canada, yours may vary"
+        for i in lol_ips.keys():
+            p = ping(lol_ips[i])
+            embed.add_field(
+                name=i,
+                value=f"{p[0]}, {p[1]}",
+                inline=False
+            )
+            await m.edit(content=f"Pinging {c} of 6...", embed=embed)
+            c += 1
+        await m.edit(content="", embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Minecraft(bot))
     HE.HelpEntries.register("jping", ["%jping server", "%jping server:port"], "Pings a java server")
     HE.HelpEntries.register("bping", "%bping server port", "Pings a bedrock server")
     HE.HelpEntries.register("lolping", "%lolping", "Pings LoL servers")
+    HE.HelpEntries.register("owping", "%owping", "Pings Overwatch servers servers")
