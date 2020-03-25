@@ -48,6 +48,17 @@ class NekoLife(commands.Cog):
         await ctx.send(embed=e)
         await ctx.message.delete()
 
+    @commands.command()
+    async def meow(self, ctx: commands.Context):
+        e = discord.Embed()
+        meow_text = random.choice(["(^-人-^)","(^・ω・^ )","(=;ェ;=)","(=^・^=)","(=^・ｪ・^=)","(=^‥^=)","(=ＴェＴ=)",
+                                   "(=ｘェｘ=)","＼(=^‥^)/`","~(=^‥^)/","└(=^‥^=)┐","ヾ(=ﾟ・ﾟ=)ﾉ","ヽ(=^・ω・^=)丿",
+                                   "d(=^・ω・^=)b","o(^・x・^)o"])
+        e.title = f'Meow! {meow_text}'
+        e.set_image(url=requests.get("https://nekos.life/api/v2/img/meow").json()["url"])
+        await ctx.send(embed=e)
+        await ctx.message.delete()
+
 
 def setup(bot):
     bot.add_cog(NekoLife(bot))
