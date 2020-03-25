@@ -77,11 +77,19 @@ class Util(commands.Cog):
                 offline.append(m)
             else:
                 online.append(m)
-        online_t = [x for x in (online[0::29] if len(online) > 29 else online)]
-        offline_t = [x for x in (offline[0::29] if len(offline) > 29 else offline)]
-        e.description = f"Listing {len(online) + len(offline)} of {len(r.members)}"
-        e.add_field(name=f"Online ({len(online_t)} of {len(online)})", value=val_or_space(" ".join([m.mention for m in online])))
-        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})", value=val_or_space(" ".join([m.mention for m in offline])))
+        online_t = []
+        for x in online:
+            online_t.append(x)
+            if len(online_t) > 30: break
+        offline_t = []
+        for x in offline:
+            offline_t.append(x)
+            if len(offline_t) > 30: break
+        e.description = f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}"
+        e.add_field(name=f"Online ({len(online_t)} of {len(online)})",
+                    value=val_or_space(" ".join([m.mention for m in online_t])))
+        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})",
+                    value=val_or_space(" ".join([m.mention for m in offline_t])))
         await ctx.send(embed=e)
 
     @role.error
