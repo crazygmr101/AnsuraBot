@@ -1,3 +1,4 @@
+import math
 import random
 from typing import Union
 
@@ -23,8 +24,8 @@ class Fun(commands.Cog):
             if len(s.split(" ")) > 1:
                 ar = s.split(" ")
                 return [
-                    " ".join(ar[:1]),
-                    " ".join(ar[1:])
+                    " ".join(ar[:math.floor(len(s.split(" "))/2)]),
+                    " ".join(ar[math.floor(len(s.split(" "))/2):])
                 ]
             if len(s.split("_")) > 1:
                 ar = s.split("_")
