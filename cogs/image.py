@@ -13,10 +13,34 @@ class Image(commands.Cog):
 
 
     @commands.command()
-    async def image(self, ctx: commands.Context, cmd: str = None):
+    async def image(self, ctx: commands.Context, filter_list: str = None):
+        """
+        Performs image processing on an *attached image*
+        filter_list is a comma-separated list of the following filters
+        rotate [n] - rotates an image n degrees counter-clockwise.
+        autocontrast - stretches the image over the widest range possible
+        invert - inverts the image's colors
+        grayscale
+        sepia
+        posterize [n] - keeps n bits of the image's colors
+        solarize [n] - inverts values with a luminance above n
+            - n defaults to 128 or half-brightness
+        flip - flips an image top-to-bottom
+        mirror - flips an image right-to-left
+        blur [n] - applies a gaussian blur with a radius of n pixels
+            - n defaults to 2
+        scale [n] - scales an image, with bicubic filtering
+        pscale [n] - scales an image, with nearest pixel filtering
+        scalexy [w] [h] - scales an image by relative width and height with bicubic pixel filtering
+        pscalexy [w] [h] - scales an image by relative width and height with nearest pixel filtering
+        potography - applies %image pscalexy 0.05 0.25, pscalexy 20 4, posterize 2, sepia, rotate 25
+        matrix [w] [h] - scales the image to a matrix of w by h, and scales it back to the image size
+        NOTE: for [p]scale[xy] commands, n, w , or h are all *relative*. A value of 1 means no scaling is done (100%)
+        SEE: https://github.com/crazygmr101/AnsuraBot/blob/master/README.md
+        """
         message: discord.Message = ctx.message
         print(message.attachments)
-        if cmd is None:
+        if filter_list is None:
             await ctx.send("I need a command telling me what to do with the image")
             return
         if not message.attachments or len(message.attachments) == 0:

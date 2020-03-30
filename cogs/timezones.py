@@ -11,6 +11,7 @@ class Timezones(commands.Cog):
 
     @commands.command()
     async def gettz(self, ctx: commands.Context, user: discord.Member):
+        """Gets a user's timezone"""
         tz = self.db.lookup_timezone(user.id)[1]
         e = discord.Embed()
         if tz is None:
@@ -24,6 +25,7 @@ class Timezones(commands.Cog):
 
     @commands.command()
     async def time(self, ctx: commands.Context, user: discord.Member):
+        """Checks the time of a user"""
         try:
             tz = self.db.lookup_timezone(user.id)[1]
             e = discord.Embed()
@@ -43,6 +45,7 @@ class Timezones(commands.Cog):
 
     @commands.command(aliases=["timezone","tz"])
     async def settz(self, ctx: commands.Context, tz: str):
+        """sets your timezone"""
         try:
             zone = pytz.timezone(tz)
             self.db.set_timezone(ctx.author.id, zone.zone)

@@ -17,12 +17,12 @@ def get_prefix(bot, message):
 
 
 bot = commands.Bot(command_prefix=get_prefix)
-bot.remove_command('help')
+# bot.remove_command('help')
 xchat = Crosschat(bot)
 
-initial_extensions = ['cogs.util', 'cogs.conversation', 'cogs.map', 'cogs.help',
+initial_extensions = ['cogs.gamertags', 'cogs.conversation', 
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
-                      'cogs.fun', 'cogs.owner', 'cogs.image', 'cogs.neko-life',
+                      'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
                       'cogs.dbl', 'cogs.timezones']
 if __name__ == '__main__':
