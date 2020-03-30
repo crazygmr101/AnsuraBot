@@ -142,12 +142,6 @@ class Util(commands.Cog):
             message = await ch.fetch_message(id)
             await message.edit(embed=e)
 
-    @commands.Cog.listener()
-    async def on_command(self, ctx: discord.ext.commands.Context):
-        print(str(ctx.command) + " command called with " + str(ctx.invoked_with))
-        print("\tUser: " + str(ctx.message.author.id))
-        print("\t>>>>> " + ctx.message.content)
-
 
 
 def setup(bot):
