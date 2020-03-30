@@ -1,3 +1,4 @@
+import asyncio
 import subprocess
 
 import discord
@@ -9,20 +10,30 @@ import re
 import core.help as HE
 import socket
 import json
+import platform
+import concurrent.futures
 
+async def ping(url: str):
+    ping_var = "-n" if platform.system() == "Windows" else "-c"
 
-def ping(url: str):
+    def pshell(url: str):
+        return str(subprocess.check_output(["ping", url, ping_var, "2"]), "utf-8")
     try:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            s = await asyncio.get_event_loop().run_in_executor(pool, pshell, url)
+        print(s)
         try:
-            s = str(subprocess.check_output(["ping", url, "-c", "2"]), "utf-8")
-            ar = s.strip("\n\r").split("\r\n")[-1].split(" ")[-2].split("/")
-            return f"{ar[0]} ms", f"{ar[2]} ms"
+            if platform.system() != "Windows":
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")[-2].split("/")
+                return f"{ar[0]} ms", f"{ar[2]} ms"
+            else:
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")
+                return ar[-7].strip(","), ar[-4].strip(",")
         except Exception as e:
-            s = str(subprocess.check_output(["ping", url, "-n", "2"]), "utf-8")
-            ar = s.strip("\n\r").split("\r\n")[-1].split(" ")
-            return ar[-7].strip(","), ar[-4].strip(",")
+            print(e)
     except Exception as e:
         print(e)
+        print(type(e))
         return "ERR", "ERR"
 
 
@@ -91,7 +102,7 @@ class Minecraft(commands.Cog):
         c = 1
         embed.description = "Note: These pings are from Canada, yours may vary"
         for i in lol_ips.keys():
-            p = ping(lol_ips[i])
+            p = await ping(lol_ips[i])
             embed.add_field(
                 name=i,
                 value=f"{p[0]}, {p[1]}",
@@ -104,7 +115,7 @@ class Minecraft(commands.Cog):
     @commands.command()
     async def owping(self, ctx: discord.ext.commands.Context):
         embed = discord.Embed()
-        lol_ips = {
+        ow_ips = {
             "US West": "24.105.30.129",
             "US Central": "24.105.62.129",
             "Europe 1": "185.60.112.157",
@@ -115,8 +126,8 @@ class Minecraft(commands.Cog):
         m: discord.Message = await ctx.send("Pinging...")
         c = 1
         embed.description = "Note: These pings are from Canada, yours may vary"
-        for i in lol_ips.keys():
-            p = ping(lol_ips[i])
+        for i in ow_ips.keys():
+            p = await ping(ow_ips[i])
             embed.add_field(
                 name=i,
                 value=f"{p[0]}, {p[1]}",
