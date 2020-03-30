@@ -59,47 +59,6 @@ class Util(commands.Cog):
         e.add_field(name="Time Zone", value=f"{tz} ({offset})" if tz is not None else "N/A")
         await ctx.send(embed=e)
 
-    @commands.command()
-    async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
-        def val_or_space(val: str): return "-" if val == "" else val
-        e = discord.Embed()
-        e.title = "Role: " + r.name
-        e.colour = r.colour
-        online = []
-        offline = []
-        m: discord.Member
-        if len(r.members) == 0:
-            e.description = f"No members with role"
-            await ctx.send(embed=e)
-            return
-        for m in r.members:
-            if m.status == discord.Status.offline:
-                offline.append(m)
-            else:
-                online.append(m)
-        online_t = []
-        for x in online:
-            online_t.append(x)
-            if len(online_t) > 30: break
-        offline_t = []
-        for x in offline:
-            offline_t.append(x)
-            if len(offline_t) > 30: break
-        e.description = f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}"
-        e.add_field(name=f"Online ({len(online_t)} of {len(online)})",
-                    value=val_or_space(" ".join([m.mention for m in online_t])))
-        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})",
-                    value=val_or_space(" ".join([m.mention for m in offline_t])))
-        await ctx.send(embed=e)
-
-    @role.error
-    async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
-            await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
-        else:
-            raise error
-
 
     @commands.command(pass_context=True)
     async def who(self, ctx: discord.ext.commands.Context, tag: str):
@@ -122,25 +81,6 @@ class Util(commands.Cog):
             s += u.name + "#" + u.discriminator + " - " + i[1] + ": " + i[2] + "\n"
         s += "```"
         await ctx.send(s)
-
-    @commands.command()
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.has_permissions(manage_messages=True)
-    async def embed(self, ctx: discord.ext.commands.Context, title: str, desc: str, ch: discord.TextChannel = None,
-                    color: discord.Colour = None, id: int = 0):
-        color = ctx.author.color if color is None else color
-        ch = ctx.channel if ch is None else ch
-        e = discord.Embed()
-        e.title = title
-        e.description = desc
-        e.colour = color
-        e.set_author(icon_url=ctx.author.avatar_url, name=ctx.author.name)
-        if id == 0:
-            await ch.send(embed=e)
-            await ctx.send()
-        else:
-            message = await ch.fetch_message(id)
-            await message.edit(embed=e)
 
 
 
