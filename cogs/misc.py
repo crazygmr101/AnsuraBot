@@ -2,7 +2,6 @@ from typing import Union
 
 import discord
 from discord.ext import commands
-import core.help as HE
 import random
 
 class Misc(commands.Cog):
@@ -12,12 +11,16 @@ class Misc(commands.Cog):
 
     @commands.command(aliases=["av"])
     async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+        """Gets a link to a users avatar"""
         if user is None:
             user = ctx.author
         await ctx.send(user.avatar_url)
 
     @commands.command()
     async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+        """
+        Lists members of a role
+        """
         def val_or_space(val: str): return "-" if val == "" else val
         e = discord.Embed()
         e.title = "Role: " + r.name
@@ -61,7 +64,14 @@ class Misc(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.has_permissions(manage_messages=True)
     async def embed(self, ctx: discord.ext.commands.Context, title: str, desc: str, ch: discord.TextChannel = None,
-                    color: discord.Colour = None, id: int = 0):
+                    color: discord.Colour = None, id: int = None):
+        """
+        Creates or edits an embed
+        - ch: defaults to current channel
+        - color: defaults to color of caller's highest role
+        - id: embed id if editing
+        :return: 
+        """
         color = ctx.author.color if color is None else color
         ch = ctx.channel if ch is None else ch
         e = discord.Embed()
@@ -69,7 +79,7 @@ class Misc(commands.Cog):
         e.description = desc
         e.colour = color
         e.set_author(icon_url=ctx.author.avatar_url, name=ctx.author.name)
-        if id == 0:
+        if id is None:
             await ch.send(embed=e)
             await ctx.send()
         else:
@@ -78,6 +88,7 @@ class Misc(commands.Cog):
 
     @commands.command()
     async def info(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+        """Gets info about a user"""
         if user is None:
             user = ctx.author
         e = discord.Embed()
@@ -100,9 +111,3 @@ class Misc(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Misc(bot))
-    HE.HelpEntries.register("placeblock_chicken", "%placeblock_chicken", "Does a <@276365523045056512>.",
-                            "Placeblock chicken. Never forget.\nNOTE: This is NOT *placeblovk fhivkrn*.\n"
-                            "Aliases: pbc, chicken")
-    HE.HelpEntries.register("maddify", "%maddify message", "It's ëpïc")
-    HE.HelpEntries.register("avatar", "%avatar @user", "Gets avatar for user", "Aliases: av")
-    HE.HelpEntries.register("info", "%info @user", "Displays info for a user")

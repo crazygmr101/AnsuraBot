@@ -7,7 +7,6 @@ import requests
 from discord import Embed
 from discord.ext import commands
 import re
-import core.help as HE
 import socket
 import json
 import platform
@@ -37,13 +36,19 @@ async def ping(url: str):
         return "ERR", "ERR"
 
 
-class Minecraft(commands.Cog):
+class Gaming(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Minecraft cog loaded")
 
     @commands.command(pass_context=True)
     async def jping(self, ctx: discord.ext.commands.Context, url: str):
+        """
+        Pings a minecraft java server
+        Command can be used as:
+        - %jping example.com (default port)
+        - %jping example.com:25562 (trailing port)
+        """
         server = mcstatus.MinecraftServer.lookup(url)
         status = server.status()
         e = Embed()
@@ -57,6 +62,13 @@ class Minecraft(commands.Cog):
 
     @commands.command(pass_context=True)
     async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int = 19132):
+        """
+        Pings a minecraft bedrock server
+        Command can be used as:
+        - %bping example.com (uses default port)
+        - %bping example.com:19182 (uses port)
+        - %bping example.com 19182 (uses port)
+        """
         try:
             if len(url.split(":")) == 2:
                 port = int(url.split(":")[1])
@@ -90,6 +102,7 @@ class Minecraft(commands.Cog):
 
     @commands.command()
     async def lolping(self, ctx: discord.ext.commands.Context):
+        """Pings LoL servers"""
         embed = discord.Embed()
         lol_ips = {
             "North America (NA)": "104.160.131.3",
@@ -114,6 +127,7 @@ class Minecraft(commands.Cog):
 
     @commands.command()
     async def owping(self, ctx: discord.ext.commands.Context):
+        """Pings overwatch servers"""
         embed = discord.Embed()
         ow_ips = {
             "US West": "24.105.30.129",
@@ -139,8 +153,4 @@ class Minecraft(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Minecraft(bot))
-    HE.HelpEntries.register("jping", ["%jping server", "%jping server:port"], "Pings a java server")
-    HE.HelpEntries.register("bping", "%bping server port", "Pings a bedrock server")
-    HE.HelpEntries.register("lolping", "%lolping", "Pings LoL servers")
-    HE.HelpEntries.register("owping", "%owping", "Pings Overwatch servers servers")
+    bot.add_cog(Gaming(bot))
