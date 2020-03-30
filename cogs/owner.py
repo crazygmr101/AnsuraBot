@@ -4,7 +4,6 @@ from typing import List, Union
 from discord.ext import commands
 import discord
 import random
-import core.help as help
 
 class Owner(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
@@ -17,6 +16,14 @@ class Owner(commands.Cog):
     @commands.has_permissions(manage_guild=True, manage_nicknames=True)
     @commands.bot_has_permissions(manage_guild=True, manage_nicknames=True)
     async def nick_all(self, ctx: discord.ext.commands.Context, name: str):
+        """
+        Nickname all users in a server according to a pattern
+        <join-num100> - 3 digit padded join num
+        <join-num>
+        <joined> - timestamp of user join
+        <disc>
+        <name>
+        """
         await ctx.send("Nicknaming " + str())
         g: discord.Guild = ctx.guild
         s = 0
@@ -46,6 +53,9 @@ class Owner(commands.Cog):
     @commands.has_permissions(manage_guild=True, manage_nicknames=True)
     @commands.bot_has_permissions(manage_guild=True, manage_nicknames=True)
     async def shufflenicks(self, ctx: discord.ext.commands.Context):
+        """
+        Shuffle the nicknames of all users in a server
+        """
         g = ctx.guild
         a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
         b: List[Union[discord.Member, discord.User]] = [x for x in g.members]
@@ -61,11 +71,15 @@ class Owner(commands.Cog):
     @commands.is_owner()
     @commands.has_permissions(manage_guild=True, manage_roles=True)
     @commands.bot_has_permissions(manage_guild=True, manage_roles=True)
-    async def role_all(self, ctx: discord.ext.commands.Context, role: str):
+    async def role_all(self, ctx: discord.ext.commands.Context, role: discord.Role):
+        """
+        Gives a role to all members of a server
+        - role: the role to give a user
+        """
         g: discord.Guild = ctx.guild
         s = 0
         f = 0
-        r: discord.Role = discord.utils.get(g.roles, name=role)
+        r = role
         i: Union[discord.Member, discord.User]
         a: List[Union[discord.Member, discord.User]] = [x for x in g.members]
         await ctx.send("Giving everyone  " + r.mention)
@@ -85,6 +99,9 @@ class Owner(commands.Cog):
     @commands.command(pass_context=True)
     @commands.is_owner()
     async def guilds(self, ctx: commands.Context):
+        """
+        Gets the list of guilds Ansura is in.
+        """
         g: discord.Guild
         i = 0
         for g in self.bot.guilds:
@@ -95,6 +112,10 @@ class Owner(commands.Cog):
     @commands.command(pass_context=True)
     @commands.is_owner()
     async def ginfo(self, ctx: commands.Context, n: int):
+        """
+        Gets basic guild info of a guild from %guilds
+        - n: guilds list index
+        """
         if n < 0 or n >= len(self.guilds):
             await ctx.send("Invalid number")
             return
@@ -111,6 +132,7 @@ class Owner(commands.Cog):
     @commands.command(pass_context=True)
     @commands.is_owner()
     async def guild_leave(self, ctx: commands.Context, id: int):
+        """Leaves a guild given by <id>"""
         g: discord.Guild = await self.bot.fetch_guild(id)
         await g.leave()
 
@@ -129,11 +151,3 @@ class Owner(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Owner(bot))
-    help.HelpEntries.register("nick_all", "%nick_all nickname-pattern", "Nicknames all the members of a server according to a pattern",
-                              "*Replacements*\n"
-                              "<join-num> - the order someone joined the server\n"
-                              "<join-num100> - same as <join-num>, but padded to 3 digits\n"
-                              "<disc> - the user's discriminator\n"
-                              "<name> - the user's username, without discriminator")
-    help.HelpEntries.register("role_all", "%role_all rolename", "Gives a role to everyone in a server")
-    help.HelpEntries.register("shuffle_nicks", "%shuffle_nicks", "Shuffles nicknames in a server")
