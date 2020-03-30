@@ -16,6 +16,7 @@ class Fun(commands.Cog):
 
     @commands.command(pass_context=True)
     async def ship(self, ctx: commands.Context, user1: discord.Member, user2: discord.Member):
+        """Ships two users.. awww <3"""
         name1: str = user1.display_name
         name2: str = user2.display_name
         def split(s: str):
@@ -49,33 +50,28 @@ class Fun(commands.Cog):
     @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def summon(self, ctx: commands.Context):
+        """Summons Ansura to your voice channel"""
         await ctx.author.voice.channel.connect()
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
     @commands.is_owner()
     async def leave(self, ctx: commands.Context):
+        """Makes Ansura leave your voice channel"""
         await ctx.guild.voice_client.disconnect()
 
     @commands.command(pass_context=True)
     @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def say(self, ctx: commands.Context, text):
+        """Makes ansura say something in the voice channel with TTS"""
         message = gtts.gTTS(text)
         message.save('tts.mp3')
         ctx.guild.voice_client.play(discord.FFmpegPCMAudio('tts.mp3'))
 
     @commands.command()
-    async def cake(self, ctx: commands.Context):
-        if random.randint(1, 5) == 1:
-            msg = 'nah, {0.author.mention}'.format(ctx.message)
-        else:
-            msg = '*gives :cake: to {0.author.mention}*'.format(ctx.message)
-        await ctx.send(msg)
-        await ctx.message.delete()
-
-    @commands.command()
     async def hug(self, ctx: commands.Context, user: discord.Member):
+        """Hug a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} hugs {user.name}'
         e.set_image(url=requests.get("https://nekos.life/api/v2/img/hug").json()["url"])
@@ -84,6 +80,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def pat(self, ctx: commands.Context, user: discord.Member):
+        """Pat a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} pats {user.name}'
         e.set_image(url=requests.get("https://nekos.life/api/v2/img/pat").json()["url"])
@@ -92,6 +89,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def poke(self, ctx: commands.Context, user: discord.Member):
+        """Poke a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} pokes {user.name}'
         e.set_image(url=requests.get("https://nekos.life/api/v2/img/poke").json()["url"])
@@ -100,6 +98,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def cuddle(self, ctx: commands.Context, user: discord.Member):
+        """Cuddle a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} cuddles {user.name}'
         e.set_image(url=requests.get("https://nekos.life/api/v2/img/cuddle").json()["url"])
@@ -108,6 +107,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def kiss(self, ctx: commands.Context, user: discord.Member):
+        """Kiss a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} kisses {user.name}'
         e.set_image(url=requests.get("https://nekos.life/api/v2/img/kiss").json()["url"])
@@ -116,6 +116,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["bork"])
     async def woof(self, ctx: commands.Context):
+        """Sends a dog pic"""
         images = [
             "irXVvTn", "1Hy1Ivm", "snyoQYt", "iTD3btm", "gI2hJgp", "4JW8iDZ", "71ssqGq", "WjNBjzO", "LQOkhKM",
             "eVFf6Oy", "JL4jVlG", "C4E5iAl", "Ck08zJG", "k18Raxy", "aJG7iXc", "CThNFi4", "jg2zL7E", "DaHdglt",
@@ -134,6 +135,7 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def meow(self, ctx: commands.Context):
+        """Sends a cat pic"""
         e = discord.Embed()
         meow_text = random.choice(["(^-人-^)", "(^・ω・^ )", "(=;ェ;=)", "(=^・^=)", "(=^・ｪ・^=)", "(=^‥^=)", "(=ＴェＴ=)",
                                    "(=ｘェｘ=)", "＼(=^‥^)/`", "~(=^‥^)/", "└(=^‥^=)┐", "ヾ(=ﾟ・ﾟ=)ﾉ", "ヽ(=^・ω・^=)丿",
@@ -145,10 +147,12 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["pbc", "chicken"])
     async def placeblock_chicken(self, ctx: commands.Context):
+        """Does a Maddie"""
         await ctx.send(random.choice("🐔,🐤,🐥,🐣".split(",")))
 
     @commands.command()
     async def maddify(self, ctx: commands.Context):
+        """Vöïds a message"""
         e = discord.Embed()
         msg: str = ctx.message.content
         msg_o : discord.Message = ctx.message
@@ -171,7 +175,3 @@ class Fun(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-    HE.HelpEntries.register("ship", "%ship @person1 @person2", "Ship <3")
-    HE.HelpEntries.register("xchat", "%xchat message", "Crosschat between servers", "Alias: xc")
-    HE.HelpEntries.register("cake", "%cake", "Try to get cake")
-    HE.HelpEntries.register("givecake", "%givecake @user", "Give cake, cuz sharing is caring :D")
