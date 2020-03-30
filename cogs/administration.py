@@ -3,7 +3,7 @@ from typing import Union
 from discord.ext import commands
 import discord
 import core.help as HE
-import cogs.util
+import cogs.gamertags
 
 class Administration(commands.Cog):
     def error(self, title, message={}, color=0xff0000):
@@ -38,7 +38,7 @@ class Administration(commands.Cog):
                            self.error("Invalid gametag type"))
             await self.bot.get_cog("Help").help_(ctx, "setgtval")
             return
-        util: cogs.util.Util= self.bot.get_cog("Util")
+        util: cogs.gamertags.Util= self.bot.get_cog("Util")
         db = util.db
         if typ == "xbox": typ = "xboxlive"
         rec = db.lookup_gaming_record(user.id)
