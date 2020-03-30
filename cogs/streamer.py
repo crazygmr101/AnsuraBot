@@ -3,15 +3,15 @@ import cogs
 import requests
 from discord.ext import commands
 import discord
-
+from core.database import AnsuraDatabase
 
 class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         print("Streamer cog loading")
         print(" Opening mixer session...")
+        self.db = bot.db
         self.mixer_key = os.getenv("MIXER")
-        print(f' Loaded mixer API with key {self.mixer_key}')
         self.session = requests.Session()
         self.session.headers.update({'Client-ID': self.mixer_key})
         print(" Mixer session opened")
