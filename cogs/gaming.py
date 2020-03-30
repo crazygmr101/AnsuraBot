@@ -41,7 +41,7 @@ class Gaming(commands.Cog):
         self.bot = bot
         print("Minecraft cog loaded")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def jping(self, ctx: discord.ext.commands.Context, url: str):
         """
         Pings a minecraft java server
@@ -60,7 +60,7 @@ class Gaming(commands.Cog):
         e.add_field(name="Protocol", value="v" + str(status.version.protocol))
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int = 19132):
         """
         Pings a minecraft bedrock server

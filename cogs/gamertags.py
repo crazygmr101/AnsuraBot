@@ -77,7 +77,7 @@ class Util(commands.Cog):
         await ctx.send(embed=e)
 
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def who(self, ctx: discord.ext.commands.Context, tag: str):
         """
         Finds users with a gamertag of <tag>

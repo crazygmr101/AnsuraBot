@@ -18,7 +18,7 @@ class Administration(commands.Cog):
         self.bot = bot
         print("Administration cog loaded")
 
-    @commands.command(pass_context=True,aliases=["sgv"])
+    @commands.command(aliases=["sgv"])
     async def setgtval(self, ctx: discord.ext.commands.Context,
                        typ: str, user: Union[discord.Member, discord.User],
                        val: str):

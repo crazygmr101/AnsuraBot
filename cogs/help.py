@@ -9,11 +9,11 @@ class Help(commands.Cog):
         self.bot = bot
         print("Help cog loaded")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def help(self, ctx: commands.Context, cmd: str = None):
         await self.help_(ctx,cmd)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def helps(self, ctx: commands.Context, cmd: str = None):
         await self.helps_(ctx,cmd)
 

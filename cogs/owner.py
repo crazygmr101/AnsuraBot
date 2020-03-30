@@ -96,7 +96,7 @@ class Owner(commands.Cog):
                 pass
         await ctx.send("Gave " + r.mention + " to " + str(s) + " (" + str(f) + " failed)")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.is_owner()
     async def guilds(self, ctx: commands.Context):
         """
@@ -109,7 +109,7 @@ class Owner(commands.Cog):
             self.guilds.append(g)
             i += 1
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.is_owner()
     async def ginfo(self, ctx: commands.Context, n: int):
         """
@@ -129,7 +129,7 @@ class Owner(commands.Cog):
         e.add_field(name="ID", value=str(g.id))
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.is_owner()
     async def guild_leave(self, ctx: commands.Context, id: int):
         """Leaves a guild given by <id>"""

@@ -14,7 +14,7 @@ class Fun(commands.Cog):
         self.bot = bot
         print("Fun cog loaded")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ship(self, ctx: commands.Context, user1: discord.Member, user2: discord.Member):
         """Ships two users.. awww <3"""
         name1: str = user1.display_name
@@ -46,21 +46,21 @@ class Fun(commands.Cog):
             return [s[:half], s[half:]]
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def summon(self, ctx: commands.Context):
         """Summons Ansura to your voice channel"""
         await ctx.author.voice.channel.connect()
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.has_permissions(manage_messages=True)
     @commands.is_owner()
     async def leave(self, ctx: commands.Context):
         """Makes Ansura leave your voice channel"""
         await ctx.guild.voice_client.disconnect()
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def say(self, ctx: commands.Context, text):
