@@ -18,10 +18,15 @@ class Streamer(commands.Cog):
         print("Streamer cog loaded")
 
     @commands.command()
-    async def profile(self, ctx: commands.Context, ptype: str, user: str):
-        ptype = ptype.lower()
+    async def profile(self, ctx: commands.Context, profile_type: str, username: str):
+        """
+        Looks up a profile.
+        - profile_type: Mixer
+        - username: Username on the service
+        """
+        ptype = profile_type.lower()
         if ptype == "mixer":
-            await self.mixer(ctx, user)
+            await self.mixer(ctx, username)
         else:
             await ctx.send("I don't recognize that profile type ):")
 
@@ -46,6 +51,9 @@ class Streamer(commands.Cog):
         commands.has_permissions(administrator=True)
     )
     async def setstreamrole(self, ctx: commands.Context, role: discord.Role):
+        """
+        Sets the streamer role on a server
+        """
         cfg: cogs.confighandler.ConfigHandler = self.bot.cfg
         cfg.data[ctx.guild.id]["streamer-role"] = role.id
         cfg.save()
@@ -53,6 +61,9 @@ class Streamer(commands.Cog):
 
     @commands.command()
     async def getstreamrole(self, ctx: commands.Context):
+        """
+        Gets the streamer role on a server
+        """
         cfg: cogs.confighandler.ConfigHandler = self.bot.cfg
         role = cfg.data[ctx.guild.id]["streamer-role"]
         await ctx.send(embed=discord.Embed(title="Role set",description=f"Streamer role set to <@&{role}>"))
