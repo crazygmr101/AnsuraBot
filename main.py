@@ -48,11 +48,6 @@ async def on_message(message: discord.Message):
         message.content = "%placeblock_chicken"
         await bot.process_commands(message)
         return
-    """
-    print("Message sent")
-    print("\t" + message.content)
-    print("\tin " + str(message.channel.id) + " by " + str(message.author.id))
-    """
     hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(bot.user.id) + ">)[!\.]*\s*$"
     if message.content == "<@!" + str(bot.user.id) + ">":
         await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
