@@ -24,7 +24,7 @@ initial_extensions = ['cogs.gamertags', 'cogs.conversation',
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
                       'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
-                      'cogs.dbl', 'cogs.timezones']
+                      'cogs.dbl', 'cogs.timezones', 'cogs.tts']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print("= Adding " + ext + " =")
