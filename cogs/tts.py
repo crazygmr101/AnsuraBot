@@ -68,6 +68,12 @@ class TTS(commands.Cog):
 
     async def tts(self, message: discord.Message):
         try:
+            if message.guild.voice_client is None:
+                try:
+                    del self.active_guilds[message.guild.id]
+                    self.queue[message.guild.id] = []
+                    return
+                except: pass
             if message.guild.id not in self.active_guilds.keys():
                 return
             if message.channel.id != self.active_guilds[message.guild.id].id:
