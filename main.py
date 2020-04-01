@@ -24,7 +24,7 @@ initial_extensions = ['cogs.gamertags', 'cogs.conversation',
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
                       'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
-                      'cogs.dbl', 'cogs.timezones']
+                      'cogs.dbl', 'cogs.timezones', 'cogs.tts']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print("= Adding " + ext + " =")
@@ -48,11 +48,6 @@ async def on_message(message: discord.Message):
         message.content = "%placeblock_chicken"
         await bot.process_commands(message)
         return
-    """
-    print("Message sent")
-    print("\t" + message.content)
-    print("\tin " + str(message.channel.id) + " by " + str(message.author.id))
-    """
     hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(bot.user.id) + ">)[!\.]*\s*$"
     if message.content == "<@!" + str(bot.user.id) + ">":
         await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
@@ -62,6 +57,7 @@ async def on_message(message: discord.Message):
                                                   "Hello :D"]))
         return
     await xchat.xchat(message)
+    await bot.get_cog("TTS").tts(message)
     await bot.process_commands(message)
 
 

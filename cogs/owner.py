@@ -13,6 +13,11 @@ class Owner(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    async def setgame(self, ctx: commands.Context, status: str):
+        await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(status))
+
+    @commands.command()
+    @commands.is_owner()
     @commands.has_permissions(manage_guild=True, manage_nicknames=True)
     @commands.bot_has_permissions(manage_guild=True, manage_nicknames=True)
     async def nick_all(self, ctx: discord.ext.commands.Context, name: str):
