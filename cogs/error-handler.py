@@ -6,7 +6,7 @@ class ErrorHandler(commands.Cog):
         self.bot = bot
         print("Error handler loaded")
 
-    @commands.Cog.listener()
+    #@commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
         if hasattr(ctx.command, 'error'):
             return

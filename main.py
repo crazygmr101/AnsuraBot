@@ -57,6 +57,7 @@ async def on_message(message: discord.Message):
                                                   "Hello :D"]))
         return
     await xchat.xchat(message)
+    await bot.get_cog("TTS").tts(message)
     await bot.process_commands(message)
 
 
