@@ -1,3 +1,5 @@
+import glob
+
 from discord.ext import commands
 import re
 import random
@@ -29,6 +31,12 @@ if __name__ == '__main__':
     for ext in initial_extensions:
         print("= Adding " + ext + " =")
         bot.load_extension(ext)
+
+filelist = glob.glob("*.mp3")
+for file in filelist:
+    try: os.remove(file)
+    except: print(f"err removing {file}")
+
 
 @bot.event
 async def on_ready():
