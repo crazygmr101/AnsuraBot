@@ -1,5 +1,5 @@
 import inspect
-from typing import List
+from typing import List, Mapping
 
 from discord.ext import commands
 import discord
@@ -32,9 +32,18 @@ class Help(commands.Cog):
             ))
             return
         else:
+            arg_str = []
+            p: inspect.Parameter
+            for key in c.clean_params:
+                p = c.clean_params[key]
+                print(p.default.__class__)
+                arg_str.append(f"<{p.name}:{p.default}>" if p.default.__class__ is not type else p.name)
             await ctx.send(embed=discord.Embed(
                 title=c.qualified_name,
-                description=f"`%{'|'.join(c.aliases + [c.name])} {', '.join(c.clean_params)}`"
+                description=f"`%{'[' if c.aliases else ''}"
+                            f"{'|'.join(c.aliases + [c.name])}"
+                            f"{']' if c.aliases else ''} "
+                            f"{' '.join(arg_str)}`"
             ).add_field(
                 name="Help",
                 value=c.help or "No help available for this command"
