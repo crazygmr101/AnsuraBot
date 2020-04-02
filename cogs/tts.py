@@ -13,6 +13,7 @@ class TTS(commands.Cog):
         self.bot = bot
         self.active_guilds: Dict[int, discord.TextChannel] = {}
         self.queue: Dict[int, List[str]] = {}
+        self.tts_mutes: Dict[int, List[str]] = {}
 
     @commands.command()
     @commands.is_owner()
@@ -37,6 +38,45 @@ class TTS(commands.Cog):
         message.save('tts.mp3')
         ctx.guild.voice_client.play(discord.FFmpegPCMAudio('tts.mp3'))
 
+    @commands.command(aliases=["tunmute"])
+    @commands.has_guild_permissions(mute_members=True)
+    async def ttsunmute(self, ctx: commands.Context, member: discord.Member = None):
+        if member is None:
+            await ctx.send("You must tag a member")
+            return
+        try:
+            del self.tts_mutes[ctx.guild.id][self.tts_mutes[ctx.guild.id].index(member.id)]
+            await ctx.send(f"TTS unmuted **{member.display_name}**")
+        except:
+            self.tts_mutes[ctx.guild.id].append(member.id)
+            await ctx.send(f"**{member.display_name}** isn't TTS muted")
+
+    @commands.command(aliases=["tmutel"])
+    async def ttsmutelist(self, ctx: commands.Context):
+        """Lists TTS-muted members"""
+        if ctx.guild.id not in self.tts_mutes.keys():
+            await ctx.send("No members TTS muted")
+        if len(self.tts_mutes[ctx.guild.id]) == 0:
+            await ctx.send("No members TTS muted")
+        embed = discord.Embed(title="TTS muted members")
+        embed.add_field(name=f"{len(self.tts_mutes[ctx.guild.id])} members TTS-muted",
+                        value=" ".join([f"<@{x}>" for x in self.tts_mutes[ctx.guild.id]]))
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["tmute"])
+    @commands.has_guild_permissions(mute_members=True)
+    async def ttsmute(self, ctx: commands.Context, member: discord.Member = None):
+        """Makes messages from a member not autotts"""
+        if member is None:
+            await ctx.send("You must tag a member")
+            return
+        try:
+            self.tts_mutes[ctx.guild.id].index(member.id)
+            await ctx.send(f"**{member.display_name}** is already TTS muted")
+        except:
+            self.tts_mutes[ctx.guild.id].append(member.id)
+            await ctx.send(f"TTS muted **{member.display_name}**")
+
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     @commands.bot_has_guild_permissions(speak=True)
@@ -44,6 +84,8 @@ class TTS(commands.Cog):
         """
         Makes Ansura join the voice channel you are in and watch the current channel
         """
+        if ctx.guild.id not in self.tts_mutes.keys():
+            self.tts_mutes[ctx.guild.id] = []
         if ctx.guild.id in self.active_guilds.keys():
             await ctx.send("Already watching a channel! Do %stoptts to stop")
         if not ctx.author.voice:
@@ -67,6 +109,8 @@ class TTS(commands.Cog):
 
 
     async def tts(self, message: discord.Message):
+        if message.content.startswith("%"):
+            return
         try:
             if message.guild.voice_client is None:
                 try:
@@ -77,6 +121,8 @@ class TTS(commands.Cog):
             if message.guild.id not in self.active_guilds.keys():
                 return
             if message.channel.id != self.active_guilds[message.guild.id].id:
+                return
+            if message.author.id in self.tts_mutes[message.guild.id]:
                 return
             msg = gtts.gTTS(f"{message.author.display_name} says {message.content}")
             fname = f"{message.id}"
