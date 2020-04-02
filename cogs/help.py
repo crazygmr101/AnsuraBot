@@ -36,7 +36,6 @@ class Help(commands.Cog):
             p: inspect.Parameter
             for key in c.clean_params:
                 p = c.clean_params[key]
-                print(p.default.__class__)
                 arg_str.append(f"<{p.name}:{p.default}>" if p.default.__class__ is not type else p.name)
             await ctx.send(embed=discord.Embed(
                 title=c.qualified_name,
@@ -55,7 +54,7 @@ class Help(commands.Cog):
         if module is None:
             await self.help(ctx)
             return
-        c: commands.Cog = self.bot.get_cog(module)
+        c: commands.Cog = self.bot.get_cog(module.title()) or self.bot.get_cog(module.upper())
         if c is None:
             await ctx.send(embed=discord.Embed(
                 title="Module not found",
