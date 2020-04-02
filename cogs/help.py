@@ -1,64 +1,80 @@
-from typing import List
+import inspect
+from typing import List, Mapping
 
 from discord.ext import commands
 import discord
 import core.help as HE
+
 
 class Help(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Help cog loaded")
 
-    @commands.command()
-    async def help(self, ctx: commands.Context, cmd: str = None):
-        await self.help_(ctx,cmd)
-
-    @commands.command()
-    async def helps(self, ctx: commands.Context, cmd: str = None):
-        await self.helps_(ctx,cmd)
-
-    async def helps_(self, ctx: commands.Context, cmd: str = None):
-        if cmd is None:
-            await self.help_(ctx, "helps")
+    @commands.command(aliases=["h"])
+    async def help(self, ctx: commands.Context, command: str = None):
+        """Lists modules, or help for a command"""
+        if not command:
+            help = discord.Embed(title="Module List",
+                                 description="Do `%commands modulename` to list commands within a module",
+                                 color=0x004400)
+            for i in self.bot.cogs:
+                if self.bot.cogs[i].qualified_name.lower() not in ["configcog", "errorhandler", "dbl"]:
+                    help.add_field(name=self.bot.cogs[i].qualified_name, value=self.bot.cogs[i].description or "_ _")
+            await ctx.send(embed=help)
             return
-        cmds = []
-        ar: List[HE.HelpEntry] = HE.HelpEntries.cmds
-        for i in ar:
-            if cmd.lower() in i.help.lower() or \
-               cmd.lower() in i.cmd.lower() or \
-               cmd.lower() in i.notes.lower() or \
-               cmd.lower() in " ".join(i.usage).lower():
-                cmds.append(i)
-        if len(cmds) == 1:
-            await self.help_(ctx,cmds[0].cmd)
+        c: commands.Command = self.bot.get_command(command)
+        if c is None:
+            await ctx.send(embed=discord.Embed(
+                title="Command not found",
+                color=0xff0000,
+                description=f"Command `{command}` not found"
+            ))
             return
-        e = discord.Embed()
-        e.title = "Search" if len(cmds) > 0 else "No results"
-        e.add_field(name="Term",value=cmd)
-        if len(cmds) > 0:
-            e.add_field(name="Commands",
-                        value=", ".join(i.cmd for i in cmds))
-            e.description = "Do %help for the command to view help"
-        await ctx.send(embed=e)
-
-
-    async def help_(self, ctx: commands.Context, cmd: str = None):
-        if cmd is None:
-            ar = HE.HelpEntries.cmds
-            a = []
-            for i in ar:
-                a.append(i.cmd)
-            e = discord.Embed()
-            e.title = "Command list"
-            e.description = "Do `%help command_name` for detailed help"
-            e.add_field(name="Commands", value=", ".join(a))
-            await ctx.send(embed=e)
         else:
-            e: discord.Embed = HE.HelpEntries.get_embed(cmd)
-            if e is not None:
-                await ctx.send(embed=e)
-            else:
-                await self.helps_(ctx,cmd)
+            arg_str = []
+            p: inspect.Parameter
+            for key in c.clean_params:
+                p = c.clean_params[key]
+                arg_str.append(f"<{p.name}:{p.default}>" if p.default.__class__ is not type else p.name)
+            await ctx.send(embed=discord.Embed(
+                title=c.qualified_name,
+                description=f"`%{'[' if c.aliases else ''}"
+                            f"{'|'.join(c.aliases + [c.name])}"
+                            f"{']' if c.aliases else ''} "
+                            f"{' '.join(arg_str)}`"
+            ).add_field(
+                name="Help",
+                value=c.help or "No help available for this command"
+            ).set_footer(text=f"Module: {c.cog.qualified_name}"))
+
+    @commands.command(aliases=["cmds"])
+    async def commands(self, ctx: commands.Context, module: str = None):
+        """Lists commands in a module"""
+        if module is None:
+            await self.help(ctx)
+            return
+        c: commands.Cog = self.bot.get_cog(module.title()) or self.bot.get_cog(module.upper())
+        if c is None:
+            await ctx.send(embed=discord.Embed(
+                title="Module not found",
+                color=0xff0000,
+                description=f"Module `{module}` not found, do `%help` for a list of modules"
+            ))
+            return
+        i: commands.Command
+        await ctx.send(embed=discord.Embed(title=c.qualified_name,
+                                           description=((c.description + "\n" if c.description else "") +
+                                                        "```css\n" +
+                                                        "\n".join(
+                                                            [
+                                                                f"{i.qualified_name.ljust(20, ' ')}"
+                                                                f"[{'|'.join(i.aliases) or ''}]"
+                                                                for i in c.walk_commands()]
+                                                        ) +
+                                                        "```")
+                                           ).set_footer(text="Do `%help command_name` for help on a command"))
+
 
 def setup(bot):
     bot.add_cog(Help(bot))

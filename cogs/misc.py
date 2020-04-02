@@ -70,7 +70,6 @@ class Misc(commands.Cog):
         - ch: defaults to current channel
         - color: defaults to color of caller's highest role
         - id: embed id if editing
-        :return: 
         """
         color = ctx.author.color if color is None else color
         ch = ctx.channel if ch is None else ch
