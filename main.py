@@ -19,14 +19,14 @@ def get_prefix(bot, message):
 
 
 bot = commands.Bot(command_prefix=get_prefix)
-# bot.remove_command('help')
+bot.remove_command('help')
 xchat = Crosschat(bot)
 
 initial_extensions = ['cogs.gamertags', 'cogs.conversation', 
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
                       'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
-                      'cogs.dbl', 'cogs.timezones', 'cogs.tts']
+                      'cogs.dbl', 'cogs.timezones', 'cogs.tts', 'cogs.help']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print("= Adding " + ext + " =")
