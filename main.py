@@ -7,6 +7,7 @@ import logging
 import os
 import discord
 from core.crosschat import Crosschat
+import cogs
 
 logging.basicConfig(level=logging.WARN)
 
@@ -46,6 +47,27 @@ async def on_ready():
     print(bot.cfg)
     await bot.cfg.start()
 
+@bot.event
+async def on_member_update(before: discord.Member, after: discord.Member):
+    guild: discord.Guild = before.guild
+    if not (discord.Streaming in [type(x) for x in after.activities] and
+        discord.Streaming not in [type(x) for x in before.activities]):
+        return
+    streamer: cogs.streamer.Streamer = bot.get_cog("Streamer")
+    rec = streamer._lookup_stream_record(guild)
+    if rec is None: return
+    if rec[1] == 0 or rec[3] == 0: return
+    if rec[1] in [r.id for r in before.roles]:
+        channel = guild.get_channel(rec[3])
+        s: discord.Streaming
+        for a in after.activities:
+            if type(a) is discord.Streaming:
+                s = a
+                break
+        msg = re.sub("%user.mention%", after.mention, rec[2])
+        msg = re.sub("%user%", after.display_name, msg)
+        msg = re.sub("%url", s.url, msg)
+        await channel.send(msg)
 
 @bot.event
 async def on_message(message: discord.Message):
