@@ -118,7 +118,7 @@ class Streamer(commands.Cog):
     )
     async def setstreammessage(self, ctx: commands.Context, *, msg: str):
         """
-        Sets the streamer channel on a server
+        Sets the streamer message on a server
         """
         self._edit_stream_record(guild=ctx.guild, stream_message=msg)
         await ctx.send(embed=discord.Embed(title="Message set", description=f"Message set to:\n{msg}"))

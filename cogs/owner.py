@@ -135,7 +135,8 @@ class Owner(commands.Cog):
             e.add_field(name="Users/Bots", value=f"{users}/{bots}")
             e.add_field(name="Region", value=str(g.region))
             e.add_field(name="ID", value=str(g.id), inline=False)
-            e.add_field(name="Owner", value=f"<@{g.owner_id}> ({g.owner_id})", inline=False)
+            u: discord.User = g.owner
+            e.add_field(name="Owner", value=f"{u.name}#{u.discriminator} ({g.owner_id})", inline=False)
         await ctx.send(embed=e)
 
     @commands.command()
