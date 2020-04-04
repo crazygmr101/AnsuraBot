@@ -66,7 +66,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
                 break
         msg = re.sub("%user.mention%", after.mention, rec[2])
         msg = re.sub("%user%", after.display_name, msg)
-        msg = re.sub("%url", s.url, msg)
+        msg = re.sub("%url%", s.url, msg)
         await channel.send(msg)
 
 @bot.event
