@@ -138,17 +138,29 @@ class TTS(commands.Cog):
             fname = f"{message.id}"
             await self.bot.loop.run_in_executor(None, msg.save, f"{fname}.mp3")
             self.queue[message.guild.id].append(fname)
-            while True:
-                while message.guild.voice_client.is_playing():
-                    pass
-                if len(self.queue[message.guild.id]) == 0:
-                    os.remove(f"{fname}.mp3")
-                    return
-                if self.queue[message.guild.id][0] == fname: break
-            del self.queue[message.guild.id][0]
-            message.guild.voice_client.play(discord.FFmpegPCMAudio(f'{fname}.mp3'), after=lambda x: os.remove(f"{fname}.mp3"))
+            def wait_for_queue():
+                while True:
+                    while message.guild.voice_client.is_playing():
+                        pass
+                    if len(self.queue[message.guild.id]) == 0:
+                        os.remove(f"{fname}.mp3")
+                        return 0
+                    if self.queue[message.guild.id][0] == fname:
+                        def final(arg):
+                            os.remove(f"{fname}.mp3")
+                            del self.queue[message.guild.id][0]
+                        message.guild.voice_client.play(discord.FFmpegPCMAudio(f'{fname}.mp3'), after=final)
+                        return 1
+            if await self.bot.loop.run_in_executor(None, wait_for_queue) == 0:
+                return
+            await message.add_reaction("✅")
+            await asyncio.sleep(10)
+            await message.remove_reaction("✅", self.bot.user)
         except Exception as e:
             print(type(e))
+            await message.add_reaction("❎")
+            await asyncio.sleep(10)
+            await message.remove_reaction("❎", self.bot.user)
             raise
 
 
