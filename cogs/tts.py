@@ -1,3 +1,4 @@
+import asyncio
 import os
 import re
 import sys
@@ -15,6 +16,7 @@ class TTS(commands.Cog):
         self.active_guilds: Dict[int, discord.TextChannel] = {}
         self.queue: Dict[int, List[str]] = {}
         self.tts_mutes: Dict[int, List[str]] = {}
+        self.tts_timeout: Dict[int, bool] = {}
 
     @commands.command()
     @commands.is_owner()
@@ -105,11 +107,12 @@ class TTS(commands.Cog):
             return
         del self.active_guilds[ctx.guild.id]
         self.queue[ctx.guild.id] = []
-        await ctx.send("Stopping when queue is empty")
+        await ctx.send("Stopping")
         await ctx.guild.voice_client.disconnect()
 
 
     async def tts(self, message: discord.Message):
+        def create_tts(m: str): return gtts.gTTS(m)
         if message.content.startswith("%"):
             return
         try:
@@ -131,21 +134,33 @@ class TTS(commands.Cog):
                        "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
                        "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m == "": return
-            msg = gtts.gTTS(m)
+            msg = await self.bot.loop.run_in_executor(None, create_tts, m)
             fname = f"{message.id}"
-            msg.save(f"{fname}.mp3")
+            await self.bot.loop.run_in_executor(None, msg.save, f"{fname}.mp3")
             self.queue[message.guild.id].append(fname)
-            while True:
-                while message.guild.voice_client.is_playing():
-                    pass
-                if len(self.queue[message.guild.id]) == 0:
-                    os.remove(f"{fname}.mp3")
-                    return
-                if self.queue[message.guild.id][0] == fname: break
-            del self.queue[message.guild.id][0]
-            message.guild.voice_client.play(discord.FFmpegPCMAudio(f'{fname}.mp3'), after=lambda x: os.remove(f"{fname}.mp3"))
+            def wait_for_queue():
+                while True:
+                    while message.guild.voice_client.is_playing():
+                        pass
+                    if len(self.queue[message.guild.id]) == 0:
+                        os.remove(f"{fname}.mp3")
+                        return 0
+                    if self.queue[message.guild.id][0] == fname:
+                        def final(arg):
+                            os.remove(f"{fname}.mp3")
+                            del self.queue[message.guild.id][0]
+                        message.guild.voice_client.play(discord.FFmpegPCMAudio(f'{fname}.mp3'), after=final)
+                        return 1
+            if await self.bot.loop.run_in_executor(None, wait_for_queue) == 0:
+                return
+            await message.add_reaction("✅")
+            await asyncio.sleep(10)
+            await message.remove_reaction("✅", self.bot.user)
         except Exception as e:
             print(type(e))
+            await message.add_reaction("❎")
+            await asyncio.sleep(10)
+            await message.remove_reaction("❎", self.bot.user)
             raise
 
 
