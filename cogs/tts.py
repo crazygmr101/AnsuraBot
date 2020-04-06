@@ -112,7 +112,11 @@ class TTS(commands.Cog):
 
 
     async def tts(self, message: discord.Message):
-        def create_tts(m: str): return gtts.gTTS(m)
+        def create_tts(m: str):
+            msg = gtts.gTTS(m)
+            fname = f"{message.id}"
+            msg.save(f"{fname}.mp3")
+            return fname
         if message.content.startswith("%"):
             return
         try:
@@ -134,9 +138,7 @@ class TTS(commands.Cog):
                        "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
                        "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m == "": return
-            msg = await self.bot.loop.run_in_executor(None, create_tts, m)
-            fname = f"{message.id}"
-            await self.bot.loop.run_in_executor(None, msg.save, f"{fname}.mp3")
+            fname = await self.bot.loop.run_in_executor(None, create_tts, m)
             self.queue[message.guild.id].append(fname)
             def wait_for_queue():
                 while True:
