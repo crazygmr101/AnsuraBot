@@ -14,9 +14,9 @@ class TTS(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.active_guilds: Dict[int, discord.TextChannel] = {}
-        self.queue: Dict[int, List[str]] = {}
         self.tts_mutes: Dict[int, List[str]] = {}
         self.tts_timeout: Dict[int, bool] = {}
+        self.queues: Dict[int, _TTSQueue] = {}
 
     @commands.command()
     @commands.is_owner()
@@ -91,13 +91,14 @@ class TTS(commands.Cog):
             self.tts_mutes[ctx.guild.id] = []
         if ctx.guild.id in self.active_guilds.keys():
             await ctx.send("Already watching a channel! Do %stoptts to stop")
+            return
         if not ctx.author.voice:
             await ctx.send("Join a voice channel!")
             return
         await ctx.send("Watching this channel for messages, do %stoptts to stop")
         await ctx.author.voice.channel.connect()
         self.active_guilds[ctx.guild.id] = ctx.channel
-        self.queue[ctx.guild.id] = []
+        self.queues[ctx.guild.id] = _TTSQueue(ctx.guild.id, ctx.guild.voice_client)
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
@@ -106,20 +107,24 @@ class TTS(commands.Cog):
             await ctx.send("Not watching a voice channel!")
             return
         del self.active_guilds[ctx.guild.id]
-        self.queue[ctx.guild.id] = []
+        self.queues[ctx.guild.id].stop()
         await ctx.send("Stopping")
         await ctx.guild.voice_client.disconnect()
 
 
     async def tts(self, message: discord.Message):
-        def create_tts(m: str): return gtts.gTTS(m)
+        def create_tts(m: str):
+            msg = gtts.gTTS(m)
+            fname = f"{message.id}"
+            msg.save(f"{fname}.mp3")
+            return fname
         if message.content.startswith("%"):
             return
         try:
             if message.guild.voice_client is None:
                 try:
                     del self.active_guilds[message.guild.id]
-                    self.queue[message.guild.id] = []
+                    del self.queues[message.guild.id]
                     return
                 except: pass
             if message.guild.id not in self.active_guilds.keys():
@@ -134,25 +139,8 @@ class TTS(commands.Cog):
                        "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
                        "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m == "": return
-            msg = await self.bot.loop.run_in_executor(None, create_tts, m)
-            fname = f"{message.id}"
-            await self.bot.loop.run_in_executor(None, msg.save, f"{fname}.mp3")
-            self.queue[message.guild.id].append(fname)
-            def wait_for_queue():
-                while True:
-                    while message.guild.voice_client.is_playing():
-                        pass
-                    if len(self.queue[message.guild.id]) == 0:
-                        os.remove(f"{fname}.mp3")
-                        return 0
-                    if self.queue[message.guild.id][0] == fname:
-                        def final(arg):
-                            os.remove(f"{fname}.mp3")
-                            del self.queue[message.guild.id][0]
-                        message.guild.voice_client.play(discord.FFmpegPCMAudio(f'{fname}.mp3'), after=final)
-                        return 1
-            if await self.bot.loop.run_in_executor(None, wait_for_queue) == 0:
-                return
+            fname = await self.bot.loop.run_in_executor(None, create_tts, m)
+            self.queues[message.guild.id].add(fname)
             await message.add_reaction("✅")
             await asyncio.sleep(10)
             await message.remove_reaction("✅", self.bot.user)
@@ -162,6 +150,43 @@ class TTS(commands.Cog):
             await asyncio.sleep(10)
             await message.remove_reaction("❎", self.bot.user)
             raise
+
+class _TTSQueue:
+    def __init__(self, guild: int, client: discord.VoiceClient):
+        self.guild = guild
+        self.client = client
+        self.playing = asyncio.Event()
+        self.queue: List[str] = []
+        self.active: bool = True
+        self.waiting = asyncio.Event()
+        asyncio.create_task(self.loop())
+
+    async def loop(self):
+        try:
+            while self.active:
+                self.playing.clear()
+                await self.waiting.wait()
+                self.play_next()
+                await self.playing.wait()
+        except Exception as e:
+            print(type(e))
+            print(e)
+
+    def _del(self, e):
+        os.remove(f'{self.queue[0]}.mp3')
+        del self.queue[0]
+        self.playing.set()
+        if len(self.queue) == 0:
+            self.waiting.clear()
+
+    def stop(self):
+        self.queue = []
+
+    def play_next(self): self.client.play(discord.FFmpegPCMAudio(f'{self.queue[0]}.mp3'), after=self._del)
+
+    def add(self, fname: str):
+        self.queue.append(fname)
+        self.waiting.set()
 
 
 def setup(bot): bot.add_cog(TTS(bot))
