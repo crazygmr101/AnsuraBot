@@ -7,13 +7,9 @@ from discord.ext import commands
 from datetime import datetime, date
 import discord.utils
 
-
 async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, key: str = None):
     with ctx.typing():
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(f"https://api.hypixel.net/player?key={token}&name={player}") as resp:
-                status = resp.status
-                data = await resp.json()
+        data = await _get(player, token)
     if data["player"] is None:
         await ctx.send("That player doesn't seem to exist on hypixel.")
         return
@@ -21,7 +17,8 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
     player = data["player"]
     player_name = player["playername"]
 
-    e = _mk_embed(player_name)
+    e = _mk_embed(player_name, key)
+    key = key.lower() if key else key
 
     if key is None:
         e.add_field(name="Previous Names",
@@ -41,7 +38,39 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
         e.add_field(name="Hypixel Level",
                     value=f"{_get_level(player['networkExp'])}")
 
+    elif key in ["bedwars", "bw"]:
+        player = player["stats"]["Bedwars"]
+        prefixes = {
+            "2v2": "eight_two",
+            "3v3v3v3": "four_three",
+            "4v4v4v4": "four_four",
+            "4v4": "two_four"
+        }
+        s = "```"
+        s += f"Level {_get_level(player['Experience'])}\n"
+        for _prefix in prefixes:
+            w = player[f"{prefixes[_prefix]}_wins_bedwars"]
+            l = player[f"{prefixes[_prefix]}_losses_bedwars"]
+            fk = player[f"{prefixes[_prefix]}_final_kills_bedwars"]
+            k = player[f"{prefixes[_prefix]}_kills_bedwars"]
+            d = player[f"{prefixes[_prefix]}_deaths_bedwars"]
+            s += _prefix.center(13, "=") + "\n"
+            s += f"{w}/{w+l} Won\n"
+            s += f"{k}:{d} KDR ({round(k/d, 2)}\n"
+            s += f"({fk} Final Kills)\n"
+
+        e.description = s + "```"
+
+
+
     await ctx.send(embed=e)
+
+async def _get(player: str, token: str):
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(f"https://api.hypixel.net/player?key={token}&name={player}") as resp:
+                status = resp.status
+                data = await resp.json()
+        return data
 
 
 def _(text: str, *, as_needed: bool = False, ignore_links: bool = True):
@@ -60,8 +89,21 @@ def _get_level(exp: int):
     return -1  # this should never happen
 
 
+def _sub_one(string, repl: Dict[str, str]):
+    if (string.lower() if string else None) in repl.keys():
+        return repl[string]
+    return string
+
+
 def _mk_embed(name: str, game: str = None) -> discord.Embed:
     e = discord.Embed()
-    e.title = f"{name}'s {game.title if game else 'Hypixel'} Profile"
-    e.set_thumbnail(url=f"https://minotar.net/helm/{name}/128.png")
+    game = _sub_one(game, {
+        "bw": "Bedwars",
+        None: "Hypixel"
+    })
+    e.title = f"{name}'s {game.title()} Profile"
+    if game != "Hypixel":
+        e.set_footer(icon_url=f"https://minotar.net/helm/{name}/128.png", text="")
+    else:
+        e.set_thumbnail(url=f"https://minotar.net/helm/{name}/128.png")
     return e
