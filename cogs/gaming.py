@@ -1,4 +1,5 @@
 import asyncio
+import os
 import subprocess
 
 import discord
@@ -8,7 +9,9 @@ from discord import Embed
 from discord.ext import commands
 import re
 import socket
+import lib.hypixel
 import json
+import aiohttp
 import platform
 import concurrent.futures
 
@@ -39,6 +42,7 @@ async def ping(url: str):
 class Gaming(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
+        self.htoken = os.getenv("HYPIXEL")
         print("Minecraft cog loaded")
 
     @commands.command()
@@ -150,6 +154,11 @@ class Gaming(commands.Cog):
             await m.edit(content=f"Pinging {c} of 6...", embed=embed)
             c += 1
         await m.edit(content="", embed=embed)
+
+    @commands.command()
+    async def hypixel(self, ctx: discord.ext.commands.Context, player: str,  *, key: str = None):
+        await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, key)
+
 
 
 def setup(bot):
