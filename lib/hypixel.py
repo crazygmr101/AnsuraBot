@@ -61,7 +61,33 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
 
         e.description = s + "```"
 
+    elif key in ["skywars", "sw"]:
+        player = player["stats"]["SkyWars"]
+        prefixes = {
+            "Solo": "solo",
+            "Solo Normal": "solo_normal",
+            "Solo Insane": "solo_insane",
+            "Teams": "team",
+            "Teams Normal": "teams_normal",
+            "Teams Insane": "teams_insane"
+        }
+        results = []
+        for _prefix in prefixes:
+            s = [_prefix]
+            vk = player.get(f'void_kills_{prefixes[_prefix]}',"-")
+            w = player.get(f'wins_{prefixes[_prefix]}',"-")
+            g = player.get(f'games_{prefixes[_prefix]}',"-")
+            k = player.get(f'kills_{prefixes[_prefix]}',"-")
+            d = player.get(f'deaths_{prefixes[_prefix]}',"-")
+            s.append(f"{w}/{g} Won\n".ljust(21, " "))
+            s.append(f"{k}:{d} KDR ({round(k/d, 2) if '-' not in [k,d] else ''})\n".ljust(21, " "))
+            s.append(f"{vk} Void kills\n".ljust(21, " "))
+            results.append(s)
 
+        e.description = ""
+        for r in results:
+            e.add_field(name=r[0],
+                        value="```" + "\n".join(r[1:3]) + "```")
 
     await ctx.send(embed=e)
 
@@ -99,7 +125,8 @@ def _mk_embed(name: str, game: str = None) -> discord.Embed:
     e = discord.Embed()
     game = _sub_one(game, {
         "bw": "Bedwars",
-        None: "Hypixel"
+        None: "Hypixel",
+        "sw": "Skywars"
     })
     e.title = f"{name}'s {game.title()} Profile"
     if game != "Hypixel":
