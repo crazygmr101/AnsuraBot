@@ -1,11 +1,16 @@
+import json
+import os
 from typing import Dict
-
+import pastebin
 import aiohttp
 import discord
 import pytz
 from discord.ext import commands
 from datetime import datetime, date
 import discord.utils
+import asyncio
+import urllib.parse
+import urllib.request
 
 async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, key: str = None):
     with ctx.typing():
@@ -28,13 +33,13 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                         value=_(player["mcVersionRp"]))
             # .strftime("%x %X")
         tz = pytz.timezone("America/Winnipeg")
-        time = tz.localize(datetime.fromtimestamp(player["lastLogout"]/1000))
+        time = tz.localize(datetime.fromtimestamp(player["lastLogout"] / 1000))
         player_tz = bot.db.lookup_timezone(ctx.author.id)[1]
         timel = time.astimezone(pytz.timezone(player_tz)) if player_tz else None
         #
         e.add_field(name="Last Seen",
                     value=f"{time.strftime('%x %X')} (Server)\n{timel.strftime('%x %X') if timel else 'N/A'} (Local)"
-                        if player["lastLogout"] > player["lastLogin"] else "Now")
+                    if player["lastLogout"] > player["lastLogin"] else "Now")
         e.add_field(name="Hypixel Level",
                     value=f"{_get_level(player['networkExp'])}")
 
@@ -55,8 +60,8 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
             k = player[f"{prefixes[_prefix]}_kills_bedwars"]
             d = player[f"{prefixes[_prefix]}_deaths_bedwars"]
             s += _prefix.center(13, "=") + "\n"
-            s += f"{w}/{w+l} Won\n"
-            s += f"{k}:{d} KDR ({round(k/d, 2)}\n"
+            s += f"{w}/{w + l} Won\n"
+            s += f"{k}:{d} KDR ({round(k / d, 2)}\n"
             s += f"({fk} Final Kills)\n"
 
         e.description = s + "```"
@@ -74,29 +79,60 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
         results = []
         for _prefix in prefixes:
             s = [_prefix]
-            vk = player.get(f'void_kills_{prefixes[_prefix]}',"-")
-            w = player.get(f'wins_{prefixes[_prefix]}',"-")
-            g = player.get(f'games_{prefixes[_prefix]}',"-")
-            k = player.get(f'kills_{prefixes[_prefix]}',"-")
-            d = player.get(f'deaths_{prefixes[_prefix]}',"-")
-            s.append(f"{w}/{g} Won\n".ljust(21, " "))
-            s.append(f"{k}:{d} KDR ({round(k/d, 2) if '-' not in [k,d] else ''})\n".ljust(21, " "))
-            s.append(f"{vk} Void kills\n".ljust(21, " "))
+            vk = player.get(f'void_kills_{prefixes[_prefix]}', "-")
+            w = player.get(f'wins_{prefixes[_prefix]}', "-")
+            g = player.get(f'games_{prefixes[_prefix]}', "-")
+            k = player.get(f'kills_{prefixes[_prefix]}', "-")
+            d = player.get(f'deaths_{prefixes[_prefix]}', "-")
+            s.append(f"{w}/{g} Won".ljust(21, " "))
+            s.append(f"{k}:{d} KDR ({round(k / d, 2) if '-' not in [k, d] else ''})".ljust(21, " "))
+            s.append(f"{vk} Void kills".ljust(21, " "))
             results.append(s)
 
         e.description = ""
         for r in results:
             e.add_field(name=r[0],
-                        value="```" + "\n".join(r[1:3]) + "```")
+                        value="```" + "\n".join(r[1:4]) + "```")
+
+    elif key in ["uhc"]:
+        player = player["stats"]["UHC"]
+        e.description = "```" \
+                        f"{player['kills']} K\n" \
+                        f"{player['deaths']} D" \
+                        "```"
+
+    elif key in ["raw"]:
+        e.description = await asyncio.get_event_loop().run_in_executor(None, _raw, data)
 
     await ctx.send(embed=e)
 
+
+def _raw(data):
+    dstr = json.dumps(data, indent=2)
+    url = "http://pastebin.com/api/api_post.php"
+    values = {'api_option': 'paste',
+              'api_dev_key': os.getenv("PASTEBIN"),
+              'api_paste_code': dstr,
+              'api_paste_private': '0',
+              'api_paste_name': 'Hypixel Profile',
+              'api_paste_expire_date': 'N',
+              'api_paste_format': 'javascript'
+            }
+
+    data = urllib.parse.urlencode(values)
+    data = data.encode('utf-8')  # data should be bytes
+    req = urllib.request.Request(url, data)
+    with urllib.request.urlopen(req) as response:
+        resp = response.read()
+    return str(resp, "utf-8")
+
+
 async def _get(player: str, token: str):
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(f"https://api.hypixel.net/player?key={token}&name={player}") as resp:
-                status = resp.status
-                data = await resp.json()
-        return data
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(f"https://api.hypixel.net/player?key={token}&name={player}") as resp:
+            status = resp.status
+            data = await resp.json()
+    return data
 
 
 def _(text: str, *, as_needed: bool = False, ignore_links: bool = True):
@@ -107,7 +143,7 @@ def _get_level(exp: int):
     lvl = 1
     cnt = 0
     while exp >= 0:
-        need = 10000 + 2500 * (lvl-1)
+        need = 10000 + 2500 * (lvl - 1)
         exp -= need
         if exp < 0:
             return lvl
