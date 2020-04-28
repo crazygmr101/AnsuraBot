@@ -20,9 +20,9 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
         return
 
     player = data["player"]
-    player_name = player["playername"]
+    player_name = player["displayname"]
 
-    e = _mk_embed(player_name, key)
+    e = _mk_embed(player_name, key.split(" ")[0] if key else None)
     key = key.lower() if key else key
 
     if key is None:
@@ -101,6 +101,46 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                         f"{player['deaths']} D" \
                         "```"
 
+    elif key.split(" ")[0] in ["sb", "skyblock"]:
+        player = player["stats"]["SkyBlock"]["profiles"]
+        if len(key.split(" ")) == 1:
+            e.description = f"Profiles:\n" +  \
+                            '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
+        else:
+            for pro in player.values():
+                if pro["cute_name"].lower() == key.split(" ")[1].lower():
+                    profile_id = pro["profile_id"]
+                    name = pro["cute_name"].title()
+                    e.url = f"https://sky.lea.moe/stats/{player_name}/{name}"
+                    break
+            else:
+                e.description = f"Profiles:\n" + \
+                                '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
+                await ctx.send(embed=e)
+                return
+            e.title += f" ({name})"
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(f"https://api.hypixel.net/skyblock/profile?key={token}&profile={profile_id}") as resp:
+                    status = resp.status
+                    data2 = await resp.json()
+            profile = data2["profile"]
+            player_sb_id = data["player"]["uuid"]
+            player_sb = profile["members"][player_sb_id]
+            if "slayer_bosses" in player_sb:
+                e.add_field(name="Slayers", value="\n".join(
+                    [f"{k.title()}: {_slayer_level(v.get('xp', 0), k)}" for k, v in player_sb["slayer_bosses"].items()]
+                ))
+                e.add_field(name="Money",
+                            value=f"Bank: {round(float(profile.get('banking', {'balance': 0})['balance']), 1)} Coins\n"
+                                            f"Purse: {round(float(player_sb['coin_purse']), 1)} Coins")
+            e.add_field(name="Experience", value="\n".join([
+                k.title() + ": " + str(_get_level(player_sb.get(f"experience_skill_{k}", 0)))
+                for k in "alchemy,runecrafting,farming,combat,mining,enchanting,fishing,foraging,carpentry".split(",")
+            ]))
+            e.add_field(name="Misc", value=f"Fairy Souls: {player_sb.get('fairy_souls_collected', 0)}\n")
+            e.set_footer(text="Click the link for more data.")
+            print(player_sb)
+
     elif key in ["raw"]:
         e.description = await asyncio.get_event_loop().run_in_executor(None, _raw, data)
 
@@ -139,9 +179,34 @@ def _(text: str, *, as_needed: bool = False, ignore_links: bool = True):
     return discord.utils.escape_markdown(text, as_needed=as_needed, ignore_links=ignore_links)
 
 
+def _slayer_level(exp: int, name: str):
+    if exp >= 1000000:
+        return 9
+    elif exp >= 400000:
+        return 8
+    elif exp >= 100000:
+        return 7
+    elif exp >= 20000:
+        return 6
+    elif exp >= 5000:
+        return 5
+    elif exp >= (1500 if name == "wolf" else 1000):
+        return 4
+    elif exp >= (250 if name == "wolf" else 200):
+        return 3
+    elif exp >= 15:
+        return 2
+    elif exp >= 5:
+        return 1
+    else:
+        return 0
+
+
 def _get_level(exp: int):
     lvl = 1
     cnt = 0
+    if exp == 0:
+        return 0
     while exp >= 0:
         need = 10000 + 2500 * (lvl - 1)
         exp -= need
@@ -162,11 +227,9 @@ def _mk_embed(name: str, game: str = None) -> discord.Embed:
     game = _sub_one(game, {
         "bw": "Bedwars",
         None: "Hypixel",
-        "sw": "Skywars"
+        "sw": "Skywars",
+        "sb": "Skyblock"
     })
     e.title = f"{name}'s {game.title()} Profile"
-    if game != "Hypixel":
-        e.set_footer(icon_url=f"https://minotar.net/helm/{name}/128.png", text="")
-    else:
-        e.set_thumbnail(url=f"https://minotar.net/helm/{name}/128.png")
+    e.set_thumbnail(url=f"https://minotar.net/helm/{name}/128.png")
     return e

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import subprocess
+from typing import Union
 
 import discord
 import mcstatus
@@ -155,9 +156,29 @@ class Gaming(commands.Cog):
             c += 1
         await m.edit(content="", embed=embed)
 
-    @commands.command()
-    async def hypixel(self, ctx: discord.ext.commands.Context, player: str,  *, key: str = None):
-        await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, key)
+    @commands.command(aliases=["hp"])
+    async def hypixel(self, ctx: discord.ext.commands.Context, player: Union[discord.Member, str],  *, profile_type: str = None):
+        """
+        Checks a player's hypixel profile
+        - player: the minecraft username
+          or a @mention of a user with their
+          mojang profile linked
+        - profile_type:
+          > None - basic hp profile
+          > sb/skyblock
+          > bw/bedwars
+          > uhc
+          > sw/skywars
+          > raw - uploads raw data to pastebin
+        """
+        if isinstance(player, discord.Member):
+            player = self.bot.db.lookup_gaming_record(player.id)[1]
+            if not player:
+                await ctx.send(embed=discord.Embed(title="No mojang linked",
+                                                   description="The person mentioned needs to set their mojang "
+                                                               "tag with `%mojang username`"))
+                return
+        await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
 
 
 
