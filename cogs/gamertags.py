@@ -6,7 +6,7 @@ from discord.ext import commands
 import discord
 import core.database as AD
 
-class Util(commands.Cog):
+class Gamertags(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Gamertags cog loaded")
@@ -53,6 +53,22 @@ class Util(commands.Cog):
         self.db.set_gaming_record(ctx.author.id, "twitch", username)
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
+    @commands.command()
+    async def reddit(self, ctx: discord.ext.commands.Context, username):
+        """
+        Sets your reddit username
+        """
+        self.db.set_gaming_record(ctx.author.id, "reddit", username)
+        await ctx.send(ctx.author.mention + ": Set to " + username)
+
+    @commands.command()
+    async def steam(self, ctx: discord.ext.commands.Context, username):
+        """
+        Sets your steam username/link
+        """
+        self.db.set_gaming_record(ctx.author.id, "steam", username)
+        await ctx.send(ctx.author.mention + ": Set to " + username)
+
     @commands.command(aliases=["gt"])
     async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
         """
@@ -73,6 +89,8 @@ class Util(commands.Cog):
         e.add_field(name="Youtube", value=rec[3] if rec[3] is not None else "N/A")
         e.add_field(name="Twitch", value=rec[4] if rec[4] is not None else "N/A")
         e.add_field(name="Mixer", value=rec[5] if rec[5] is not None else "N/A")
+        e.add_field(name="Reddit", value=rec[6] if rec[6] is not None else "N/A")
+        e.add_field(name="Steam", value=rec[7] if rec[7] is not None else "N/A")
         e.add_field(name="Time Zone", value=f"{tz} ({offset})" if tz is not None else "N/A")
         await ctx.send(embed=e)
 
@@ -105,4 +123,4 @@ class Util(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Util(bot))
+    bot.add_cog(Gamertags(bot))
