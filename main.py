@@ -23,7 +23,7 @@ bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
 xchat = Crosschat(bot)
 
-initial_extensions = ['cogs.gamertags', 'cogs.conversation', 
+initial_extensions = ['cogs.gamertags',
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
                       'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
