@@ -14,8 +14,8 @@ class Crosschat:
     async def init_channels(self):
         g: Guild
         c: discord.TextChannel
-        async for g in self.bot.fetch_guilds():
-            for c in await g.fetch_channels():
+        for g in self.bot.guilds:
+            for c in g.channels:
                 if type(c) is not TextChannel:
                     continue
                 if c.topic is None:
