@@ -80,7 +80,6 @@ class Misc(commands.Cog):
         e.set_author(icon_url=ctx.author.avatar_url, name=ctx.author.name)
         if id is None:
             await ch.send(embed=e)
-            await ctx.send()
         else:
             message = await ch.fetch_message(id)
             await message.edit(embed=e)
