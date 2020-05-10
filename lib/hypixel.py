@@ -112,7 +112,12 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                     profile_id = pro["profile_id"]
                     name = pro["cute_name"].title()
                     e.url = f"https://sky.lea.moe/stats/{player_name}/{name}"
-                    break
+                    e.title = "Skyblock temporarily disabled"
+                    e.description = f"This is currently disabled as it is being redone. Visit " \
+                                    f"[here](https://sky.lea.moe/stats/{player_name}/{name}) to view profile info"
+                    await ctx.send(embed=e)
+                    return
+                    # break
             else:
                 e.description = f"Profiles:\n" + \
                                 '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
