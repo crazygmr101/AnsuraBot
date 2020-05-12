@@ -4,7 +4,6 @@ from typing import Union
 
 from discord.ext import commands
 import discord
-import core.help as HE
 import gtts
 import requests
 

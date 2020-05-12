@@ -3,7 +3,6 @@ from typing import List, Mapping
 
 from discord.ext import commands
 import discord
-import core.help as HE
 
 
 class Help(commands.Cog):

@@ -2,7 +2,6 @@ from typing import Union
 
 from discord.ext import commands
 import discord
-import core.help as HE
 import cogs.gamertags
 
 class Administration(commands.Cog):
@@ -67,11 +66,3 @@ class Administration(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Administration(bot))
-    HE.HelpEntries.register("setgtval",
-                            "%setgtval type @user value",
-                            "Sets a user's gametag value as "
-                            "if they used the %xbox,%mja, etc "
-                            "commands",
-                            "Aliases: sgv\n"
-                            "Gametag types: xbox, mojang, "
-                            "mixer, youtube, twitch")
