@@ -11,7 +11,6 @@ import cogs
 class Owner(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Owner cog loaded")
         self.guilds: List[discord.Guild] = []
 
     @commands.command()

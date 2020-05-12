@@ -10,7 +10,6 @@ from discord.ext import commands
 class Image(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Image cog loaded")
 
     @commands.command()
     async def image(self, ctx: commands.Context, filter_list: str = None):

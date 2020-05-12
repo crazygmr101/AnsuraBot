@@ -10,14 +10,10 @@ from lib.database import AnsuraDatabase
 class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        print("Streamer cog loading")
-        print(" Opening mixer session...")
         self.db: AnsuraDatabase = bot.db
         self.mixer_key = os.getenv("MIXER")
         self.session = requests.Session()
         self.session.headers.update({'Client-ID': self.mixer_key})
-        print(" Mixer session opened")
-        print("Streamer cog loaded")
 
     def _add_stream_record(self, guild: discord.Guild):
         self.db.cursor.execute("insert into streamer values (?,?,?,?)", (guild.id, 0, "%user% is streaming!", 0))

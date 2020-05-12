@@ -7,7 +7,6 @@ from discord.ext import commands
 class Misc(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Misc cog loaded")
 
     @commands.command(aliases=["av"])
     async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):

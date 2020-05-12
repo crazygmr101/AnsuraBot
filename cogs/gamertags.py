@@ -11,7 +11,6 @@ import lib.database as AD
 class Gamertags(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Gamertags cog loaded")
         bot.db = AD.AnsuraDatabase()
         self.db = bot.db
 

@@ -44,7 +44,6 @@ class Gaming(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         self.htoken = os.getenv("HYPIXEL")
-        print("Minecraft cog loaded")
 
     @commands.command()
     async def jping(self, ctx: discord.ext.commands.Context, url: str):

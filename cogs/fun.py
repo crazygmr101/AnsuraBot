@@ -9,7 +9,6 @@ from discord.ext import commands
 class Fun(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Fun cog loaded")
 
     @commands.command()
     async def ship(self, ctx: commands.Context, user1: discord.Member, user2: discord.Member):
