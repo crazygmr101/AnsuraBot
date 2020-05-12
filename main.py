@@ -6,7 +6,7 @@ import random
 import logging
 import os
 import discord
-from core.crosschat import Crosschat
+from lib.crosschat import Crosschat
 import cogs
 
 logging.basicConfig(level=logging.WARN)

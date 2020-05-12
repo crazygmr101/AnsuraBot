@@ -4,7 +4,7 @@ from typing import Union
 import pytz
 from discord.ext import commands
 import discord
-import core.database as AD
+import lib.database as AD
 
 class Gamertags(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):

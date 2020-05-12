@@ -1,9 +1,8 @@
 import os
-import cogs
 import requests
 from discord.ext import commands
 import discord
-from core.database import AnsuraDatabase
+from lib.database import AnsuraDatabase
 
 class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):

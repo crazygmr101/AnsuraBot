@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import pytz
-from core.database import AnsuraDatabase as DB
+from lib.database import AnsuraDatabase as DB
 import datetime
 
 class Timezones(commands.Cog):
