@@ -7,14 +7,13 @@ import discord
 import gtts
 from discord.ext import commands
 
+from lib.voicemanager import _TTSQueue, VoiceManager
+
 
 class TTS(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.active_guilds: Dict[int, discord.TextChannel] = {}
-        self.tts_mutes: Dict[int, List[str]] = {}
-        self.tts_timeout: Dict[int, bool] = {}
-        self.queues: Dict[int, _TTSQueue] = {}
+        self.vm: VoiceManager = bot.vm
 
     @commands.command()
     @commands.is_owner()
@@ -46,22 +45,22 @@ class TTS(commands.Cog):
             await ctx.send("You must tag a member")
             return
         try:
-            del self.tts_mutes[ctx.guild.id][self.tts_mutes[ctx.guild.id].index(member.id)]
+            del self.vm.tts_mutes[ctx.guild.id][self.vm.tts_mutes[ctx.guild.id].index(member.id)]
             await ctx.send(f"TTS unmuted **{member.display_name}**")
         except:
-            self.tts_mutes[ctx.guild.id].append(member.id)
+            self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"**{member.display_name}** isn't TTS muted")
 
     @commands.command(aliases=["tmutel"])
     async def ttsmutelist(self, ctx: commands.Context):
         """Lists TTS-muted members"""
-        if ctx.guild.id not in self.tts_mutes.keys():
+        if ctx.guild.id not in self.vm.tts_mutes.keys():
             await ctx.send("No members TTS muted")
-        if len(self.tts_mutes[ctx.guild.id]) == 0:
+        if len(self.vm.tts_mutes[ctx.guild.id]) == 0:
             await ctx.send("No members TTS muted")
         embed = discord.Embed(title="TTS muted members")
-        embed.add_field(name=f"{len(self.tts_mutes[ctx.guild.id])} members TTS-muted",
-                        value=" ".join([f"<@{x}>" for x in self.tts_mutes[ctx.guild.id]]))
+        embed.add_field(name=f"{len(self.vm.tts_mutes[ctx.guild.id])} members TTS-muted",
+                        value=" ".join([f"<@{x}>" for x in self.vm.tts_mutes[ctx.guild.id]]))
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["tmute"])
@@ -72,10 +71,10 @@ class TTS(commands.Cog):
             await ctx.send("You must tag a member")
             return
         try:
-            self.tts_mutes[ctx.guild.id].index(member.id)
+            self.vm.tts_mutes[ctx.guild.id].index(member.id)
             await ctx.send(f"**{member.display_name}** is already TTS muted")
         except:
-            self.tts_mutes[ctx.guild.id].append(member.id)
+            self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"TTS muted **{member.display_name}**")
 
     @commands.command()
@@ -85,9 +84,11 @@ class TTS(commands.Cog):
         """
         Makes Ansura join the voice channel you are in and watch the current channel
         """
-        if ctx.guild.id not in self.tts_mutes.keys():
-            self.tts_mutes[ctx.guild.id] = []
-        if ctx.guild.id in self.active_guilds.keys():
+        if self.vm.guild_states.get(ctx.guild.id, 0) != 0:
+            await ctx.send("Already active in a channel!")
+        if ctx.guild.id not in self.vm.tts_mutes.keys():
+            self.vm.tts_mutes[ctx.guild.id] = []
+        if ctx.guild.id in self.vm.active_guilds.keys():
             await ctx.send("Already watching a channel! Do %stoptts to stop")
             return
         if not ctx.author.voice:
@@ -95,17 +96,19 @@ class TTS(commands.Cog):
             return
         await ctx.send("Watching this channel for messages, do %stoptts to stop")
         await ctx.author.voice.channel.connect()
-        self.active_guilds[ctx.guild.id] = ctx.channel
-        self.queues[ctx.guild.id] = _TTSQueue(ctx.guild.id, ctx.guild.voice_client)
+        self.vm.guild_states[ctx.guild.id] = 1
+        self.vm.active_guilds[ctx.guild.id] = ctx.channel
+        self.vm.queues[ctx.guild.id] = _TTSQueue(ctx.guild.id, ctx.guild.voice_client)
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     async def stoptts(self, ctx: commands.Context):
-        if ctx.guild.id not in self.active_guilds.keys():
+        if ctx.guild.id not in self.vm.active_guilds.keys():
             await ctx.send("Not watching a voice channel!")
             return
-        del self.active_guilds[ctx.guild.id]
-        self.queues[ctx.guild.id].stop()
+        del self.vm.active_guilds[ctx.guild.id]
+        del self.vm.guild_states[ctx.guild.id]
+        self.vm.queues[ctx.guild.id].stop()
         await ctx.send("Stopping")
         await ctx.guild.voice_client.disconnect()
 
@@ -116,21 +119,22 @@ class TTS(commands.Cog):
             msg.save(f"{fname}.mp3")
             return fname
 
-        if message.content.startswith("%"):
+        if message.content.startswith("%")\
+                or message.content.startswith("ab!"):
             return
         try:
             if message.guild.voice_client is None:
                 try:
-                    del self.active_guilds[message.guild.id]
-                    del self.queues[message.guild.id]
+                    del self.vm.active_guilds[message.guild.id]
+                    del self.vm.queues[message.guild.id]
                     return
                 except:
                     pass
-            if message.guild.id not in self.active_guilds.keys():
+            if message.guild.id not in self.vm.active_guilds.keys():
                 return
-            if message.channel.id != self.active_guilds[message.guild.id].id:
+            if message.channel.id != self.vm.active_guilds[message.guild.id].id:
                 return
-            if message.author.id in self.tts_mutes[message.guild.id]:
+            if message.author.id in self.vm.tts_mutes[message.guild.id]:
                 return
             m = f"{message.author.display_name} says {message.clean_content}"
             m = re.sub(r"((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?", ".Link.",
@@ -141,7 +145,7 @@ class TTS(commands.Cog):
                 "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m == "": return
             fname = await self.bot.loop.run_in_executor(None, create_tts, m)
-            self.queues[message.guild.id].add(fname)
+            self.vm.queues[message.guild.id].add(fname)
             await message.add_reaction("✅")
             await asyncio.sleep(10)
             await message.remove_reaction("✅", self.bot.user)
@@ -152,44 +156,6 @@ class TTS(commands.Cog):
             await message.remove_reaction("❎", self.bot.user)
             raise
 
-
-class _TTSQueue:
-    def __init__(self, guild: int, client: discord.VoiceClient):
-        self.guild = guild
-        self.client = client
-        self.playing = asyncio.Event()
-        self.queue: List[str] = []
-        self.active: bool = True
-        self.waiting = asyncio.Event()
-        asyncio.create_task(self.loop())
-
-    async def loop(self):
-        try:
-            while self.active:
-                self.playing.clear()
-                await self.waiting.wait()
-                self.play_next()
-                await self.playing.wait()
-        except Exception as e:
-            print(type(e))
-            print(e)
-
-    def _del(self, e):
-        os.remove(f'{self.queue[0]}.mp3')
-        del self.queue[0]
-        self.playing.set()
-        if len(self.queue) == 0:
-            self.waiting.clear()
-
-    def stop(self):
-        self.queue = []
-
-    def play_next(self):
-        self.client.play(discord.FFmpegPCMAudio(f'{self.queue[0]}.mp3'), after=self._del)
-
-    def add(self, fname: str):
-        self.queue.append(fname)
-        self.waiting.set()
 
 
 def setup(bot): bot.add_cog(TTS(bot))

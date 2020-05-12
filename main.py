@@ -8,11 +8,14 @@ import os
 import discord
 from lib.crosschat import Crosschat
 import cogs
+from lib.voicemanager import VoiceManager
 
 logging.basicConfig(level=logging.WARN)
 
 
 def get_prefix(bot, message):
+    if bot.user.id == 643869468774105099:
+        return "ab!"
     prefixes = ['%']
     if not message.guild:
         return '%'
@@ -22,6 +25,8 @@ def get_prefix(bot, message):
 bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
 xchat = Crosschat(bot)
+
+bot.vm = VoiceManager(bot)
 
 initial_extensions = ['cogs.gamertags',
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
