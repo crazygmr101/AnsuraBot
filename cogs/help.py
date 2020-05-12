@@ -7,6 +7,7 @@ from discord.ext import commands
 class Help(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
+
     @commands.command(aliases=["h"])
     async def help(self, ctx: commands.Context, command: str = None):
         """Lists modules, or help for a command"""

@@ -1,3 +1,4 @@
+import logging
 import os
 
 import discord
@@ -11,6 +12,7 @@ class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db: AnsuraDatabase = bot.db
+        print("[STREAMER] Loading Mixer session")
         self.mixer_key = os.getenv("MIXER")
         self.session = requests.Session()
         self.session.headers.update({'Client-ID': self.mixer_key})

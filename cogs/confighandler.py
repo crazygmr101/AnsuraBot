@@ -7,7 +7,7 @@ from discord.ext import commands
 
 class ConfigHandler:
     def __init__(self, bot):
-        print("Loading config handler")
+        print("[CONFIG] Loading internal config handler")
         bot.cfg = self
         self.bot = bot
         self.data = {}
@@ -24,45 +24,45 @@ class ConfigHandler:
                 y[g.id] = {"streamer-role": 0, "streamer-announce-channel": 1}
             docs = yaml.dump(y, file)
             file.close()
-        print(" Opening config file")
+        print("[CONFIG] Opening config file")
         self.config_file = open("config.yaml")
         self.data = yaml.full_load(self.config_file)
         self.config_file.close()
-        print("Config Handler Loaded")
+        print("[CONFIG] Internal config handler loaded")
 
     def save(self):
-        print("Saving config file")
+        print('[CONFIG] Saving..', end="")
         self.config_file = open("config.yaml", "w")
         yaml.dump(self.data, self.config_file)
         self.config_file.close()
-        print("Config file saved")
+        print("Done")
 
     def reload(self):
-        print("Reloading config file")
+        print('[CONFIG] Reloading..', end="")
         self.config_file = open("config.yaml")
         self.data = yaml.full_load(self.config_file)
         self.config_file.close()
-        print("Config file reloaded")
+        print("Done")
 
 
 class ConfigCog(commands.Cog):
     def __init__(self, bot):
-        print("Adding Configuration cog")
+        print("[CONFIG] Initializing")
         self.bot = bot
         self.cfg = ConfigHandler(bot)
-        print("Configuration cog added")
+        print("[CONFIG] Initialized")
 
     @commands.command()
     @commands.is_owner()
     async def reload(self, ctx: commands.Context):
-        await ctx.send("Reloading config...")
+        await ctx.send("Reloading streamer config...")
         self.cfg.reload()
         await ctx.send("Reloaded!")
 
     @commands.command()
     @commands.is_owner()
     async def save(self, ctx: commands.Context):
-        await ctx.send("Saving config...")
+        await ctx.send("Saving streamer config...")
         self.cfg.reload()
         await ctx.send("Saved!")
 

@@ -4,7 +4,6 @@ from discord.ext import commands
 class ErrorHandler(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        print("Error handler loaded")
 
     # @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):

@@ -1,11 +1,13 @@
 import sqlite3
 from typing import List, Dict
-
+import logging
 
 class AnsuraDatabase:
     def __init__(self):
+        print("[DATABASE] Loading database")
         self.conn: sqlite3.Connection = sqlite3.connect("users.db")
         self.cursor: sqlite3.Cursor = self.conn.cursor()
+        print("[DATABASE] Loaded database")
 
     def lookup_timezone(self, userid: int):
         if not self.has_timezone(userid):

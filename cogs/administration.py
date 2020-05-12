@@ -17,7 +17,6 @@ class Administration(commands.Cog):
 
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Administration cog loaded")
 
     @commands.command(aliases=["sgv"])
     async def setgtval(self, ctx: discord.ext.commands.Context,

@@ -30,7 +30,7 @@ initial_extensions = ['cogs.gamertags',
                       'cogs.dbl', 'cogs.timezones', 'cogs.tts', 'cogs.help']
 if __name__ == '__main__':
     for ext in initial_extensions:
-        print("= Adding " + ext + " =")
+        print(f"[COGS] Loading {ext}")
         bot.load_extension(ext)
 
 filelist = glob.glob("*.mp3")
@@ -43,9 +43,9 @@ for file in filelist:
 async def on_ready():
     await xchat.init_channels()
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("%help"))
-    print("Bot ready!")
-    print(bot.cfg)
     await bot.cfg.start()
+    print("Ansura online! :D")
+    print(f" {len(bot.guilds)} Guilds")
 
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
