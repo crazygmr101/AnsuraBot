@@ -1,16 +1,16 @@
 import os
 
-from PIL import ImageOps, ImageFilter
-from discord.ext import commands
-import discord
 import PIL
+import discord
+from PIL import ImageOps, ImageFilter
 from PIL.Image import Image
+from discord.ext import commands
+
 
 class Image(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
         print("Image cog loaded")
-
 
     @commands.command()
     async def image(self, ctx: commands.Context, filter_list: str = None):
@@ -124,7 +124,6 @@ class Image(commands.Cog):
         im.save(b)
         return True, b
 
-
     def _fname(self, url: str):
         return url.split("/")[-1]
 
@@ -134,6 +133,7 @@ class Image(commands.Cog):
                 return True
         else:
             return False
+
 
 def setup(bot):
     bot.add_cog(Image(bot))

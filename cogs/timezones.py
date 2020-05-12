@@ -1,8 +1,11 @@
-import discord
-from discord.ext import commands
-import pytz
-from lib.database import AnsuraDatabase as DB
 import datetime
+
+import discord
+import pytz
+from discord.ext import commands
+
+from lib.database import AnsuraDatabase as DB
+
 
 class Timezones(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -43,7 +46,7 @@ class Timezones(commands.Cog):
             print(type(e))
             print(str(e))
 
-    @commands.command(aliases=["timezone","tz"])
+    @commands.command(aliases=["timezone", "tz"])
     async def settz(self, ctx: commands.Context, tz: str):
         """sets your timezone"""
         try:
@@ -66,6 +69,7 @@ class Timezones(commands.Cog):
         except Exception as ex:
             print(type(ex))
             print(ex.__str__())
+
 
 def setup(bot):
     bot.add_cog(Timezones(bot))

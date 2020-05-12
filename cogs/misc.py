@@ -2,7 +2,7 @@ from typing import Union
 
 import discord
 from discord.ext import commands
-import random
+
 
 class Misc(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
@@ -21,7 +21,10 @@ class Misc(commands.Cog):
         """
         Lists members of a role
         """
-        def val_or_space(val: str): return "-" if val == "" else val
+
+        def val_or_space(val: str):
+            return "-" if val == "" else val
+
         e = discord.Embed()
         e.title = "Role: " + r.name
         e.colour = r.colour
@@ -54,8 +57,8 @@ class Misc(commands.Cog):
 
     @role.error
     async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
+        if isinstance(error, discord.ext.commands.ConversionError) or \
+                isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
         else:
             raise error

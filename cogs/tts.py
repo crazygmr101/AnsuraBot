@@ -1,14 +1,12 @@
 import asyncio
 import os
 import re
-import sys
-import traceback
-from io import BytesIO
 from typing import List, Dict
 
 import discord
 import gtts
 from discord.ext import commands
+
 
 class TTS(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -111,13 +109,13 @@ class TTS(commands.Cog):
         await ctx.send("Stopping")
         await ctx.guild.voice_client.disconnect()
 
-
     async def tts(self, message: discord.Message):
         def create_tts(m: str):
             msg = gtts.gTTS(m)
             fname = f"{message.id}"
             msg.save(f"{fname}.mp3")
             return fname
+
         if message.content.startswith("%"):
             return
         try:
@@ -126,7 +124,8 @@ class TTS(commands.Cog):
                     del self.active_guilds[message.guild.id]
                     del self.queues[message.guild.id]
                     return
-                except: pass
+                except:
+                    pass
             if message.guild.id not in self.active_guilds.keys():
                 return
             if message.channel.id != self.active_guilds[message.guild.id].id:
@@ -134,10 +133,12 @@ class TTS(commands.Cog):
             if message.author.id in self.tts_mutes[message.guild.id]:
                 return
             m = f"{message.author.display_name} says {message.clean_content}"
-            m = re.sub(r"((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?", ".Link.", m)
-            m = re.sub("[^0-9A-Za-z.\u0020\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02af\u1d00-\u1d25\u1d62-\u1d65\u1d6b-\u1d77"
-                       "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
-                       "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
+            m = re.sub(r"((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?", ".Link.",
+                       m)
+            m = re.sub(
+                "[^0-9A-Za-z.\u0020\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02af\u1d00-\u1d25\u1d62-\u1d65\u1d6b-\u1d77"
+                "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
+                "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m == "": return
             fname = await self.bot.loop.run_in_executor(None, create_tts, m)
             self.queues[message.guild.id].add(fname)
@@ -150,6 +151,7 @@ class TTS(commands.Cog):
             await asyncio.sleep(10)
             await message.remove_reaction("❎", self.bot.user)
             raise
+
 
 class _TTSQueue:
     def __init__(self, guild: int, client: discord.VoiceClient):
@@ -182,7 +184,8 @@ class _TTSQueue:
     def stop(self):
         self.queue = []
 
-    def play_next(self): self.client.play(discord.FFmpegPCMAudio(f'{self.queue[0]}.mp3'), after=self._del)
+    def play_next(self):
+        self.client.play(discord.FFmpegPCMAudio(f'{self.queue[0]}.mp3'), after=self._del)
 
     def add(self, fname: str):
         self.queue.append(fname)

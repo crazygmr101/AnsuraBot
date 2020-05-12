@@ -1,9 +1,8 @@
-from typing import List
-
-from discord import Guild, TextChannel
-from discord.ext import commands
 import discord
 import discord.errors
+from discord import Guild, TextChannel
+from discord.ext import commands
+
 
 class Crosschat:
     def __init__(self, bot: commands.Bot):
@@ -22,13 +21,13 @@ class Crosschat:
                     continue
                 if "ansura crosschat" in c.topic or c.topic == "ansura crosschat":
                     print("Found channel " + c.name + " (" + str(c.id) + ") in " + g.name + " (" + str(g.id) + ")")
-                    color = int(g.id/64) % (14**3) + 0x222
+                    color = int(g.id / 64) % (14 ** 3) + 0x222
                     rd = color >> 8
                     gr = (color & 0x0f0) >> 4
                     bl = (color & 0xf)
                     print(" Added with color: " + hex(color))
                     self.channels[g.id] = int(c.id)
-                    self.colors[g.id] = discord.Colour.from_rgb(rd*0x11, gr*0x11, bl*0x11)
+                    self.colors[g.id] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
                     break
 
     async def xchat(self, message: discord.Message):

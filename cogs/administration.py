@@ -1,8 +1,10 @@
 from typing import Union
 
-from discord.ext import commands
 import discord
+from discord.ext import commands
+
 import cogs.gamertags
+
 
 class Administration(commands.Cog):
     def error(self, title, message={}, color=0xff0000):
@@ -21,8 +23,8 @@ class Administration(commands.Cog):
     async def setgtval(self, ctx: discord.ext.commands.Context,
                        typ: str, user: Union[discord.Member, discord.User],
                        val: str):
-        ch : discord.TextChannel = \
-          ctx.channel
+        ch: discord.TextChannel = \
+            ctx.channel
         if not ch.permissions_for(ctx.author).administrator:
             await ctx.send(embed=
                            self.error("Permission error",
@@ -37,7 +39,7 @@ class Administration(commands.Cog):
                            self.error("Invalid gametag type"))
             await self.bot.get_cog("Help").help_(ctx, "setgtval")
             return
-        util: cogs.gamertags.Util= self.bot.get_cog("Util")
+        util: cogs.gamertags.Util = self.bot.get_cog("Util")
         db = util.db
         if typ == "xbox": typ = "xboxlive"
         rec = db.lookup_gaming_record(user.id)
@@ -61,7 +63,6 @@ class Administration(commands.Cog):
         e.add_field(name="Twitch", value=rec[4] if rec[4] is not None else "N/A")
         e.add_field(name="Mixer", value=rec[5] if rec[5] is not None else "N/A")
         await ctx.send(embed=e)
-
 
 
 def setup(bot):

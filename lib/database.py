@@ -1,7 +1,5 @@
 import sqlite3
-from typing import Union, List, Dict
-import datetime
-import discord
+from typing import List, Dict
 
 
 class AnsuraDatabase:
@@ -30,7 +28,8 @@ class AnsuraDatabase:
         return self.cursor.execute("select * from timezones where user=?", (userid,)).fetchone() is not None
 
     def add_gaming_record(self, userid: int):
-        self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?)", (userid, None, None, None, None, None, None, None))
+        self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?)",
+                            (userid, None, None, None, None, None, None, None))
         print("Empty record added for user " + str(userid))
         self.conn.commit()
 
@@ -41,7 +40,7 @@ class AnsuraDatabase:
     def set_gaming_record(self, userid: int, type: str, string: str):
         if not self.has_gaming_record(userid):
             self.add_gaming_record(userid)
-        self.cursor.execute("update gaming set "+type+"=? where id=?", (string,userid))
+        self.cursor.execute("update gaming set " + type + "=? where id=?", (string, userid))
         print(type + "set to " + string + " for " + str(userid))
         self.conn.commit()
 

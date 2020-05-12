@@ -1,11 +1,9 @@
 import math
 import random
-from typing import Union
 
-from discord.ext import commands
 import discord
-import gtts
 import requests
+from discord.ext import commands
 
 
 class Fun(commands.Cog):
@@ -18,14 +16,15 @@ class Fun(commands.Cog):
         """Ships two users.. awww <3"""
         name1: str = user1.display_name
         name2: str = user2.display_name
+
         def split(s: str):
             import re
-            if s == "crazygmr101": return ["crazy","gmr101"]
+            if s == "crazygmr101": return ["crazy", "gmr101"]
             if len(s.split(" ")) > 1:
                 ar = s.split(" ")
                 return [
-                    " ".join(ar[:math.floor(len(s.split(" "))/2)]),
-                    " ".join(ar[math.floor(len(s.split(" "))/2):])
+                    " ".join(ar[:math.floor(len(s.split(" ")) / 2)]),
+                    " ".join(ar[math.floor(len(s.split(" ")) / 2):])
                 ]
             if len(s.split("_")) > 1:
                 ar = s.split("_")
@@ -41,8 +40,9 @@ class Fun(commands.Cog):
                     " ".join(ar[1:])
                 ]
             # TODO: work on this code a tad more, just push
-            half = int(len(s)/2)
+            half = int(len(s) / 2)
             return [s[:half], s[half:]]
+
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
     @commands.command()
@@ -100,8 +100,8 @@ class Fun(commands.Cog):
         ]
         e = discord.Embed()
         woof_text = random.choice(["Woof!", "Arf!", "Bork!"])
-        woof_emoji = random.choice(["▼・ᴥ・▼", "▼(´ᴥ`)▼", "U ´ᴥ` U", "U・ᴥ・U", "U・ﻌ・U", "U ´x` U","(U・x・U)",
-                                    "υ´• ﻌ •`υ", "૮ ・ﻌ・ა", "(❍ᴥ❍ʋ)", "( ͡° ᴥ ͡° ʋ)", "V●ω●V","V✪ω✪V","V✪⋏✪V",
+        woof_emoji = random.choice(["▼・ᴥ・▼", "▼(´ᴥ`)▼", "U ´ᴥ` U", "U・ᴥ・U", "U・ﻌ・U", "U ´x` U", "(U・x・U)",
+                                    "υ´• ﻌ •`υ", "૮ ・ﻌ・ა", "(❍ᴥ❍ʋ)", "( ͡° ᴥ ͡° ʋ)", "V●ω●V", "V✪ω✪V", "V✪⋏✪V",
                                     "∪ ̿–⋏ ̿–∪", "∪･ω･∪", "໒( ●ܫฺ ●)ʋ", "໒( = ᴥ =)ʋ}"])
         woof_img = random.choice(images)
         e.title = f'{woof_text} {woof_emoji}'
@@ -131,7 +131,7 @@ class Fun(commands.Cog):
         """Vöïds a message"""
         e = discord.Embed()
         msg: str = ctx.message.content
-        msg_o : discord.Message = ctx.message
+        msg_o: discord.Message = ctx.message
         msg = " ".join(msg.split(" ")[1::])
         replacements = [
             "a,e,i,o,u,A,E,I,O,U".split(","),
@@ -145,8 +145,6 @@ class Fun(commands.Cog):
         e.description = msg
         await ctx.send(embed=e)
         await msg_o.delete()
-
-
 
 
 def setup(bot):

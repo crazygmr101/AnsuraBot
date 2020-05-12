@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Union
 
+import discord
 import pytz
 from discord.ext import commands
-import discord
+
 import lib.database as AD
+
 
 class Gamertags(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
@@ -94,7 +96,6 @@ class Gamertags(commands.Cog):
         e.add_field(name="Time Zone", value=f"{tz} ({offset})" if tz is not None else "N/A")
         await ctx.send(embed=e)
 
-
     @commands.command()
     async def who(self, ctx: discord.ext.commands.Context, tag: str):
         """
@@ -102,7 +103,7 @@ class Gamertags(commands.Cog):
         """
         db = self.db
         records = db.get_all()
-        #id, mojang, xbox, youtube, twitch, mixer
+        # id, mojang, xbox, youtube, twitch, mixer
         users = []
         async with ctx.channel.typing():
             for r in records:
@@ -119,7 +120,6 @@ class Gamertags(commands.Cog):
             s += u.name + "#" + u.discriminator + " - " + i[1] + ": " + i[2] + "\n"
         s += "```"
         await ctx.send(s)
-
 
 
 def setup(bot):

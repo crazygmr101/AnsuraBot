@@ -1,9 +1,7 @@
-from os.path import exists
+import os
 
 import discord
 import yaml
-import os
-
 from discord.ext import commands
 
 
@@ -46,6 +44,7 @@ class ConfigHandler:
         self.config_file.close()
         print("Config file reloaded")
 
+
 class ConfigCog(commands.Cog):
     def __init__(self, bot):
         print("Adding Configuration cog")
@@ -66,6 +65,7 @@ class ConfigCog(commands.Cog):
         await ctx.send("Saving config...")
         self.cfg.reload()
         await ctx.send("Saved!")
+
 
 def setup(bot):
     bot.add_cog(ConfigCog(bot))

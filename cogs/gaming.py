@@ -1,26 +1,26 @@
 import asyncio
+import concurrent.futures
 import os
+import platform
+import re
+import socket
 import subprocess
 from typing import Union
 
 import discord
 import mcstatus
-import requests
 from discord import Embed
 from discord.ext import commands
-import re
-import socket
+
 import lib.hypixel
-import json
-import aiohttp
-import platform
-import concurrent.futures
+
 
 async def ping(url: str):
     ping_var = "-n" if platform.system() == "Windows" else "-c"
 
     def pshell(url: str):
         return str(subprocess.check_output(["ping", url, ping_var, "2"]), "utf-8")
+
     try:
         with concurrent.futures.ThreadPoolExecutor() as pool:
             s = await asyncio.get_event_loop().run_in_executor(pool, pshell, url)
@@ -157,7 +157,8 @@ class Gaming(commands.Cog):
         await m.edit(content="", embed=embed)
 
     @commands.command(aliases=["hp"])
-    async def hypixel(self, ctx: discord.ext.commands.Context, player: Union[discord.Member, str],  *, profile_type: str = None):
+    async def hypixel(self, ctx: discord.ext.commands.Context, player: Union[discord.Member, str], *,
+                      profile_type: str = None):
         """
         Checks a player's hypixel profile
         - player: the minecraft username
@@ -179,7 +180,6 @@ class Gaming(commands.Cog):
                                                                "tag with `%mojang username`"))
                 return
         await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
-
 
 
 def setup(bot):

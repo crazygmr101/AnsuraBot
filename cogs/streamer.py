@@ -1,8 +1,11 @@
 import os
+
+import discord
 import requests
 from discord.ext import commands
-import discord
+
 from lib.database import AnsuraDatabase
+
 
 class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -67,7 +70,7 @@ class Streamer(commands.Cog):
         embed.set_thumbnail(url=j['user']['avatarUrl'])
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["ssr","streamrole"])
+    @commands.command(aliases=["ssr", "streamrole"])
     @commands.check_any(
         commands.has_permissions(manage_roles=True, manage_guild=True),
         commands.is_owner(),
@@ -82,13 +85,13 @@ class Streamer(commands.Cog):
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
+        if isinstance(error, discord.ext.commands.ConversionError) or \
+                isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
         else:
             raise error
 
-    @commands.command(aliases=["ssc","streamch"])
+    @commands.command(aliases=["ssc", "streamch"])
     @commands.check_any(
         commands.has_permissions(manage_roles=True, manage_guild=True),
         commands.is_owner(),
@@ -103,8 +106,8 @@ class Streamer(commands.Cog):
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
+        if isinstance(error, discord.ext.commands.ConversionError) or \
+                isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that channel. Double-check capitalization.")
         else:
             raise error
