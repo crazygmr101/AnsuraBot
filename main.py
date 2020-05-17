@@ -32,7 +32,7 @@ initial_extensions = ['cogs.gamertags',
                       'cogs.administration', 'cogs.misc', 'cogs.gaming',
                       'cogs.fun', 'cogs.owner', 'cogs.image',
                       'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
-                      'cogs.dbl', 'cogs.timezones', 'cogs.tts', 'cogs.help']
+                      'cogs.dbl', 'cogs.timezones', 'cogs.voice', 'cogs.help']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print(f"[COGS] Loading {ext}")
@@ -92,7 +92,7 @@ async def on_message(message: discord.Message):
                                                   "Hello :D"]))
         return
     await xchat.xchat(message)
-    await bot.get_cog("TTS").tts(message)
+    await bot.get_cog("Voice").tts(message)
     await bot.process_commands(message)
 
 

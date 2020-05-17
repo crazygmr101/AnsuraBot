@@ -1,5 +1,7 @@
-from discord.ext import commands
+import sys
 
+from discord.ext import commands
+import traceback
 
 class ErrorHandler(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -7,6 +9,7 @@ class ErrorHandler(commands.Cog):
 
     # @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
+        print(traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr))
         if hasattr(ctx.command, 'error'):
             return
 

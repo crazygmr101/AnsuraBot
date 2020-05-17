@@ -106,7 +106,7 @@ class Owner(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def guilds(self, ctx: commands.Context):
-        tts: cogs.tts.TTS = self.bot.get_cog("TTS")
+        tts: cogs.voice.TTS = self.bot.get_cog("TTS")
         g: discord.Guild
         m: discord.Message = await ctx.send("Building list...")
         s = """```"""

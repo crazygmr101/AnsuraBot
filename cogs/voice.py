@@ -5,18 +5,29 @@ from typing import List, Dict
 
 import discord
 import gtts
+import youtube_dl
 from discord.ext import commands
 
-from lib.voicemanager import _TTSQueue, VoiceManager
+from lib.voicemanager import VoiceManager, TTSQueue, YTDLSource
 
 
-class TTS(commands.Cog):
+class Voice(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.vm: VoiceManager = bot.vm
 
+
+    @commands.command(aliases=["radio"])
+    async def stream(self, ctx, *, url):
+        """Streams from a url (same as yt, but doesn't predownload)"""
+
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.send('Now playing: {}'.format(player.title))
+
     @commands.command()
-    @commands.is_owner()
     @commands.has_permissions(manage_messages=True)
     async def summon(self, ctx: commands.Context):
         """Summons Ansura to your voice channel"""
@@ -24,19 +35,9 @@ class TTS(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    @commands.is_owner()
     async def leave(self, ctx: commands.Context):
         """Makes Ansura leave your voice channel"""
         await ctx.guild.voice_client.disconnect()
-
-    @commands.command()
-    @commands.is_owner()
-    @commands.has_permissions(manage_messages=True)
-    async def say(self, ctx: commands.Context, text):
-        """Makes ansura say something in the voice channel with TTS"""
-        message = gtts.gTTS(text)
-        message.save('tts.mp3')
-        ctx.guild.voice_client.play(discord.FFmpegPCMAudio('tts.mp3'))
 
     @commands.command(aliases=["tunmute"])
     @commands.has_guild_permissions(mute_members=True)
@@ -89,16 +90,20 @@ class TTS(commands.Cog):
         if ctx.guild.id not in self.vm.tts_mutes.keys():
             self.vm.tts_mutes[ctx.guild.id] = []
         if ctx.guild.id in self.vm.active_guilds.keys():
-            await ctx.send("Already watching a channel! Do %stoptts to stop")
+            await ctx.send("Do %stoptts to stop")
             return
         if not ctx.author.voice:
             await ctx.send("Join a voice channel!")
             return
         await ctx.send("Watching this channel for messages, do %stoptts to stop")
-        await ctx.author.voice.channel.connect()
+        try:
+            await ctx.author.voice.channel.connect()
+        except:
+            pass
+        # TODO fix this
         self.vm.guild_states[ctx.guild.id] = 1
         self.vm.active_guilds[ctx.guild.id] = ctx.channel
-        self.vm.queues[ctx.guild.id] = _TTSQueue(ctx.guild.id, ctx.guild.voice_client)
+        self.vm.queues[ctx.guild.id] = TTSQueue(ctx.guild.id, ctx.guild.voice_client)
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
@@ -158,4 +163,4 @@ class TTS(commands.Cog):
 
 
 
-def setup(bot): bot.add_cog(TTS(bot))
+def setup(bot): bot.add_cog(Voice(bot))
