@@ -1,13 +1,14 @@
 import glob
-
-from discord.ext import commands
-import re
-import random
 import logging
 import os
+import random
+import re
+
 import discord
-from lib.crosschat import Crosschat
+from discord.ext import commands
+
 import cogs
+from lib.crosschat import Crosschat
 from lib.voicemanager import VoiceManager
 
 logging.basicConfig(level=logging.WARN)
@@ -15,7 +16,7 @@ logging.basicConfig(level=logging.WARN)
 
 def get_prefix(bot, message):
     if bot.user.id == 643869468774105099:
-        return "ab!"
+        return "!"
     prefixes = ['%']
     if not message.guild:
         return '%'
@@ -29,10 +30,19 @@ xchat = Crosschat(bot)
 bot.vm = VoiceManager(bot)
 
 initial_extensions = ['cogs.gamertags',
-                      'cogs.administration', 'cogs.misc', 'cogs.gaming',
-                      'cogs.fun', 'cogs.owner', 'cogs.image',
-                      'cogs.error-handler', 'cogs.streamer', 'cogs.confighandler',
-                      'cogs.dbl', 'cogs.timezones', 'cogs.voice', 'cogs.help']
+                      'cogs.administration',
+                      'cogs.misc',
+                      'cogs.gaming',
+                      'cogs.fun',
+                      'cogs.owner',
+                      'cogs.image',
+                      'cogs.error-handler',
+                      'cogs.streamer',
+                      'cogs.confighandler',
+                      'cogs.dbl',
+                      'cogs.timezones',
+                      'cogs.voice',
+                      'cogs.help']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print(f"[COGS] Loading {ext}")
