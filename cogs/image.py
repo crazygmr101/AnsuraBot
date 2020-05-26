@@ -10,7 +10,7 @@ from discord.ext import commands
 class Image(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        
+
     @commands.command(aliases=["ihelp"])
     async def imagehelp(self, ctx: commands.Context, cmd: str = None):
         if cmd:
@@ -91,14 +91,14 @@ class Image(commands.Cog):
             clr = "".join(c + c for c in clr.split())
         if len(clr) == 6:
             try:
-                c = tuple(int(clr[i:i+2], 16) for i in range(0, len(clr), 2))
+                c = tuple(int(clr[i:i + 2], 16) for i in range(0, len(clr), 2))
                 return c
             except:
                 raise commands.ConversionError("Oops! There's an invalid color ): Colors must be formatted "
                                                "`rgb` or `rrggbb`",
                                                original=None)
         raise commands.ConversionError("Oops! There's an invalid color ): Colors must be formatted "
-                                               "`rgb` or `rrggbb`",
+                                       "`rgb` or `rrggbb`",
                                        original=None)
 
     def _process_commands(self, command: str, path: str):
@@ -151,7 +151,8 @@ class Image(commands.Cog):
                     a = 2
                 im = im.filter(ImageFilter.BoxBlur(a))
             if e[0] == "sharpen":
-                e.append([None, None, None])
+                for i in range(3):
+                    e.append(None)
                 im = im.filter(ImageFilter.UnsharpMask(int(e[1]) if e[1] else 2,
                                                        int(e[2]) if e[2] else 150,
                                                        int(e[3]) if e[3] else 3))
