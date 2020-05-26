@@ -6,10 +6,13 @@ from PIL import ImageOps, ImageFilter
 from PIL.Image import Image, WEB, ADAPTIVE
 from discord.ext import commands
 import math
+import asyncio
 
 class Image(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
+        self.counter = 100000
+        self.lock = asyncio.Lock()
 
     @commands.command(aliases=["ihelp"])
     async def imagehelp(self, ctx: commands.Context, cmd: str = None):
@@ -90,7 +93,7 @@ class Image(commands.Cog):
         f.close()
         code = False
         try:
-            code, msg, size = self._process_commands(" ".join(ctx.message.content.split(" ")[1::]), f.name)
+            code, msg, size = await self._process_commands(" ".join(ctx.message.content.split(" ")[1::]), f.name)
             if code is True:
                 await ctx.send(content=f"{self._fsize(size)}", file=discord.File(msg))
         except commands.ConversionError as e:
@@ -124,7 +127,7 @@ class Image(commands.Cog):
                                        "`rgb` or `rrggbb`",
                                        original=None)
 
-    def _process_commands(self, command: str, path: str):
+    async def _process_commands(self, command: str, path: str):
         ar = [x.split(" ") for x in [a.strip(" ") for a in command.split(',')]]
         im: Image = PIL.Image.open(path)
         # im.load()
@@ -231,7 +234,9 @@ class Image(commands.Cog):
                 im = im.resize((int(e[1]), int(e[2])), PIL.Image.NEAREST)
                 im = im.resize(size, PIL.Image.NEAREST)
         a = path.split(".")
-        b = path + "." + fmt  # + a[-1]
+        async with self.lock:
+            self.counter += 1
+        b = str(self.counter) + "." + fmt  # + a[-1]
         im.save(b)
         return True, b, os.path.getsize(b)
 
