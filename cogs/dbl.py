@@ -1,7 +1,9 @@
+import os
+
+import dbl
 import discord
 from discord.ext import commands, tasks
-import dbl
-import os
+
 
 class DBL(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -18,6 +20,7 @@ class DBL(commands.Cog):
                 type=discord.ActivityType.watching
             )
         )
+
 
 def setup(bot):
     bot.add_cog(DBL(bot))

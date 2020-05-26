@@ -1,13 +1,15 @@
-import discord
+import sys
+
 from discord.ext import commands
+import traceback
 
 class ErrorHandler(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        print("Error handler loaded")
 
-    #@commands.Cog.listener()
+    # @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: Exception):
+        print(traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr))
         if hasattr(ctx.command, 'error'):
             return
 
@@ -28,6 +30,7 @@ class ErrorHandler(commands.Cog):
 
         else:
             print(error)
+
 
 def setup(bot):
     bot.add_cog(ErrorHandler(bot))

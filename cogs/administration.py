@@ -1,9 +1,10 @@
 from typing import Union
 
-from discord.ext import commands
 import discord
-import core.help as HE
+from discord.ext import commands
+
 import cogs.gamertags
+
 
 class Administration(commands.Cog):
     def error(self, title, message={}, color=0xff0000):
@@ -16,14 +17,13 @@ class Administration(commands.Cog):
 
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Administration cog loaded")
 
     @commands.command(aliases=["sgv"])
     async def setgtval(self, ctx: discord.ext.commands.Context,
                        typ: str, user: Union[discord.Member, discord.User],
                        val: str):
-        ch : discord.TextChannel = \
-          ctx.channel
+        ch: discord.TextChannel = \
+            ctx.channel
         if not ch.permissions_for(ctx.author).administrator:
             await ctx.send(embed=
                            self.error("Permission error",
@@ -38,7 +38,7 @@ class Administration(commands.Cog):
                            self.error("Invalid gametag type"))
             await self.bot.get_cog("Help").help_(ctx, "setgtval")
             return
-        util: cogs.gamertags.Util= self.bot.get_cog("Util")
+        util: cogs.gamertags.Util = self.bot.get_cog("Util")
         db = util.db
         if typ == "xbox": typ = "xboxlive"
         rec = db.lookup_gaming_record(user.id)
@@ -64,14 +64,5 @@ class Administration(commands.Cog):
         await ctx.send(embed=e)
 
 
-
 def setup(bot):
     bot.add_cog(Administration(bot))
-    HE.HelpEntries.register("setgtval",
-                            "%setgtval type @user value",
-                            "Sets a user's gametag value as "
-                            "if they used the %xbox,%mja, etc "
-                            "commands",
-                            "Aliases: sgv\n"
-                            "Gametag types: xbox, mojang, "
-                            "mixer, youtube, twitch")

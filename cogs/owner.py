@@ -1,15 +1,16 @@
-import asyncio
+import random
 import re
 from typing import List, Union
-import cogs
-from discord.ext import commands
+
 import discord
-import random
+from discord.ext import commands
+
+import cogs
+
 
 class Owner(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
-        print("Owner cog loaded")
         self.guilds: List[discord.Guild] = []
 
     @commands.command()
@@ -105,7 +106,7 @@ class Owner(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def guilds(self, ctx: commands.Context):
-        tts: cogs.tts.TTS = self.bot.get_cog("TTS")
+        tts: cogs.voice.TTS = self.bot.get_cog("TTS")
         g: discord.Guild
         m: discord.Message = await ctx.send("Building list...")
         s = """```"""
@@ -125,8 +126,10 @@ class Owner(commands.Cog):
             g: discord.Guild = self.bot.get_guild(id)
             users, bots = 0, 0
             for m in g.members:
-                if m.bot: bots += 1
-                else: users += 1
+                if m.bot:
+                    bots += 1
+                else:
+                    users += 1
             e = discord.Embed()
             e.title = g.name
             e.set_thumbnail(url=g.icon_url)
@@ -150,9 +153,6 @@ class Owner(commands.Cog):
         s = g.name
         await g.leave()
         await ctx.send(f"Left {s}")
-
-
-
 
     @commands.command()
     @commands.is_owner()

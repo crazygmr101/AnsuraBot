@@ -1,21 +1,26 @@
+import asyncio
+import logging
 import os
-import cogs
+from typing import Dict
+
+import discord
 import requests
 from discord.ext import commands
-import discord
-from core.database import AnsuraDatabase
+import youtube_dl
+
+from lib.database import AnsuraDatabase
+
 
 class Streamer(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        print("Streamer cog loading")
-        print(" Opening mixer session...")
         self.db: AnsuraDatabase = bot.db
+        self.active: Dict[int, int] = {}
+        print("[STREAMER] Loading Mixer session")
         self.mixer_key = os.getenv("MIXER")
         self.session = requests.Session()
         self.session.headers.update({'Client-ID': self.mixer_key})
-        print(" Mixer session opened")
-        print("Streamer cog loaded")
+
 
     def _add_stream_record(self, guild: discord.Guild):
         self.db.cursor.execute("insert into streamer values (?,?,?,?)", (guild.id, 0, "%user% is streaming!", 0))
@@ -40,6 +45,10 @@ class Streamer(commands.Cog):
         if self.db.cursor.execute("select * from streamer where guildid=?", (guild.id,)).fetchone() is None:
             self._add_stream_record(guild)
         return self.db.cursor.execute("select * from streamer where guildid=?", (guild.id,)).fetchone()
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, b: discord.VoiceState, a: discord.VoiceState):
+        pass
 
     @commands.command()
     async def profile(self, ctx: commands.Context, profile_type: str, username: str):
@@ -68,7 +77,7 @@ class Streamer(commands.Cog):
         embed.set_thumbnail(url=j['user']['avatarUrl'])
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["ssr","streamrole"])
+    @commands.command(aliases=["ssr", "streamrole"])
     @commands.check_any(
         commands.has_permissions(manage_roles=True, manage_guild=True),
         commands.is_owner(),
@@ -83,13 +92,13 @@ class Streamer(commands.Cog):
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
+        if isinstance(error, discord.ext.commands.ConversionError) or \
+                isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
         else:
             raise error
 
-    @commands.command(aliases=["ssc","streamch"])
+    @commands.command(aliases=["ssc", "streamch"])
     @commands.check_any(
         commands.has_permissions(manage_roles=True, manage_guild=True),
         commands.is_owner(),
@@ -104,8 +113,8 @@ class Streamer(commands.Cog):
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
-        if isinstance(error, discord.ext.commands.ConversionError) or\
-           isinstance(error, discord.ext.commands.BadArgument):
+        if isinstance(error, discord.ext.commands.ConversionError) or \
+                isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that channel. Double-check capitalization.")
         else:
             raise error

@@ -1,16 +1,17 @@
+import asyncio
 import json
 import os
-from typing import Dict
-import pastebin
-import aiohttp
-import discord
-import pytz
-from discord.ext import commands
-from datetime import datetime, date
-import discord.utils
-import asyncio
 import urllib.parse
 import urllib.request
+from datetime import datetime
+from typing import Dict
+
+import aiohttp
+import discord
+import discord.utils
+import pytz
+from discord.ext import commands
+
 
 async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, key: str = None):
     with ctx.typing():
@@ -104,7 +105,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
     elif key.split(" ")[0] in ["sb", "skyblock"]:
         player = player["stats"]["SkyBlock"]["profiles"]
         if len(key.split(" ")) == 1:
-            e.description = f"Profiles:\n" +  \
+            e.description = f"Profiles:\n" + \
                             '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
         else:
             for pro in player.values():
@@ -125,7 +126,8 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                 return
             e.title += f" ({name})"
             async with aiohttp.ClientSession() as sess:
-                async with sess.get(f"https://api.hypixel.net/skyblock/profile?key={token}&profile={profile_id}") as resp:
+                async with sess.get(
+                        f"https://api.hypixel.net/skyblock/profile?key={token}&profile={profile_id}") as resp:
                     status = resp.status
                     data2 = await resp.json()
             profile = data2["profile"]
@@ -137,7 +139,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                 ))
                 e.add_field(name="Money",
                             value=f"Bank: {round(float(profile.get('banking', {'balance': 0})['balance']), 1)} Coins\n"
-                                            f"Purse: {round(float(player_sb['coin_purse']), 1)} Coins")
+                                  f"Purse: {round(float(player_sb['coin_purse']), 1)} Coins")
             e.add_field(name="Experience", value="\n".join([
                 k.title() + ": " + str(_get_level(player_sb.get(f"experience_skill_{k}", 0)))
                 for k in "alchemy,runecrafting,farming,combat,mining,enchanting,fishing,foraging,carpentry".split(",")
@@ -162,7 +164,7 @@ def _raw(data):
               'api_paste_name': 'Hypixel Profile',
               'api_paste_expire_date': 'N',
               'api_paste_format': 'javascript'
-            }
+              }
 
     data = urllib.parse.urlencode(values)
     data = data.encode('utf-8')  # data should be bytes
