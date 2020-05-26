@@ -63,7 +63,7 @@ class Image(commands.Cog):
         ar = [x.split(" ") for x in [a.strip(" ") for a in command.split(',')]]
         im: Image = PIL.Image.open(path)
         # im.load()
-        im = im.convert("RGB")
+        im = im.convert("RGBA")
         print(ar)
         for e in ar:
             if e[0] == "autocontrast":
@@ -119,7 +119,7 @@ class Image(commands.Cog):
                 im = im.resize((int(e[1]), int(e[2])), PIL.Image.NEAREST)
                 im = im.resize(size, PIL.Image.NEAREST)
         a = path.split(".")
-        b = path + "." + a[-1]
+        b = path + ".png"  # + a[-1]
         im.save(b)
         return True, b
 
