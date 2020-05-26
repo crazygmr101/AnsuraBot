@@ -52,6 +52,10 @@ filelist = glob.glob("*.mp3")
 for file in filelist:
     try: os.remove(file)
     except: print(f"err removing {file}")
+filelist = glob.glob("attachments/*")
+for file in filelist:
+    try: os.remove(file)
+    except: print(f"err removing {file}")
 
 
 @bot.event
