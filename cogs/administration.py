@@ -18,6 +18,7 @@ class Administration(commands.Cog):
     def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
 
+    @commands.is_owner()
     @commands.command(aliases=["sgv"])
     async def setgtval(self, ctx: discord.ext.commands.Context,
                        typ: str, user: Union[discord.Member, discord.User],
