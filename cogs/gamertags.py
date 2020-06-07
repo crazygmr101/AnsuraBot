@@ -15,7 +15,7 @@ class Gamertags(commands.Cog):
         self.db = bot.db
 
     @commands.command()
-    async def xbox(self, ctx: discord.ext.commands.Context, username):
+    async def xbox(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your xbox username
         """
@@ -23,7 +23,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mojang(self, ctx: discord.ext.commands.Context, username):
+    async def mojang(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your mojang username
         """
@@ -31,7 +31,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["yt"])
-    async def youtube(self, ctx: discord.ext.commands.Context, username):
+    async def youtube(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your youtube username
         """
@@ -39,7 +39,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mixer(self, ctx: discord.ext.commands.Context, username):
+    async def mixer(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your mixer username
         """
@@ -47,7 +47,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def twitch(self, ctx: discord.ext.commands.Context, username):
+    async def twitch(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your twitch username
         """
@@ -55,7 +55,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def reddit(self, ctx: discord.ext.commands.Context, username):
+    async def reddit(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your reddit username
         """
@@ -63,7 +63,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def steam(self, ctx: discord.ext.commands.Context, username):
+    async def steam(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your steam username/link
         """
