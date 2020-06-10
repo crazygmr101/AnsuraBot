@@ -71,12 +71,19 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["gt"])
-    async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None,
+                       override: bool = False):
         """
         Lists a user's gamertags
+        This only shows members of the server, bot owner can set `override` to change this
         """
+        if override and not await self.bot.is_owner(ctx.author):
+            override = False
         if user is None:
             user = ctx.author
+        if isinstance(user, discord.User) and not override:
+            await ctx.send("That user isn't in this server")
+            return
         rec = self.db.lookup_gaming_record(user.id)
         e = discord.Embed()
         e.colour = user.color
