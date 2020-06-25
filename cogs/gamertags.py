@@ -15,6 +15,32 @@ class Gamertags(commands.Cog):
         self.db = bot.db
 
     @commands.command()
+    async def setbio(self, ctx: commands.Context, *, bio: str):
+        if len(bio) > 1000:
+            bio = bio[:1000]
+        self.db.set_bio(ctx.author.id, bio)
+        await ctx.send(embed=discord.Embed(
+            title="Bio set",
+            description=bio,
+        ))
+
+    @commands.command()
+    async def bio(self, ctx: commands.Context, member: discord.Member = None):
+        if not member:
+            member = ctx.author
+        r = self.db.get_bio(member.id)
+        if not r:
+            await ctx.send(embed=discord.Embed(
+                title="No Bio",
+                description=f"{member.mention} hasn't set a bio yet. Have them do `!setbio cool bio here`"
+            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"{member}'s Bio",
+                description=r,
+            ))
+
+    @commands.command()
     async def xbox(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your xbox username

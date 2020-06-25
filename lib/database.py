@@ -9,6 +9,20 @@ class AnsuraDatabase:
         self.cursor: sqlite3.Cursor = self.conn.cursor()
         print("[DATABASE] Loaded database")
 
+    def get_bio(self, userid: int):
+        row = self.cursor.execute("select * from bios where id=?", (userid, )).fetchone()
+        if not row:
+            return None
+        return row[1]
+
+    def set_bio(self, userid: int, bio: str):
+        row = self.cursor.execute("select * from bios where id=?", (userid, )).fetchone()
+        if row:
+            self.cursor.execute("update bios set bio=? where id=?", (bio, userid))
+        else:
+            self.cursor.execute("insert into bios values (?,?)", (userid, bio))
+        self.conn.commit()
+
     def lookup_timezone(self, userid: int):
         if not self.has_timezone(userid):
             self.add_timezone(userid)
