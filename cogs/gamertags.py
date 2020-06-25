@@ -15,7 +15,33 @@ class Gamertags(commands.Cog):
         self.db = bot.db
 
     @commands.command()
-    async def xbox(self, ctx: discord.ext.commands.Context, username):
+    async def setbio(self, ctx: commands.Context, *, bio: str):
+        if len(bio) > 1000:
+            bio = bio[:1000]
+        self.db.set_bio(ctx.author.id, bio)
+        await ctx.send(embed=discord.Embed(
+            title="Bio set",
+            description=bio,
+        ))
+
+    @commands.command()
+    async def bio(self, ctx: commands.Context, member: discord.Member = None):
+        if not member:
+            member = ctx.author
+        r = self.db.get_bio(member.id)
+        if not r:
+            await ctx.send(embed=discord.Embed(
+                title="No Bio",
+                description=f"{member.mention} hasn't set a bio yet. Have them do `!setbio cool bio here`"
+            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"{member}'s Bio",
+                description=r,
+            ))
+
+    @commands.command()
+    async def xbox(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your xbox username
         """
@@ -23,7 +49,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mojang(self, ctx: discord.ext.commands.Context, username):
+    async def mojang(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your mojang username
         """
@@ -31,7 +57,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["yt"])
-    async def youtube(self, ctx: discord.ext.commands.Context, username):
+    async def youtube(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your youtube username
         """
@@ -39,7 +65,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mixer(self, ctx: discord.ext.commands.Context, username):
+    async def mixer(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your mixer username
         """
@@ -47,7 +73,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def twitch(self, ctx: discord.ext.commands.Context, username):
+    async def twitch(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your twitch username
         """
@@ -55,7 +81,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def reddit(self, ctx: discord.ext.commands.Context, username):
+    async def reddit(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your reddit username
         """
@@ -63,7 +89,7 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def steam(self, ctx: discord.ext.commands.Context, username):
+    async def steam(self, ctx: discord.ext.commands.Context, *, username):
         """
         Sets your steam username/link
         """
@@ -71,12 +97,19 @@ class Gamertags(commands.Cog):
         await ctx.send(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["gt"])
-    async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None,
+                       override: bool = False):
         """
         Lists a user's gamertags
+        This only shows members of the server, bot owner can set `override` to change this
         """
+        if override and not await self.bot.is_owner(ctx.author):
+            override = False
         if user is None:
             user = ctx.author
+        if isinstance(user, discord.User) and not override:
+            await ctx.send("That user isn't in this server")
+            return
         rec = self.db.lookup_gaming_record(user.id)
         e = discord.Embed()
         e.colour = user.color
