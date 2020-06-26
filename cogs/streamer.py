@@ -51,7 +51,7 @@ class Streamer(commands.Cog):
         pass
 
     @commands.command()
-    async def profile(self, ctx: commands.Context, profile_type: str, username: str):
+    async def sprofile(self, ctx: commands.Context, profile_type: str, username: str):
         """
         Looks up a profile.
         - profile_type: Mixer
