@@ -16,8 +16,8 @@ class AnsuraDatabase:
         """
         if not self.has_gaming_record(userid):
             self.add_gaming_record(userid)
-        r = self.lookup_gaming_record(userid)
-        return r[8], r[9]
+        r = self.cursor.execute("select private, webprivate from gaming where id=?", (userid,)).fetchone()
+        return r[0], r[1]
 
     def setprivate(self, userid: int, *, web: bool = None, gt: bool = None):
         if web is not None and gt is not None:
