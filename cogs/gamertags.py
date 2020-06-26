@@ -159,15 +159,14 @@ class Gamertags(commands.Cog):
             await ctx.send("That user isn't in this server")
             return
         rec = self.db.lookup_gaming_record(user.id)
-        print(rec)
-        print(repr(rec[8]))
-        if rec[8] == 1 and not ctx.author.guild_permissions.manage_guild:
+        priv = self.db.isprivate(user.id)
+        if priv[0] == 1 and not ctx.author.guild_permissions.manage_guild:
             await ctx.send(embed=discord.Embed(
                 title=user.display_name,
                 description="This user's profile is private"
             ))
             return
-        if rec[8] == 1:
+        if priv[0] == 1:
             await ctx.send("This profile is private. Do you want to continue to display it anyway?")
             resp = await self.bot.wait_for("message", timeout=60, check=lambda m: m.author.id == ctx.author.id and
                                            m.channel.id == ctx.channel.id)
