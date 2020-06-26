@@ -9,6 +9,28 @@ class AnsuraDatabase:
         self.cursor: sqlite3.Cursor = self.conn.cursor()
         print("[DATABASE] Loaded database")
 
+    def isprivate(self, userid: int):
+        """
+        :param userid:
+        :return: private, webprivate
+        """
+        if not self.has_gaming_record(userid):
+            self.add_gaming_record(userid)
+        r = self.lookup_gaming_record(userid)
+        return r[8], r[9]
+
+    def setprivate(self, userid: int, *, web: bool = None, gt: bool = None):
+        if web is not None and gt is not None:
+            raise AttributeError("web and gt can not be both supplied")
+        if not self.has_gaming_record(userid):
+            self.add_gaming_record(userid)
+        if web is not None:
+            self.cursor.execute("update gaming set webprivate=? where id=?", (1 if web else 0, userid))
+        else:
+            self.cursor.execute("update gaming set private=? where id=?", (1 if gt else 0, userid))
+        self.conn.commit()
+        return self.isprivate(userid)
+
     def get_bio(self, userid: int):
         row = self.cursor.execute("select * from bios where id=?", (userid, )).fetchone()
         if not row:
@@ -44,8 +66,8 @@ class AnsuraDatabase:
         return self.cursor.execute("select * from timezones where user=?", (userid,)).fetchone() is not None
 
     def add_gaming_record(self, userid: int):
-        self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?)",
-                            (userid, None, None, None, None, None, None, None))
+        self.cursor.execute("insert into gaming values (?,?,?,?,?,?,?,?,?,?)",
+                            (userid, None, None, None, None, None, None, None, 0, 1))
         print("Empty record added for user " + str(userid))
         self.conn.commit()
 
