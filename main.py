@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 
 import cogs
-from lib.crosschat import Crosschat
+from cogs.crosschat import Crosschat
 from lib.voicemanager import VoiceManager
 
 logging.basicConfig(level=logging.WARN)
@@ -25,7 +25,6 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=get_prefix)
 bot.remove_command('help')
-xchat = Crosschat(bot)
 
 bot.vm = VoiceManager(bot)
 
@@ -42,7 +41,8 @@ initial_extensions = ['cogs.gamertags',
                       'cogs.dbl',
                       'cogs.timezones',
                       'cogs.voice',
-                      'cogs.help']
+                      'cogs.help',
+                      'cogs.crosschat']
 if __name__ == '__main__':
     for ext in initial_extensions:
         print(f"[COGS] Loading {ext}")
@@ -60,6 +60,7 @@ for file in filelist:
 
 @bot.event
 async def on_ready():
+    xchat: Crosschat =  bot.get_cog("Crosschat")
     await xchat.init_channels()
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("%help"))
     await bot.cfg.start()
@@ -97,6 +98,7 @@ async def on_message(message: discord.Message):
         message.content = "%placeblock_chicken"
         await bot.process_commands(message)
         return
+    xchat: Crosschat = bot.get_cog("Crosschat")
     hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(bot.user.id) + ">)[!\.]*\s*$"
     if message.content == "<@!" + str(bot.user.id) + ">":
         await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
