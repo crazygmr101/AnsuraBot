@@ -79,6 +79,12 @@ class Crosschat(commands.Cog):
             return
         with open("xchat.yaml", "w") as fp:
             YAML().dump({"banned": self.banned, "channels": self.channels}, fp)
+        for i in self.channels:
+            color = int(i) // 64 % (14 ** 3) + 0x222
+            rd = color >> 8
+            gr = (color & 0x0f0) >> 4
+            bl = (color & 0xf)
+            self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
 
 
     @commands.command()
