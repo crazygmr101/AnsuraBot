@@ -1,12 +1,10 @@
-import logging
-
 import discord
 import discord.errors
 from discord import Guild, TextChannel
 from discord.ext import commands
 
 
-class Crosschat:
+class Crosschat(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.colors = {}
         self.channels = {}
@@ -68,3 +66,7 @@ class Crosschat:
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
             if c is not None:
                 await c.send(embed=e)
+
+
+def setup(bot):
+    bot.add_cog(Crosschat(bot))
