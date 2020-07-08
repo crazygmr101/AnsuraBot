@@ -53,7 +53,7 @@ class Crosschat(commands.Cog):
                                 )).run()
 
     @commands.command()
-    @commands.is_owner()
+    @commands.has_permissions(administrator=True)
     async def crosschat(self, ctx: commands.Context, arg: Union[discord.TextChannel, str] = None):
         if not arg:
             if ctx.guild.id in self.channels.keys():
