@@ -11,6 +11,7 @@ class Crosschat:
         self.colors = {}
         self.channels = {}
         self.bot = bot
+        self._cd = commands.CooldownMapping.from_cooldown(2, 60, commands.BucketType.user)
 
     async def init_channels(self):
         print("[XCHAT] Looking for channels")
@@ -34,6 +35,13 @@ class Crosschat:
         print("[XCHAT] Channel search done")
 
     async def xchat(self, message: discord.Message):
+        if self._cd.get_bucket(message).update_rate_limit():
+            try:
+                await message.delete()
+            except discord.errors.Forbidden:
+                pass
+            await message.channel.send(f"{message.author.mention}, you're sending messages too fast!", delete_after=30)
+            return
         channel: discord.TextChannel = message.channel
         if channel.id not in self.channels.values():
             return
