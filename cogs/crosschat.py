@@ -12,7 +12,7 @@ class Crosschat(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.colors = {}
         self.bot = bot
-        self._cd = commands.CooldownMapping.from_cooldown(3, 50, commands.BucketType.user)
+        self._cd = commands.CooldownMapping.from_cooldown(3, 30, commands.BucketType.user)
         self.channels: Optional[Dict[str, int]] = None
         self.banned: Optional[List[int]] = None
 
