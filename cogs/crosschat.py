@@ -15,17 +15,20 @@ class Crosschat(commands.Cog):
         self._cd = commands.CooldownMapping.from_cooldown(3, 30, commands.BucketType.user)
         self.channels: Optional[Dict[str, int]] = None
         self.banned: Optional[List[int]] = None
+        self.exempt: Optional[List[int]] = None
 
     @commands.command()
     @commands.is_owner()
-    async def xcreload(self):
+    async def xcreload(self, ctx: commands.Context):
         self._reload()
+        await ctx.send("Reloaded")
 
     def _reload(self):
         with open("xchat.yaml") as fp:
             config = YAML().load(fp)
         self.channels = config["channels"]
         self.banned = config["banned"]
+        self.exempt = config["exempt"]
         for i in self.channels:
             color = int(i) // 64 % (14 ** 3) + 0x222
             rd = color >> 8
@@ -78,7 +81,7 @@ class Crosschat(commands.Cog):
         else:
             return
         with open("xchat.yaml", "w") as fp:
-            YAML().dump({"banned": self.banned, "channels": self.channels}, fp)
+            YAML().dump({"banned": self.banned, "channels": self.channels, "exempt": self.exempt}, fp)
         for i in self.channels:
             color = int(i) // 64 % (14 ** 3) + 0x222
             rd = color >> 8
@@ -130,7 +133,7 @@ class Crosschat(commands.Cog):
             except discord.errors.Forbidden:
                 pass
             return
-        if self._cd.get_bucket(message).update_rate_limit():
+        if self._cd.get_bucket(message).update_rate_limit() and message.author.id not in self.exempt:
             try:
                 await message.delete()
             except discord.errors.Forbidden:
