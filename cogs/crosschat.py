@@ -50,9 +50,9 @@ class Crosschat(commands.Cog):
     async def xcservers(self, ctx: commands.Context):
         await BotEmbedPaginator(ctx,
                                 pages(
-                                    [f"{self.bot.get_guild(int(x))} ({x}) - "
+                                    [f"**{self.bot.get_guild(int(x))}** ({x})\n- "
                                      f"{self.bot.get_channel(c)} ({c})" for x, c in self.channels.items()],
-                                    10, "Crosschat servers"
+                                    10, "Crosschat servers", fmt="%s"
                                 )).run()
 
     @commands.command()
