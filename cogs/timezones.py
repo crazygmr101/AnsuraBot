@@ -75,6 +75,8 @@ class Timezones(commands.Cog):
     @commands.command()
     async def timezones(self, ctx: commands.Context, search: str = None):
         """Gets a list of supported timezones, use `%timezones akhjdlksa` to search by text"""
+        if not search:
+            search = ""
         all_timezones = [tz for tz in pytz.all_timezones if (search.lower() or "") in tz.lower()]
         await BotEmbedPaginator(
             ctx,
