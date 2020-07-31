@@ -146,7 +146,7 @@ class Owner(commands.Cog):
     @commands.is_owner()
     async def guild_leave(self, ctx: commands.Context, id: int):
         """Leaves a guild given by <id>"""
-        g: discord.Guild = await self.bot.get_guild(id)
+        g: discord.Guild = self.bot.get_guild(id)
         if g is None:
             await ctx.send("I'm not in a guild with this ID")
             return
