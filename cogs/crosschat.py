@@ -190,7 +190,7 @@ class Crosschat(commands.Cog):
             except discord.errors.Forbidden:
                 pass
             await message.channel.send(f"{message.author.mention}, you're sending messages too fast! "
-                                       f"Try again in {time} seconds.", delete_after=30)
+                                       f"Try again in {round(time)} seconds.", delete_after=30)
             return
 
         guild: discord.Guild = channel.guild
