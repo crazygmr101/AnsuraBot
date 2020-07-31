@@ -232,7 +232,8 @@ class Crosschat(commands.Cog):
         self.messages.append([message.guild.id, message.channel.id, message.author.id, sent])
         if len(self.messages) > 250:
             del self.messages[0]
-        os.remove(f"attachments/{message.attachments[0].filename}")
+        if file:
+            os.remove(f"attachments/{message.attachments[0].filename}")
 
     def _is_image(self, url: str):
         for i in "jpg,jpeg,png,gif".split(","):
