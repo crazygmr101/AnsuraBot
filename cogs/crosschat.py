@@ -9,6 +9,14 @@ from ruamel.yaml import YAML
 from disputils import BotEmbedPaginator
 from lib.utils import pages
 
+def ansura_staff():
+    def predicate(ctx: commands.Context):
+        ansura_guild: discord.Guild = ctx.bot.get_guild(604823602973376522)
+        if not ansura_guild.get_member(ctx.author.id):
+            return
+        return 691752324787339351 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
+    return commands.check(predicate)
+
 class Crosschat(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.colors = {}
@@ -26,7 +34,7 @@ class Crosschat(commands.Cog):
         return None
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xclist(self, ctx: commands.Context):
         channels = pages([f"{self.bot.get_guild(k)} ({k})\n - {self.bot.get_channel(v)} ({v})"
                           for k, v in self.channels.items()], 10, fmt="%s", title="Channels")
@@ -36,7 +44,7 @@ class Crosschat(commands.Cog):
         await BotEmbedPaginator(ctx, list(chain(channels, banned, exempt))).run()
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcreload(self, ctx: commands.Context):
         self._reload()
         await ctx.send("Reloaded")
@@ -59,16 +67,16 @@ class Crosschat(commands.Cog):
             YAML().dump({"banned": self.banned, "channels": self.channels, "exempt": self.exempt}, fp)
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcbans(self, ctx: commands.Context):
         await BotEmbedPaginator(ctx,
                                 pages(
-                                    [f"{self.bot.get_user(x)} - {x}" for x in self.banned],
-                                    10, "Crosschat bans"
+                                    [f"{self._resolve(x)} - {x}" for x in self.banned],
+                                    10, "Crosschat bans", fmt="%s"
                                 )).run()
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcservers(self, ctx: commands.Context):
         await BotEmbedPaginator(ctx,
                                 pages(
@@ -115,7 +123,7 @@ class Crosschat(commands.Cog):
             self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcgban(self, ctx: commands.Context, guild: int):
         if guild in self.banned:
             return await ctx.send(f"Guild {self.bot.get_guild(guild).name} already banned.")
@@ -124,7 +132,7 @@ class Crosschat(commands.Cog):
         await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcgunban(self, ctx: commands.Context, guild: int):
         if guild not in self.banned:
             return await ctx.send(f"Guild {self.bot.get_guild(guild).name} not banned.")
@@ -133,7 +141,7 @@ class Crosschat(commands.Cog):
         await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcban(self, ctx: commands.Context, member: Union[discord.Member, int]):
         if isinstance(member, discord.Member):
             member = member.id
@@ -145,7 +153,7 @@ class Crosschat(commands.Cog):
             await ctx.send(f"{self.bot.get_user(member)} ({member}) already xchat banned")
 
     @commands.command()
-    @commands.is_owner()
+    @ansura_staff()
     async def xcunban(self, ctx: commands.Context, member: Union[discord.Member, int]):
         if isinstance(member, discord.Member):
             member = member.id
@@ -206,6 +214,15 @@ class Crosschat(commands.Cog):
             if c is not None:
                 await c.send(embed=e)
 
+    @commands.command()
+    @ansura_staff()
+    async def xchelp(self, ctx: commands.Context):
+        await ctx.send(embed=discord.Embed(
+            title="Ansura Crosschat Moderation",
+            description="**Guild Ban Management**:`xcgunban`/`xcgban`\n"
+                        "**User Ban Management**: `xcunban`/`xcban`\n"
+                        "**List Guilds, Bans, Exemptions**: `xclist`\n"
+        ))
 
 def setup(bot):
     bot.add_cog(Crosschat(bot))
