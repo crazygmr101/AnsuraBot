@@ -1,4 +1,5 @@
 from itertools import chain
+import os
 from typing import Dict, List, Optional, Tuple, Union
 
 import discord
@@ -200,6 +201,15 @@ class Crosschat(commands.Cog):
         user: discord.User = message.author
         e.description = message.content
         err_s = ""
+        file = None
+        if message.attachments:
+            if self._is_image(message.attachments[0].filename):
+                with open(f"attachments/{message.attachments[0].filename}", "wb") as fp:
+                    await message.attachments[0].save(fp)
+                file = True
+                e.set_image(url=f"attachment://{message.attachments[0].filename}")
+        else:
+            file = False
         try:
             await message.delete()
         except discord.errors.Forbidden as err:
@@ -209,14 +219,27 @@ class Crosschat(commands.Cog):
             pass
         e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s, icon_url=user.avatar_url)
         sent = []
+
         for k in self.channels.keys():
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
             if c is not None:
-                msg = await c.send(embed=e)
+                if file:
+                    with open(f"attachments/{message.attachments[0].filename}", "rb") as fp:
+                        msg = await c.send(embed=e, file=discord.File(fp, message.attachments[0].filename))
+                else:
+                    msg = await c.send(embed=e)
                 sent.append((c.id, msg.id))
         self.messages.append([message.guild.id, message.channel.id, message.author.id, sent])
         if len(self.messages) > 250:
             del self.messages[0]
+        os.remove(f"attachments/{message.attachments[0].filename}")
+
+    def _is_image(self, url: str):
+        for i in "jpg,jpeg,png,gif".split(","):
+            if url.endswith("." + i):
+                return True
+        else:
+            return False
 
     @commands.command()
     @ansura_staff()
@@ -308,7 +331,8 @@ class Crosschat(commands.Cog):
             description="**Guild Ban Management**:`xcgunban guild_id` `xcgban guild_id`\n"
                         "**User Ban Management**: `xcunban member_id_or_@`/`xcban member_id_or_@`\n"
                         "**List Guilds, Bans, Exemptions**: `xclist`\n"
-                        "**Lookup a message**: `xclookup message_link_or_id"
+                        "**Lookup a message**: `xclookup message_link`\n"
+                        "**Delete a message**: `xcldelete message_link`"
         ))
 
 def setup(bot):
