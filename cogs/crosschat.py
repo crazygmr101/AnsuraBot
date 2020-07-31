@@ -18,12 +18,20 @@ class Crosschat(commands.Cog):
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
 
+    def _resolve(self, u):
+        if self.bot.get_user(u):
+            return f"*U* {self.bot.get_user(u)}"
+        if self.bot.get_guild(u):
+            return f"*G* {self.bot.get_guild(u)}"
+        return None
+
     @commands.command()
     @commands.is_owner()
     async def xclist(self, ctx: commands.Context):
         channels = pages([f"{self.bot.get_guild(k)} ({k})\n - {self.bot.get_channel(v)} ({v})"
-                  for k, v in self.channels.items()], 10, fmt="%s", title="Channels")
-        banned = pages([f"{self.bot.get_user(u)} - {u}" for u in self.banned], 10, fmt="%s", title="Banned")
+                          for k, v in self.channels.items()], 10, fmt="%s", title="Channels")
+        banned = pages([f"{self._resolve(u)} - {u}"
+                        for u in self.banned], 10, fmt="%s", title="Banned")
         exempt = pages([f"{self.bot.get_user(u)} - {u}" for u in self.exempt], 10, fmt="%s", title="Exempt")
         await BotEmbedPaginator(ctx, list(chain(channels, banned, exempt))).run()
 
@@ -45,6 +53,10 @@ class Crosschat(commands.Cog):
             gr = (color & 0x0f0) >> 4
             bl = (color & 0xf)
             self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
+
+    def _save(self):
+        with open("xchat.yaml", "w") as fp:
+            YAML().dump({"banned": self.banned, "channels": self.channels, "exempt": self.exempt}, fp)
 
     @commands.command()
     @commands.is_owner()
@@ -71,6 +83,10 @@ class Crosschat(commands.Cog):
         commands.has_guild_permissions(administrator=True)
     )
     async def crosschat(self, ctx: commands.Context, arg: Union[discord.TextChannel, str] = None):
+        if ctx.guild.id in self.banned:
+            await ctx.send("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
+                           "go to https://discord.gg/t5MGS2X to appeal.")
+            return
         if not arg:
             if ctx.guild.id in self.channels.keys():
                 await ctx.send(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
@@ -90,8 +106,7 @@ class Crosschat(commands.Cog):
             await ctx.send(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
         else:
             return
-        with open("xchat.yaml", "w") as fp:
-            YAML().dump({"banned": self.banned, "channels": self.channels, "exempt": self.exempt}, fp)
+        self._save()
         for i in self.channels:
             color = int(i) // 64 % (14 ** 3) + 0x222
             rd = color >> 8
@@ -99,6 +114,23 @@ class Crosschat(commands.Cog):
             bl = (color & 0xf)
             self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
 
+    @commands.command()
+    @commands.is_owner()
+    async def xcgban(self, ctx: commands.Context, guild: int):
+        if guild in self.banned:
+            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} already banned.")
+        self.banned.append(guild)
+        self._save()
+        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
+
+    @commands.command()
+    @commands.is_owner()
+    async def xcgunban(self, ctx: commands.Context, guild: int):
+        if guild not in self.banned:
+            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} not banned.")
+        self.banned.remove(guild)
+        self._save()
+        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
 
     @commands.command()
     @commands.is_owner()
@@ -107,8 +139,7 @@ class Crosschat(commands.Cog):
             member = member.id
         if member not in self.banned:
             self.banned.append(member)
-            with open("xchat.yaml", "w") as fp:
-                YAML().dump({"banned": self.banned, "channels": self.channels}, fp)
+            self._save()
             await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat banned")
         else:
             await ctx.send(f"{self.bot.get_user(member)} ({member}) already xchat banned")
@@ -120,8 +151,7 @@ class Crosschat(commands.Cog):
             member = member.id
         if member in self.banned:
             self.banned.remove(member)
-            with open("xchat.yaml", "w") as fp:
-                YAML().dump({"banned": self.banned, "channels": self.channels}, fp)
+            self._save()
             await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat unbanned")
         else:
             await ctx.send(f"{self.bot.get_user(member)} ({member}) already not banned")
@@ -137,7 +167,7 @@ class Crosschat(commands.Cog):
         channel: discord.TextChannel = message.channel
         if channel.id not in self.channels.values():
             return
-        if message.author.id in self.banned:
+        if message.author.id in self.banned or message.guild.id in self.banned:
             try:
                 await message.delete()
             except discord.errors.Forbidden:
