@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import discord
 import discord.errors
@@ -25,6 +25,7 @@ class Crosschat(commands.Cog):
         self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
+        self.messages: List[List[int, int, int, List[Tuple[int, int]]]] = []
 
     def _resolve(self, u):
         if self.bot.get_user(u):
@@ -207,21 +208,107 @@ class Crosschat(commands.Cog):
         except discord.errors.NotFound as e:
             pass
         e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s, icon_url=user.avatar_url)
+        sent = []
         for k in self.channels.keys():
-            if self.channels[k] == channel.id:
-                pass
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
             if c is not None:
-                await c.send(embed=e)
+                msg = await c.send(embed=e)
+                sent.append((c.id, msg.id))
+        self.messages.append([message.guild.id, message.channel.id, message.author.id, sent])
+        if len(self.messages) > 250:
+            del self.messages[0]
+
+    @commands.command()
+    @ansura_staff()
+    async def xclookup(self, ctx: commands.Context, message: Union[discord.Message, int]):
+        if isinstance(message, discord.Message):
+            msg_id = message.id
+        else:
+            msg_id = message
+        guild = None
+        messages = None
+        msgs = None
+        author = None
+        found = False
+        channel = None
+        for i in self.messages:
+            guild = i[0]
+            channel = i[1]
+            author = i[2]
+            msgs = i[3]
+            for m in msgs:
+                if m[1] == msg_id:
+                    found = True
+                    break
+            if found: break
+        else:
+            return await ctx.send("Message not found")
+        await ctx.send(
+            embed=discord.Embed(
+                title="Message lookup",
+            ).add_field(
+                name="Guild",
+                value=f"{self.bot.get_guild(guild)} - {guild}",
+                inline=False
+            ).add_field(
+                name="Channel",
+                value=f"{self.bot.get_channel(channel)} - {channel}",
+                inline=False
+            ).add_field(
+                name="Author",
+                value=f"{self.bot.get_user(author)} - {author}",
+                inline=False
+            )
+        )
+
+    @commands.command()
+    @ansura_staff()
+    async def xcdelete(self, ctx: commands.Context, message: Union[discord.Message, int]):
+        if isinstance(message, discord.Message):
+            msg_id = message.id
+        else:
+            msg_id = message
+        guild = None
+        messages = None
+        msgs = None
+        author = None
+        found = False
+        channel = None
+        for i in self.messages:
+            guild = i[0]
+            channel = i[1]
+            author = i[2]
+            msgs = i[3]
+            for m in msgs:
+                if m[1] == msg_id:
+                    found = True
+                    break
+            if found: break
+        else:
+            return await ctx.send("Message not found")
+        count = 0
+        fail = 0
+        for g, c in self.channels.items():
+            for m in msgs:
+                chan: discord.TextChannel = self.bot.get_channel(m[0])
+                if chan:
+                    try:
+                        await (await chan.fetch_message(m[1])).delete()
+                        count += 1
+                    except:
+                        pass
+        await ctx.send(f"Deleted message from {count} servers. {fail} failed")
+
 
     @commands.command()
     @ansura_staff()
     async def xchelp(self, ctx: commands.Context):
         await ctx.send(embed=discord.Embed(
             title="Ansura Crosschat Moderation",
-            description="**Guild Ban Management**:`xcgunban`/`xcgban`\n"
-                        "**User Ban Management**: `xcunban`/`xcban`\n"
+            description="**Guild Ban Management**:`xcgunban guild_id` `xcgban guild_id`\n"
+                        "**User Ban Management**: `xcunban member_id_or_@`/`xcban member_id_or_@`\n"
                         "**List Guilds, Bans, Exemptions**: `xclist`\n"
+                        "**Lookup a message**: `xclookup message_link_or_id"
         ))
 
 def setup(bot):
