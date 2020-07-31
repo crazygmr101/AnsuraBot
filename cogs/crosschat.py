@@ -12,7 +12,7 @@ class Crosschat(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.colors = {}
         self.bot = bot
-        self._cd = commands.CooldownMapping.from_cooldown(3, 30, commands.BucketType.user)
+        self._cd = commands.CooldownMapping.from_cooldown(3, 15, commands.BucketType.user)
         self.channels: Optional[Dict[str, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
@@ -133,12 +133,14 @@ class Crosschat(commands.Cog):
             except discord.errors.Forbidden:
                 pass
             return
-        if self._cd.get_bucket(message).update_rate_limit() and message.author.id not in self.exempt:
+        time = self._cd.get_bucket(message).update_rate_limit()
+        if time and message.author.id not in self.exempt:
             try:
                 await message.delete()
             except discord.errors.Forbidden:
                 pass
-            await message.channel.send(f"{message.author.mention}, you're sending messages too fast!", delete_after=30)
+            await message.channel.send(f"{message.author.mention}, you're sending messages too fast! "
+                                       f"Try again in {time} seconds.", delete_after=30)
             return
 
         guild: discord.Guild = channel.guild
