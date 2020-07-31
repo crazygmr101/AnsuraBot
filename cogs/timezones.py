@@ -5,6 +5,8 @@ import pytz
 from discord.ext import commands
 
 from lib.database import AnsuraDatabase as DB
+from lib.utils import pages
+from disputils import BotEmbedPaginator
 
 
 class Timezones(commands.Cog):
@@ -20,7 +22,7 @@ class Timezones(commands.Cog):
         if tz is None:
             e.title = "No timezone"
             e.colour = discord.Colour.dark_gold()
-            e.description = f"{user.mention} doesn't have their timezone set"
+            e.description = f"{user.mention} doesn't have their timezone set. Have them set it with `%timezone`"
         else:
             e.title = f"{user.display_name}"
             e.description = f"{user.display_name}'s timezone is `{tz}`"
@@ -35,7 +37,7 @@ class Timezones(commands.Cog):
             if tz is None:
                 e.title = "No timezone"
                 e.colour = discord.Colour.dark_gold()
-                e.description = f"{user.mention} doesn't have their timezone set"
+                e.description = f"{user.mention} doesn't have their timezone set. Have them set it with `%timezone`"
             else:
                 e.title = f"{user.display_name}"
                 now_utc = datetime.datetime.now(pytz.timezone("UTC"))
@@ -62,13 +64,22 @@ class Timezones(commands.Cog):
             e.colour = discord.Colour.red()
             e.title = "Invalid Timezone"
             e.description = f"{tz} is an invalid timezone. Refer to " \
-                            f"https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of supported " \
+                            f"`!timezones` for a list of supported " \
                             f"timezones "
             await ctx.send(embed=e)
             return
         except Exception as ex:
             print(type(ex))
             print(ex.__str__())
+
+    @commands.command()
+    async def timezones(self, ctx: commands.Context, search: str = None):
+        """Gets a list of supported timezones, use `%timezones akhjdlksa` to search by text"""
+        all_timezones = [tz for tz in pytz.all_timezones if (search.lower() or "") in tz.lower()]
+        await BotEmbedPaginator(
+            ctx,
+            pages(all_timezones, 20, "Supported Timezones", fmt="%s"),
+        ).run()
 
 
 def setup(bot):
