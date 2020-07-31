@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import Dict, List, Optional, Union
 
 import discord
@@ -13,9 +14,18 @@ class Crosschat(commands.Cog):
         self.colors = {}
         self.bot = bot
         self._cd = commands.CooldownMapping.from_cooldown(3, 15, commands.BucketType.user)
-        self.channels: Optional[Dict[str, int]] = None
+        self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
+
+    @commands.command()
+    @commands.is_owner()
+    async def xclist(self, ctx: commands.Context):
+        channels = pages([f"{self.bot.get_guild(k)} ({k})\n - {self.bot.get_channel(v)} ({v})"
+                  for k, v in self.channels.items()], 10, fmt="%s", title="Channels")
+        banned = pages([f"{self.bot.get_user(u)} - {u}" for u in self.banned], 10, fmt="%s", title="Banned")
+        exempt = pages([f"{self.bot.get_user(u)} - {u}" for u in self.exempt], 10, fmt="%s", title="Exempt")
+        await BotEmbedPaginator(ctx, list(chain(channels, banned, exempt))).run()
 
     @commands.command()
     @commands.is_owner()
