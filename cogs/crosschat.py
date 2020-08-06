@@ -27,6 +27,7 @@ class Crosschat(commands.Cog):
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
         self.messages: List[List[int, int, int, List[Tuple[int, int]]]] = []
+        self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
 
     def _resolve(self, u):
         if self.bot.get_user(u):
@@ -122,7 +123,13 @@ class Crosschat(commands.Cog):
             rd = color >> 8
             gr = (color & 0x0f0) >> 4
             bl = (color & 0xf)
-            self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x11, gr * 0x11, bl * 0x11)
+            if abs(rd - self.ansura_color.r) < 0x20:
+                rd = (rd + 0x40) % 0x100
+            if abs(gr - self.ansura_color.g) < 0x20:
+                gr = (gr + 0x40) % 0x100
+            if abs(bl - self.ansura_color.b) < 0x20:
+                bl = (bl + 0x40) % 0x100
+            self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x10, gr * 0x10, bl * 0x10)
 
     @commands.command()
     @ansura_staff()
@@ -196,8 +203,19 @@ class Crosschat(commands.Cog):
         guild: discord.Guild = channel.guild
         author: discord.Member = message.author
         e = discord.Embed()
+        g: discord.Guild = self.bot.get_guild(604823602973376522)
+        m: discord.Member = g.get_member(author.id)
+        if m and 691752324787339351 in [r.id for r in m.roles]:
+            staff = True
+        else:
+            staff = False
         e.title = f"Chat from **{guild.name}**"
         e.colour = self.colors[int(guild.id)]
+        if staff:
+            e.set_author(name="Ansura Staff Member",
+                         icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
+                                  "cab59a4cb92c877f5b7c3fc1ae402298.png")
+            e.colour = self.ansura_color
         user: discord.User = message.author
         e.description = message.content
         err_s = ""
