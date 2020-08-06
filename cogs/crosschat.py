@@ -205,14 +205,11 @@ class Crosschat(commands.Cog):
         e = discord.Embed()
         g: discord.Guild = self.bot.get_guild(604823602973376522)
         m: discord.Member = g.get_member(author.id)
-        if m and 691752324787339351 in [r.id for r in m.roles]:
-            staff = True
-        else:
-            staff = False
         e.title = f"Chat from **{guild.name}**"
         e.colour = self.colors[int(guild.id)]
-        if staff:
-            e.set_author(name="Ansura Staff Member",
+        if m and 691752324787339351 in [r.id for r in m.roles]:
+            e.set_author(name="Ansura Developer" if author.id == 267499094090579970 else
+                         "Ansura Staff Member",
                          icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
                                   "cab59a4cb92c877f5b7c3fc1ae402298.png")
             e.colour = self.ansura_color

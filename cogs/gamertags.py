@@ -160,10 +160,6 @@ class Gamertags(commands.Cog):
             return
         guild: discord.Guild = self.bot.get_guild(604823602973376522)
         member: discord.Member = guild.get_member(user.id)
-        if member and 691752324787339351 in [r.id for r in member.roles]:
-            staff = True
-        else:
-            staff = False
         rec = self.db.lookup_gaming_record(user.id)
         priv = self.db.isprivate(user.id)
         if priv[0] == 1 and not ctx.author.guild_permissions.manage_guild:
@@ -180,8 +176,9 @@ class Gamertags(commands.Cog):
                 await resp.add_reaction("👍")
                 return
         e = discord.Embed()
-        if staff:
-            e.set_author(name="Ansura Staff Member",
+        if m and 691752324787339351 in [r.id for r in member.roles]:
+            e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else
+                         "Ansura Staff Member",
                          icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
                                   "cab59a4cb92c877f5b7c3fc1ae402298.png")
         e.colour = user.color
