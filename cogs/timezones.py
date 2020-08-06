@@ -64,7 +64,7 @@ class Timezones(commands.Cog):
             e.colour = discord.Colour.red()
             e.title = "Invalid Timezone"
             e.description = f"{tz} is an invalid timezone. Refer to " \
-                            f"`!timezones` for a list of supported " \
+                            f"`%timezones` for a list of supported " \
                             f"timezones "
             await ctx.send(embed=e)
             return
