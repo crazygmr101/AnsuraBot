@@ -176,7 +176,7 @@ class Gamertags(commands.Cog):
                 await resp.add_reaction("👍")
                 return
         e = discord.Embed()
-        if m and 691752324787339351 in [r.id for r in member.roles]:
+        if member and 691752324787339351 in [r.id for r in member.roles]:
             e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else
                          "Ansura Staff Member",
                          icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
