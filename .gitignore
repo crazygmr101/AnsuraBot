@@ -25,3 +25,5 @@ config.yaml
 tests/
 
 *.yaml
+
+.env
