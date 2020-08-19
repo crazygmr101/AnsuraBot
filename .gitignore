@@ -4,7 +4,6 @@ venv/
 *.pyc
 
 users.db-journal
-users.db
 *.db
 
 core/ping-mc.py
@@ -20,7 +19,7 @@ Assets/
 *.mp3
 /attachments/
 
-config.yaml
+config-default.yaml
 
 tests/
 
