@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS "timezones" (
 )
 """
 
+
 def _hr():
     print("-" * 20)
 
@@ -106,6 +107,15 @@ while True:
             cursor.execute(s)
         conn.commit()
         conn.close()
+
+        with open(".env", "w") as fp:
+            for i, v in {
+                "ANSURA": "discord bot token",
+                "TWITCH": "twitch application token",
+                "MIXER": "mixer token",
+                "PASTEBIN": "pastebin token"
+            }.items():
+                fp.write(f"{i}={input(f'Input {v}: ')}\n")
 
 
 
