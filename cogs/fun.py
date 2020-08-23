@@ -44,52 +44,47 @@ class Fun(commands.Cog):
             half = int(len(s) / 2)
             return [s[:half], s[half:]]
 
-        await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
+        await ctx.send_info("I ship it: " + split(name1)[0] + split(name2)[1])
 
     @commands.command()
     async def hug(self, ctx: AnsuraContext, user: discord.Member):
         """Hug a user"""
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} hugs {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/hug").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            description=f'{ctx.author.mention} hugs {user.mention}',
+            image=requests.get("https://nekos.life/api/v2/img/hug").json()["url"]
+        )
 
     @commands.command()
     async def pat(self, ctx: AnsuraContext, user: discord.Member):
         """Pat a user"""
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} pats {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/pat").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            description=f'{ctx.author.mention} pats {user.mention}',
+            image=requests.get("https://nekos.life/api/v2/img/pat").json()["url"]
+        )
 
     @commands.command()
     async def poke(self, ctx: AnsuraContext, user: discord.Member):
         """Poke a user"""
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} pokes {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/poke").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            description=f'{ctx.author.mention} pokes {user.mention}',
+            image=requests.get("https://nekos.life/api/v2/img/poke").json()["url"]
+        )
 
     @commands.command()
     async def cuddle(self, ctx: AnsuraContext, user: discord.Member):
         """Cuddle a user"""
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} cuddles {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/cuddle").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            description=f'{ctx.author.mention} cuddles {user.mention}',
+            image=requests.get("https://nekos.life/api/v2/img/cuddle").json()["url"]
+        )
 
     @commands.command()
     async def kiss(self, ctx: AnsuraContext, user: discord.Member):
         """Kiss a user"""
-        e = discord.Embed()
-        e.title = f'{ctx.author.name} kisses {user.name}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/kiss").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            description=f'{ctx.author.mention} kisses {user.mention}',
+            image=requests.get("https://nekos.life/api/v2/img/kiss").json()["url"]
+        )
 
     @commands.command(aliases=["bork"])
     async def woof(self, ctx: AnsuraContext):
@@ -105,10 +100,10 @@ class Fun(commands.Cog):
                                     "υ´• ﻌ •`υ", "૮ ・ﻌ・ა", "(❍ᴥ❍ʋ)", "( ͡° ᴥ ͡° ʋ)", "V●ω●V", "V✪ω✪V", "V✪⋏✪V",
                                     "∪ ̿–⋏ ̿–∪", "∪･ω･∪", "໒( ●ܫฺ ●)ʋ", "໒( = ᴥ =)ʋ}"])
         woof_img = random.choice(images)
-        e.title = f'{woof_text} {woof_emoji}'
-        e.set_image(url=f"https://i.imgur.com/{woof_img}.jpg")
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            image=f"https://i.imgur.com/{woof_img}.jpg",
+            title=f'{woof_text} {woof_emoji}'
+        )
 
     @commands.command()
     async def meow(self, ctx: AnsuraContext):
@@ -117,10 +112,10 @@ class Fun(commands.Cog):
         meow_text = random.choice(["(^-人-^)", "(^・ω・^ )", "(=;ェ;=)", "(=^・^=)", "(=^・ｪ・^=)", "(=^‥^=)", "(=ＴェＴ=)",
                                    "(=ｘェｘ=)", "＼(=^‥^)/`", "~(=^‥^)/", "└(=^‥^=)┐", "ヾ(=ﾟ・ﾟ=)ﾉ", "ヽ(=^・ω・^=)丿",
                                    "d(=^・ω・^=)b", "o(^・x・^)o"])
-        e.title = f'Meow! {meow_text}'
-        e.set_image(url=requests.get("https://nekos.life/api/v2/img/meow").json()["url"])
-        await ctx.send(embed=e)
-        await ctx.message.delete()
+        await ctx.embed(
+            title=f"Meow {meow_text}",
+            image=requests.get("https://nekos.life/api/v2/img/meow").json()["url"]
+        )
 
     @commands.command(aliases=["pbc", "chicken"])
     async def placeblock_chicken(self, ctx: AnsuraContext):
@@ -140,11 +135,7 @@ class Fun(commands.Cog):
         ]
         for i in range(len(replacements[0])):
             msg = msg.replace(replacements[0][i], replacements[1][i])
-        author: discord.Member = ctx.author
-        e.colour = author.color
-        e.title = author.display_name
-        e.description = msg
-        await ctx.send(embed=e)
+        await ctx.send_info(msg)
         await msg_o.delete()
 
 

@@ -24,11 +24,11 @@ class ErrorHandler(commands.Cog):
             print(error)
 
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("You can't do that! >.>\n" +
+            await ctx.send_error("You can't do that! >.>\n" +
                            str(error))
 
         elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.send("Oops. Doesn't look like I was given the proper permissions for that!\n" +
+            await ctx.send_error("Oops. Doesn't look like I was given the proper permissions for that!\n" +
                            str(error))
 
         else:

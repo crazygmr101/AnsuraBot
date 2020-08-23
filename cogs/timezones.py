@@ -36,15 +36,13 @@ class Timezones(commands.Cog):
             tz = self.db.lookup_timezone(user.id)[1]
             e = discord.Embed()
             if tz is None:
-                e.title = "No timezone"
-                e.colour = discord.Colour.dark_gold()
-                e.description = f"{user.mention} doesn't have their timezone set. Have them set it with `%timezone`"
+                return await ctx.send_error(f"{user.mention} doesn't have their timezone set. "
+                                            "Have them set it with `%timezone`")
             else:
                 e.title = f"{user.display_name}"
                 now_utc = datetime.datetime.now(pytz.timezone("UTC"))
                 local = now_utc.astimezone(pytz.timezone(tz)).strftime("%H:%M:%S %a %Z (%z)")
-                e.description = f"{user.display_name}'s time is `{local}`"
-            await ctx.send(embed=e)
+                return await ctx.send_info(f"{user.display_name}'s time is `{local}`")
         except Exception as e:
             print(type(e))
             print(str(e))

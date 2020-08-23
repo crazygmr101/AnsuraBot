@@ -158,7 +158,7 @@ class Owner(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def die(self, ctx: AnsuraContext):
-        await ctx.send(random.choice([
+        await ctx.send_ok(random.choice([
             "Oh..okay..sure..I'll brb",
             "): Okay",
             "D: But..why? *sighs* fInE"

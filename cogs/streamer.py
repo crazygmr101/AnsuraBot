@@ -21,12 +21,15 @@ class Streamer(commands.Cog):
                             stream_channel: int = None):
         if self._lookup_stream_record(guild=guild) is None:
             self._add_stream_record(guild)
-        if stream_role: self.db.cursor.execute("update streamer set streamrole=? where guildid=?",
-                                               (stream_role, guild.id))
-        if stream_message: self.db.cursor.execute("update streamer set streammsg=? where guildid=?",
-                                                  (stream_message, guild.id))
-        if stream_channel: self.db.cursor.execute("update streamer set streamchannel=? where guildid=?",
-                                                  (stream_channel, guild.id))
+        if stream_role:
+            self.db.cursor.execute("update streamer set streamrole=? where guildid=?",
+                                   (stream_role, guild.id))
+        if stream_message:
+            self.db.cursor.execute("update streamer set streammsg=? where guildid=?",
+                                   (stream_message, guild.id))
+        if stream_channel:
+            self.db.cursor.execute("update streamer set streamchannel=? where guildid=?",
+                                   (stream_channel, guild.id))
         self.db.conn.commit()
 
     def _has_stream_record(self, guild: discord.Guild):
@@ -52,13 +55,13 @@ class Streamer(commands.Cog):
         Sets the streamer role on a server
         """
         self._edit_stream_record(guild=ctx.guild, stream_role=role.id)
-        await ctx.send(embed=discord.Embed(title="Role set", description=f"Streamer role set to {role.mention}"))
+        await ctx.send_ok(f"Streamer role set to {role.mention}")
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
-            await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
+            await ctx.send_error("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
         else:
             raise error
 
@@ -73,13 +76,13 @@ class Streamer(commands.Cog):
         Sets the streamer channel on a server
         """
         self._edit_stream_record(guild=ctx.guild, stream_channel=ch.id)
-        await ctx.send(embed=discord.Embed(title="Channel set", description=f"Streamer role set to {ch.mention}"))
+        await ctx.send_ok(f"Streamer channel set to {ch.mention}")
 
     @setstreamrole.error
     async def setstreamrole_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
-            await ctx.send("Oops. I can't seem to find that channel. Double-check capitalization.")
+            await ctx.send_error("Oops. I can't seem to find that channel. Double-check capitalization.")
         else:
             raise error
 
@@ -94,7 +97,7 @@ class Streamer(commands.Cog):
         Sets the streamer message on a server
         """
         self._edit_stream_record(guild=ctx.guild, stream_message=msg)
-        await ctx.send(embed=discord.Embed(title="Message set", description=f"Message set to:\n{msg}"))
+        await ctx.send_ok(f"Streamer message set to\n{role.mention}")
 
     @commands.command(aliases=["gss"])
     async def getstreamsettings(self, ctx: AnsuraContext):

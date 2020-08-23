@@ -95,13 +95,13 @@ class Gaming(commands.Cog):
             e.add_field(name="Default Gamemode", value=status[8])
             await ctx.send(embed=e)
         except socket.timeout as t:
-            await ctx.send("*Oops ):*\n Looks like the ping I made to " + url + ":" + str(port) + " timed out. "
+            await ctx.send_error("*Oops ):*\n Looks like the ping I made to " + url + ":" + str(port) + " timed out. "
                                                                                                   "Either the server is down, not responding, or I was given a wrong URL or port.")
         except socket.gaierror as e:
-            await ctx.send("I can't figure out how to reach that URL. ): Double check that it's correct.")
+            await ctx.send_error("I can't figure out how to reach that URL. ): Double check that it's correct.")
             return
         except Exception as e:
-            await ctx.send("*Uh-oh D:*\n An error happened"
+            await ctx.send_error("*Uh-oh D:*\n An error happened"
                            " while I was pinging the server.")
             print(e)
 

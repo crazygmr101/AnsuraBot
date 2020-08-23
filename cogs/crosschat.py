@@ -101,26 +101,26 @@ class Crosschat(commands.Cog):
     )
     async def crosschat(self, ctx: AnsuraContext, arg: Union[discord.TextChannel, str] = None):
         if ctx.guild.id in self.banned:
-            await ctx.send("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
+            await ctx.send_error("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
                            "go to https://discord.gg/t5MGS2X to appeal.")
             return
         if not arg:
             if ctx.guild.id in self.channels.keys():
-                await ctx.send(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
+                await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
                                f"`%crosschat #channel` to change this or `%crosschat clear` to "
                                f"turn off crosschat")
             else:
-                await ctx.send(f"Crosschat is not enabled on this server. Do "
+                await ctx.send_ok(f"Crosschat is not enabled on this server. Do "
                                f"`%crosschat #channel` to change this.")
             return
         if isinstance(arg, discord.TextChannel):
             self.channels[ctx.guild.id] = arg.id
-            await ctx.send(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
+            await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
                            f"`%crosschat #channel` to change this or `%crosschat clear` to "
                            f"turn off crosschat")
         elif arg == "clear":
             del self.channels[ctx.guild.id]
-            await ctx.send(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
+            await ctx.send_ok(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
         else:
             return
         self._save()
@@ -141,19 +141,19 @@ class Crosschat(commands.Cog):
     @ansura_staff_or_selfhost_owner()
     async def xcgban(self, ctx: AnsuraContext, guild: int):
         if guild in self.banned:
-            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} already banned.")
+            return await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name} already banned.")
         self.banned.append(guild)
         self._save()
-        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
+        await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
 
     @commands.command()
     @ansura_staff_or_selfhost_owner()
     async def xcgunban(self, ctx: AnsuraContext, guild: int):
         if guild not in self.banned:
-            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} not banned.")
+            return await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name} not banned.")
         self.banned.remove(guild)
         self._save()
-        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
+        await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
 
     @commands.command()
     @ansura_staff_or_selfhost_owner()
@@ -163,9 +163,9 @@ class Crosschat(commands.Cog):
         if member not in self.banned:
             self.banned.append(member)
             self._save()
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) xchat banned")
         else:
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) already xchat banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) already xchat banned")
 
     @commands.command()
     @ansura_staff_or_selfhost_owner()
@@ -175,9 +175,9 @@ class Crosschat(commands.Cog):
         if member in self.banned:
             self.banned.remove(member)
             self._save()
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat unbanned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) xchat unbanned")
         else:
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) already not banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) already not banned")
 
     async def init_channels(self):
         print("[XCHAT] Looking for channels")
@@ -285,26 +285,16 @@ class Crosschat(commands.Cog):
             if found:
                 break
         else:
-            return await ctx.send("Message not found")
-        await ctx.send(
-            embed=discord.Embed(
-                title="Message lookup",
-            ).add_field(
-                name="Guild",
-                value=f"{self.bot.get_guild(guild)} - {guild}",
-                inline=False
-            ).add_field(
-                name="Channel",
-                value=f"{self.bot.get_channel(channel)} - {channel}",
-                inline=False
-            ).add_field(
-                name="Author",
-                value=f"{self.bot.get_user(author)} - {author}",
-                inline=False
-            ).add_field(
-                name="Content",
-                value=content[:800]
-            )
+            return await ctx.send_error("Message not found")
+        await ctx.embed(
+            title="Message lookup",
+            fields=[
+                ("Guild", f"{self.bot.get_guild(guild)} - {guild}"),
+                ("Channel", f"{self.bot.get_guild(channel)} - {channel}"),
+                ("Author", f"{self.bot.get_guild(author)} - {author}"),
+                ("Content", content[":800"]),
+            ],
+            not_inline=[0, 1, 2, 3]
         )
 
     @commands.command()

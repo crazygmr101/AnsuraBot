@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import random
+import re
 from typing import Optional
 
 import aiohttp
@@ -12,12 +14,34 @@ from .ansuracontext import AnsuraContext
 
 class AnsuraBot(commands.Bot):
     def __init__(self, *args, **kwargs):
+        print("[BOT] Initializing bot")
         super(AnsuraBot, self).__init__(*args, **kwargs)
         self.db: AnsuraDatabase = AnsuraDatabase()
         self.vm: Optional[VoiceManager] = None
 
     async def on_message(self, message):
-        await self.invoke(await self.get_context(message, cls=AnsuraContext))
+        if message.author.bot:
+            return
+
+        if message.content == "/placeblock chicken":
+            message.content = "%placeblock_chicken"
+            await self.process_commands(message)
+            return
+        xchat = self.get_cog("Crosschat")
+        hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(
+            self.user.id) + ">)[!\.]*\s*$"
+        if message.content == "<@!" + str(self.user.id) + ">":
+            await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
+        if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
+            await message.channel.send(random.choice(["Hi, " + message.author.mention + " :3",
+                                                      "Hey, " + message.author.display_name,
+                                                      "Hello :D"]))
+            return
+        await xchat.xchat(message)
+        await self.get_cog("Voice").tts(message)
+
+        ctx = await self.get_context(message, cls=AnsuraContext)
+        await self.invoke(ctx)
 
     async def start(self, *args, **kwargs):
         """|coro|

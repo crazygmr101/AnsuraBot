@@ -92,7 +92,7 @@ class Gamertags(commands.Cog):
         Sets your xbox username
         """
         self.db.set_gaming_record(ctx.author.id, "xboxlive", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
     async def mojang(self, ctx: AnsuraContext, *, username):
@@ -100,7 +100,7 @@ class Gamertags(commands.Cog):
         Sets your mojang username
         """
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx: AnsuraContext, *, username):
@@ -108,7 +108,7 @@ class Gamertags(commands.Cog):
         Sets your youtube username
         """
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
     async def mixer(self, ctx: AnsuraContext, *, username):
@@ -116,7 +116,7 @@ class Gamertags(commands.Cog):
         Sets your mixer username
         """
         self.db.set_gaming_record(ctx.author.id, "mixer", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
     async def twitch(self, ctx: AnsuraContext, *, username):
@@ -124,7 +124,7 @@ class Gamertags(commands.Cog):
         Sets your twitch username
         """
         self.db.set_gaming_record(ctx.author.id, "twitch", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
     async def reddit(self, ctx: AnsuraContext, *, username):
@@ -132,7 +132,7 @@ class Gamertags(commands.Cog):
         Sets your reddit username
         """
         self.db.set_gaming_record(ctx.author.id, "reddit", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
     async def steam(self, ctx: AnsuraContext, *, username):
@@ -140,7 +140,7 @@ class Gamertags(commands.Cog):
         Sets your steam username/link
         """
         self.db.set_gaming_record(ctx.author.id, "steam", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["gt"])
     async def gametags(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None,

@@ -97,28 +97,5 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         await channel.send(msg)
 
 
-@bot.event
-async def on_message(message: discord.Message):
-    if message.author.bot:
-        return
-
-    if message.content == "/placeblock chicken":
-        message.content = "%placeblock_chicken"
-        await bot.process_commands(message)
-        return
-    xchat: Crosschat = bot.get_cog("Crosschat")
-    hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(
-        bot.user.id) + ">)[!\.]*\s*$"
-    if message.content == "<@!" + str(bot.user.id) + ">":
-        await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
-    if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:
-        await message.channel.send(random.choice(["Hi, " + message.author.mention + " :3",
-                                                  "Hey, " + message.author.display_name,
-                                                  "Hello :D"]))
-        return
-    await xchat.xchat(message)
-    await bot.get_cog("Voice").tts(message)
-    await bot.process_commands(message)
-
 
 bot.run(os.getenv("ANSURA"))

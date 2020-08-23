@@ -15,7 +15,23 @@ class Misc(commands.Cog):
         """Gets a link to a users avatar"""
         if user is None:
             user = ctx.author
-        await ctx.send(user.avatar_url)
+        try:
+            await ctx.embed(
+                image=str(user.avatar_url),
+                title=f"{user}'s avatar",
+                description=f"[jpg]({user.avatar_url_as(format='jpeg')}) "
+                            f"[png]({user.avatar_url_as(format='png')}) "
+                            f"[webp]({user.avatar_url_as(format='webp')}) "
+                            f"[gif]({user.avatar_url_as(format='gif')}) "
+            )
+        except discord.InvalidArgument:
+            await ctx.embed(
+                image=str(user.avatar_url),
+                title=f"{user}'s avatar",
+                description=f"[jpg]({user.avatar_url_as(format='jpeg')}) "
+                            f"[png]({user.avatar_url_as(format='png')}) "
+                            f"[webp]({user.avatar_url_as(format='webp')}) "
+            )
 
     @commands.command()
     async def role(self, ctx: AnsuraContext, r: discord.Role):
@@ -25,17 +41,11 @@ class Misc(commands.Cog):
 
         def val_or_space(val: str):
             return "-" if val == "" else val
-
-        e = discord.Embed()
-        e.title = "Role: " + r.name
-        e.colour = r.colour
         online = []
         offline = []
         m: discord.Member
         if len(r.members) == 0:
-            e.description = f"No members with role"
-            await ctx.send(embed=e)
-            return
+            return await ctx.send_info(f"No members with role {r}")
         for m in r.members:
             if m.status == discord.Status.offline:
                 offline.append(m)
@@ -44,17 +54,25 @@ class Misc(commands.Cog):
         online_t = []
         for x in online:
             online_t.append(x)
-            if len(online_t) > 30: break
+            if len(online_t) > 30:
+                break
         offline_t = []
         for x in offline:
             offline_t.append(x)
-            if len(offline_t) > 30: break
-        e.description = f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}"
-        e.add_field(name=f"Online ({len(online_t)} of {len(online)})",
-                    value=val_or_space(" ".join([m.mention for m in online_t])))
-        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})",
-                    value=val_or_space(" ".join([m.mention for m in offline_t])))
-        await ctx.send(embed=e)
+            if len(offline_t) > 30:
+                break
+        await ctx.embed(
+            title=("Role: " + r.name),
+            description=f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}",
+            fields=[
+                (f"Online ({len(online_t)} of {len(online)})",
+                 val_or_space(" ".join([m.mention for m in online_t]))),
+                (f"Offline ({len(offline_t)} of {len(offline)})",
+                 val_or_space(" ".join([m.mention for m in offline_t])))
+            ],
+            clr=r.colour
+
+        )
 
     @role.error
     async def role_error(self, ctx: AnsuraContext, error: Exception):
