@@ -28,7 +28,7 @@ class Crosschat(commands.Cog):
         self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
-        self.messages: List[List[int, int, int, List[Tuple[int, int]]]] = []
+        self.messages: List[List[int, int, int, List[Tuple[int, int]], str]] = []
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
 
     def _resolve(self, u):
@@ -246,7 +246,7 @@ class Crosschat(commands.Cog):
                 else:
                     msg = await c.send(embed=e)
                 sent.append((c.id, msg.id))
-        self.messages.append([message.guild.id, message.channel.id, message.author.id, sent])
+        self.messages.append([message.guild.id, message.channel.id, message.author.id, sent, message.content])
         if len(self.messages) > 250:
             del self.messages[0]
         if file:
@@ -266,22 +266,20 @@ class Crosschat(commands.Cog):
             msg_id = message.id
         else:
             msg_id = message
-        guild = None
-        messages = None
-        msgs = None
-        author = None
         found = False
-        channel = None
         for i in self.messages:
             guild = i[0]
             channel = i[1]
             author = i[2]
             msgs = i[3]
+            content = i[4]
+
             for m in msgs:
                 if m[1] == msg_id:
                     found = True
                     break
-            if found: break
+            if found:
+                break
         else:
             return await ctx.send("Message not found")
         await ctx.send(
@@ -299,6 +297,9 @@ class Crosschat(commands.Cog):
                 name="Author",
                 value=f"{self.bot.get_user(author)} - {author}",
                 inline=False
+            ).add_field(
+                name="Content",
+                value=content[:800]
             )
         )
 
@@ -324,7 +325,8 @@ class Crosschat(commands.Cog):
                 if m[1] == msg_id:
                     found = True
                     break
-            if found: break
+            if found:
+                break
         else:
             return await ctx.send("Message not found")
         count = 0
