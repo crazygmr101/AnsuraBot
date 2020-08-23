@@ -34,6 +34,7 @@ class Crosschat(commands.Cog):
         self.exempt: Optional[List[int]] = None
         self.messages: List[List[int, int, int, List[Tuple[int, int]], str]] = []
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
+        self._reload()
 
     def _resolve(self, u):
         if self.bot.get_user(u):
@@ -290,8 +291,8 @@ class Crosschat(commands.Cog):
             title="Message lookup",
             fields=[
                 ("Guild", f"{self.bot.get_guild(guild)} - {guild}"),
-                ("Channel", f"{self.bot.get_guild(channel)} - {channel}"),
-                ("Author", f"{self.bot.get_guild(author)} - {author}"),
+                ("Channel", f"{self.bot.get_channel(channel)} - {channel}"),
+                ("Author", f"{self.bot.get_user(author)} - {author}"),
                 ("Content", content[":800"]),
             ],
             not_inline=[0, 1, 2, 3]
