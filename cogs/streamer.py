@@ -1,12 +1,7 @@
-import asyncio
-import logging
-import os
 from typing import Dict
 
 import discord
-import requests
 from discord.ext import commands
-import youtube_dl
 
 from ansura import AnsuraContext, AnsuraBot
 from lib.database import AnsuraDatabase
@@ -17,11 +12,6 @@ class Streamer(commands.Cog):
         self.bot = bot
         self.db: AnsuraDatabase = bot.db
         self.active: Dict[int, int] = {}
-        print("[STREAMER] Loading Mixer session")
-        self.mixer_key = os.getenv("MIXER")
-        self.session = requests.Session()
-        self.session.headers.update({'Client-ID': self.mixer_key})
-
 
     def _add_stream_record(self, guild: discord.Guild):
         self.db.cursor.execute("insert into streamer values (?,?,?,?)", (guild.id, 0, "%user% is streaming!", 0))
@@ -50,33 +40,6 @@ class Streamer(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, b: discord.VoiceState, a: discord.VoiceState):
         pass
-
-    @commands.command()
-    async def sprofile(self, ctx: AnsuraContext, profile_type: str, username: str):
-        """
-        Looks up a profile.
-        - profile_type: Mixer
-        - username: Username on the service
-        """
-        ptype = profile_type.lower()
-        if ptype == "mixer":
-            await self.mixer(ctx, username)
-        else:
-            await ctx.send("I don't recognize that profile type ):")
-
-    async def mixer(self, ctx: AnsuraContext, user: str):
-        resp = self.session.get('https://mixer.com/api/v1/channels/{}'.format(user))
-        j = resp.json()
-
-        embed = discord.Embed(title=(user + "'s Mixer"), color=0x0000ff)
-        embed.add_field(name="Bio", value=j['user']['bio'], inline=False)
-        embed.add_field(name="Latest Stream", value=j['name'], inline=False)
-        embed.add_field(name="Total Viewers", value=j['viewersTotal'])
-        embed.add_field(name="Viewers", value=j['viewersCurrent'])
-        embed.add_field(name="Audience", value=j['audience'])
-        embed.add_field(name="Online", value=j['online'])
-        embed.set_thumbnail(url=j['user']['avatarUrl'])
-        await ctx.send(embed=embed)
 
     @commands.command(aliases=["ssr", "streamrole"])
     @commands.check_any(
