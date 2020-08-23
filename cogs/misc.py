@@ -41,6 +41,7 @@ class Misc(commands.Cog):
 
         def val_or_space(val: str):
             return "-" if val == "" else val
+
         online = []
         offline = []
         m: discord.Member
@@ -111,22 +112,40 @@ class Misc(commands.Cog):
         """Gets info about a user"""
         if user is None:
             user = ctx.author
-        e = discord.Embed()
-        e.title = user.name + "#" + user.discriminator
-        e.set_thumbnail(url=user.avatar_url)
-        e.add_field(name="ID", value=user.id)
-        if type(user) == discord.Member:
-            e.add_field(name="Display Name", value=user.display_name)
-            e.add_field(name="Top Role", value=user.top_role.name + " (" + str(user.top_role.id) + ")")
-            e.add_field(name="Created on", value=user.created_at)
-            e.add_field(name="Joined on", value=user.joined_at)
-            e.add_field(name="Mobile", value=str(user.is_on_mobile()))
-            e.colour = user.color
-        await ctx.send(embed=e)
+        fields = [
+            ("ID", f"{user.id}{' (Bot)' if user.bot else ''}"),
+            ("Display Name", user.display_name),
+            ("Top Role", user.top_role.name + " (" + str(user.top_role.id) + ")"),
+            ("Created on", user.created_at),
+            ("Joined on", user.joined_at),
+            ("Mobile", str(user.is_on_mobile()))]
+        if not user.bot:
+            flags: discord.PublicUserFlags = user.public_flags
+            f = []
+            print(flags.all())
+            for _prop, text in {
+                "staff": "Discord Staff Member",
+                "partner": "Discord Partner",
+                "hypesquad": "HypeSquad Events Member",
+                "hypesquad_bravery": "HypeSquad Bravery",
+                "hypesquad_brilliance": "HypeSquad Brilliance",
+                "hypesquad_balance": "HypeSquad Balance",
+                "early_supporter": "Early Supporter",
+                "verified_bot": "Verified Bot",
+                "verified_bot_developer": "Verified Bot Developer"
+            }.items():
+                if discord.UserFlags.__dict__[_prop] in flags.all():
+                    f.append(text)
+            fields.append(("Flags", ", ".join(f) if f else "None"))
+        await ctx.embed(
+            title=f"{user}",
+            thumbnail=user.avatar_url,
+            fields=fields
+        )
 
     @commands.command()
     async def ping(self, ctx: AnsuraContext):
-        await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
+        await ctx.send_info("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
 
 def setup(bot):
