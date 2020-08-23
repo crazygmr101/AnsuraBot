@@ -5,13 +5,15 @@ import discord
 import requests
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
+
 
 class Fun(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     @commands.command()
-    async def ship(self, ctx: commands.Context, user1: discord.Member, user2: discord.Member):
+    async def ship(self, ctx: AnsuraContext, user1: discord.Member, user2: discord.Member):
         """Ships two users.. awww <3"""
         name1: str = user1.display_name
         name2: str = user2.display_name
@@ -45,7 +47,7 @@ class Fun(commands.Cog):
         await ctx.send("I ship it: " + split(name1)[0] + split(name2)[1])
 
     @commands.command()
-    async def hug(self, ctx: commands.Context, user: discord.Member):
+    async def hug(self, ctx: AnsuraContext, user: discord.Member):
         """Hug a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} hugs {user.name}'
@@ -54,7 +56,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def pat(self, ctx: commands.Context, user: discord.Member):
+    async def pat(self, ctx: AnsuraContext, user: discord.Member):
         """Pat a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} pats {user.name}'
@@ -63,7 +65,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def poke(self, ctx: commands.Context, user: discord.Member):
+    async def poke(self, ctx: AnsuraContext, user: discord.Member):
         """Poke a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} pokes {user.name}'
@@ -72,7 +74,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def cuddle(self, ctx: commands.Context, user: discord.Member):
+    async def cuddle(self, ctx: AnsuraContext, user: discord.Member):
         """Cuddle a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} cuddles {user.name}'
@@ -81,7 +83,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def kiss(self, ctx: commands.Context, user: discord.Member):
+    async def kiss(self, ctx: AnsuraContext, user: discord.Member):
         """Kiss a user"""
         e = discord.Embed()
         e.title = f'{ctx.author.name} kisses {user.name}'
@@ -90,7 +92,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command(aliases=["bork"])
-    async def woof(self, ctx: commands.Context):
+    async def woof(self, ctx: AnsuraContext):
         """Sends a dog pic"""
         images = [
             "irXVvTn", "1Hy1Ivm", "snyoQYt", "iTD3btm", "gI2hJgp", "4JW8iDZ", "71ssqGq", "WjNBjzO", "LQOkhKM",
@@ -109,7 +111,7 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def meow(self, ctx: commands.Context):
+    async def meow(self, ctx: AnsuraContext):
         """Sends a cat pic"""
         e = discord.Embed()
         meow_text = random.choice(["(^-人-^)", "(^・ω・^ )", "(=;ェ;=)", "(=^・^=)", "(=^・ｪ・^=)", "(=^‥^=)", "(=ＴェＴ=)",
@@ -121,12 +123,12 @@ class Fun(commands.Cog):
         await ctx.message.delete()
 
     @commands.command(aliases=["pbc", "chicken"])
-    async def placeblock_chicken(self, ctx: commands.Context):
+    async def placeblock_chicken(self, ctx: AnsuraContext):
         """Does a Maddie"""
         await ctx.send(random.choice("🐔,🐤,🐥,🐣".split(",")))
 
     @commands.command()
-    async def maddify(self, ctx: commands.Context):
+    async def maddify(self, ctx: AnsuraContext):
         """Vöïds a message"""
         e = discord.Embed()
         msg: str = ctx.message.content

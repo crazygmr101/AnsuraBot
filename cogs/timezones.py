@@ -4,18 +4,19 @@ import discord
 import pytz
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
 from lib.database import AnsuraDatabase as DB
 from lib.utils import pages
 from disputils import BotEmbedPaginator
 
 
 class Timezones(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.db: DB = bot.db
 
     @commands.command()
-    async def gettz(self, ctx: commands.Context, user: discord.Member):
+    async def gettz(self, ctx: AnsuraContext, user: discord.Member):
         """Gets a user's timezone"""
         tz = self.db.lookup_timezone(user.id)[1]
         e = discord.Embed()
@@ -29,7 +30,7 @@ class Timezones(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def time(self, ctx: commands.Context, user: discord.Member):
+    async def time(self, ctx: AnsuraContext, user: discord.Member):
         """Checks the time of a user"""
         try:
             tz = self.db.lookup_timezone(user.id)[1]
@@ -49,7 +50,7 @@ class Timezones(commands.Cog):
             print(str(e))
 
     @commands.command(aliases=["timezone", "tz"])
-    async def settz(self, ctx: commands.Context, tz: str):
+    async def settz(self, ctx: AnsuraContext, tz: str):
         """sets your timezone"""
         try:
             zone = pytz.timezone(tz)
@@ -73,7 +74,7 @@ class Timezones(commands.Cog):
             print(ex.__str__())
 
     @commands.command()
-    async def timezones(self, ctx: commands.Context, search: str = None):
+    async def timezones(self, ctx: AnsuraContext, search: str = None):
         """Gets a list of supported timezones, use `%timezones akhjdlksa` to search by text"""
         if not search:
             search = ""

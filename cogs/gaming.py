@@ -13,6 +13,7 @@ from discord import Embed
 from discord.ext import commands
 
 import lib.hypixel
+from ansura import AnsuraBot, AnsuraContext
 
 
 async def ping(url: str):
@@ -41,12 +42,12 @@ async def ping(url: str):
 
 
 class Gaming(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.htoken = os.getenv("HYPIXEL")
 
     @commands.command()
-    async def jping(self, ctx: discord.ext.commands.Context, url: str):
+    async def jping(self, ctx: AnsuraContext, url: str):
         """
         Pings a minecraft java server
         Command can be used as:
@@ -65,7 +66,7 @@ class Gaming(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def bping(self, ctx: discord.ext.commands.Context, url: str, port: int = 19132):
+    async def bping(self, ctx: AnsuraContext, url: str, port: int = 19132):
         """
         Pings a minecraft bedrock server
         Command can be used as:
@@ -105,7 +106,7 @@ class Gaming(commands.Cog):
             print(e)
 
     @commands.command()
-    async def lolping(self, ctx: discord.ext.commands.Context):
+    async def lolping(self, ctx: AnsuraContext):
         """Pings LoL servers"""
         embed = discord.Embed()
         lol_ips = {
@@ -130,7 +131,7 @@ class Gaming(commands.Cog):
         await m.edit(content="", embed=embed)
 
     @commands.command()
-    async def owping(self, ctx: discord.ext.commands.Context):
+    async def owping(self, ctx: AnsuraContext):
         """Pings overwatch servers"""
         embed = discord.Embed()
         ow_ips = {
@@ -156,7 +157,7 @@ class Gaming(commands.Cog):
         await m.edit(content="", embed=embed)
 
     @commands.command(aliases=["hp"])
-    async def hypixel(self, ctx: discord.ext.commands.Context, player: Union[discord.Member, str], *,
+    async def hypixel(self, ctx: AnsuraContext, player: Union[discord.Member, str], *,
                       profile_type: str = None):
         """
         Checks a player's hypixel profile

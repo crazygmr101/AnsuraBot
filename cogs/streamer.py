@@ -8,11 +8,12 @@ import requests
 from discord.ext import commands
 import youtube_dl
 
+from ansura import AnsuraContext, AnsuraBot
 from lib.database import AnsuraDatabase
 
 
 class Streamer(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.db: AnsuraDatabase = bot.db
         self.active: Dict[int, int] = {}
@@ -51,7 +52,7 @@ class Streamer(commands.Cog):
         pass
 
     @commands.command()
-    async def sprofile(self, ctx: commands.Context, profile_type: str, username: str):
+    async def sprofile(self, ctx: AnsuraContext, profile_type: str, username: str):
         """
         Looks up a profile.
         - profile_type: Mixer
@@ -63,7 +64,7 @@ class Streamer(commands.Cog):
         else:
             await ctx.send("I don't recognize that profile type ):")
 
-    async def mixer(self, ctx: commands.Context, user: str):
+    async def mixer(self, ctx: AnsuraContext, user: str):
         resp = self.session.get('https://mixer.com/api/v1/channels/{}'.format(user))
         j = resp.json()
 
@@ -83,7 +84,7 @@ class Streamer(commands.Cog):
         commands.is_owner(),
         commands.has_permissions(administrator=True)
     )
-    async def setstreamrole(self, ctx: commands.Context, role: discord.Role):
+    async def setstreamrole(self, ctx: AnsuraContext, role: discord.Role):
         """
         Sets the streamer role on a server
         """
@@ -91,7 +92,7 @@ class Streamer(commands.Cog):
         await ctx.send(embed=discord.Embed(title="Role set", description=f"Streamer role set to {role.mention}"))
 
     @setstreamrole.error
-    async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
+    async def setstreamrole_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
@@ -104,7 +105,7 @@ class Streamer(commands.Cog):
         commands.is_owner(),
         commands.has_permissions(administrator=True)
     )
-    async def setstreamchannel(self, ctx: commands.Context, ch: discord.TextChannel):
+    async def setstreamchannel(self, ctx: AnsuraContext, ch: discord.TextChannel):
         """
         Sets the streamer channel on a server
         """
@@ -112,7 +113,7 @@ class Streamer(commands.Cog):
         await ctx.send(embed=discord.Embed(title="Channel set", description=f"Streamer role set to {ch.mention}"))
 
     @setstreamrole.error
-    async def setstreamrole_error(self, ctx: discord.ext.commands.Context, error: Exception):
+    async def setstreamrole_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that channel. Double-check capitalization.")
@@ -125,7 +126,7 @@ class Streamer(commands.Cog):
         commands.is_owner(),
         commands.has_permissions(administrator=True)
     )
-    async def setstreammessage(self, ctx: commands.Context, *, msg: str):
+    async def setstreammessage(self, ctx: AnsuraContext, *, msg: str):
         """
         Sets the streamer message on a server
         """
@@ -133,7 +134,7 @@ class Streamer(commands.Cog):
         await ctx.send(embed=discord.Embed(title="Message set", description=f"Message set to:\n{msg}"))
 
     @commands.command(aliases=["gss"])
-    async def getstreamsettings(self, ctx: commands.Context):
+    async def getstreamsettings(self, ctx: AnsuraContext):
         """
         Gets the streamer role, channel, and message on a server
         """

@@ -9,6 +9,7 @@ import dotenv
 from discord.ext import commands
 
 import cogs
+from ansura import AnsuraBot
 from cogs.crosschat import Crosschat
 from lib.voicemanager import VoiceManager
 
@@ -21,7 +22,7 @@ def get_prefix(bot, message):
     return commands.when_mentioned_or("%")(bot, message)
 
 
-bot = commands.Bot(command_prefix=get_prefix)
+bot = AnsuraBot(command_prefix=get_prefix)
 bot.remove_command('help')
 
 bot.vm = VoiceManager(bot)

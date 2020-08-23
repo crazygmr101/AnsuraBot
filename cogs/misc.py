@@ -3,20 +3,22 @@ from typing import Union
 import discord
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
+
 
 class Misc(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     @commands.command(aliases=["av"])
-    async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def avatar(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None):
         """Gets a link to a users avatar"""
         if user is None:
             user = ctx.author
         await ctx.send(user.avatar_url)
 
     @commands.command()
-    async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+    async def role(self, ctx: AnsuraContext, r: discord.Role):
         """
         Lists members of a role
         """
@@ -55,7 +57,7 @@ class Misc(commands.Cog):
         await ctx.send(embed=e)
 
     @role.error
-    async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
+    async def role_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
@@ -65,7 +67,7 @@ class Misc(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     @commands.has_permissions(manage_messages=True)
-    async def embed(self, ctx: discord.ext.commands.Context, title: str, desc: str, ch: discord.TextChannel = None,
+    async def embed(self, ctx: AnsuraContext, title: str, desc: str, ch: discord.TextChannel = None,
                     color: discord.Colour = None, id: int = None):
         """
         Creates or edits an embed
@@ -87,7 +89,7 @@ class Misc(commands.Cog):
             await message.edit(embed=e)
 
     @commands.command()
-    async def info(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def info(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None):
         """Gets info about a user"""
         if user is None:
             user = ctx.author
@@ -105,7 +107,7 @@ class Misc(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ping(self, ctx: discord.ext.commands.Context):
+    async def ping(self, ctx: AnsuraContext):
         await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
 

@@ -1,14 +1,17 @@
 import sys
-
-from discord.ext import commands
 import traceback
 
+from discord.ext import commands
+
+from ansura import *
+
+
 class ErrorHandler(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     # @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error: Exception):
+    async def on_command_error(self, ctx: AnsuraContext, error: Exception):
         print(traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr))
         if hasattr(ctx.command, 'error'):
             return
