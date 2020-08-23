@@ -293,7 +293,7 @@ class Crosschat(commands.Cog):
                 ("Guild", f"{self.bot.get_guild(guild)} - {guild}"),
                 ("Channel", f"{self.bot.get_channel(channel)} - {channel}"),
                 ("Author", f"{self.bot.get_user(author)} - {author}"),
-                ("Content", content[":800"]),
+                ("Content", content[:800]),
             ],
             not_inline=[0, 1, 2, 3]
         )
