@@ -8,11 +8,12 @@ import gtts
 import youtube_dl
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
 from lib.voicemanager import VoiceManager, TTSQueue, YTDLSource
 
 
 class Voice(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.vm: VoiceManager = bot.vm
 
@@ -29,19 +30,19 @@ class Voice(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def summon(self, ctx: commands.Context):
+    async def summon(self, ctx: AnsuraContext):
         """Summons Ansura to your voice channel"""
         await ctx.author.voice.channel.connect()
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def leave(self, ctx: commands.Context):
+    async def leave(self, ctx: AnsuraContext):
         """Makes Ansura leave your voice channel"""
         await ctx.guild.voice_client.disconnect()
 
     @commands.command(aliases=["tunmute"])
     @commands.has_guild_permissions(mute_members=True)
-    async def ttsunmute(self, ctx: commands.Context, member: discord.Member = None):
+    async def ttsunmute(self, ctx: AnsuraContext, member: discord.Member = None):
         if member is None:
             await ctx.send("You must tag a member")
             return
@@ -53,7 +54,7 @@ class Voice(commands.Cog):
             await ctx.send(f"**{member.display_name}** isn't TTS muted")
 
     @commands.command(aliases=["tmutel"])
-    async def ttsmutelist(self, ctx: commands.Context):
+    async def ttsmutelist(self, ctx: AnsuraContext):
         """Lists TTS-muted members"""
         if ctx.guild.id not in self.vm.tts_mutes.keys():
             await ctx.send("No members TTS muted")
@@ -66,7 +67,7 @@ class Voice(commands.Cog):
 
     @commands.command(aliases=["tmute"])
     @commands.has_guild_permissions(mute_members=True)
-    async def ttsmute(self, ctx: commands.Context, member: discord.Member = None):
+    async def ttsmute(self, ctx: AnsuraContext, member: discord.Member = None):
         """Makes messages from a member not autotts"""
         if member is None:
             await ctx.send("You must tag a member")
@@ -81,7 +82,7 @@ class Voice(commands.Cog):
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
     @commands.bot_has_guild_permissions(speak=True)
-    async def autotts(self, ctx: commands.Context):
+    async def autotts(self, ctx: AnsuraContext):
         """
         Makes Ansura join the voice channel you are in and watch the current channel
         """
@@ -107,7 +108,7 @@ class Voice(commands.Cog):
 
     @commands.command()
     @commands.has_guild_permissions(manage_messages=True)
-    async def stoptts(self, ctx: commands.Context):
+    async def stoptts(self, ctx: AnsuraContext):
         if ctx.guild.id not in self.vm.active_guilds.keys():
             await ctx.send("Not watching a voice channel!")
             return

@@ -4,9 +4,11 @@ import dbl
 import discord
 from discord.ext import commands, tasks
 
+from ansura import AnsuraBot
+
 
 class DBL(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.token = os.getenv("DBL")
         self.dblpy = dbl.DBLClient(self.bot, self.token, autopost=True)

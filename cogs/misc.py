@@ -3,20 +3,38 @@ from typing import Union
 import discord
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
+
 
 class Misc(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     @commands.command(aliases=["av"])
-    async def avatar(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def avatar(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None):
         """Gets a link to a users avatar"""
         if user is None:
             user = ctx.author
-        await ctx.send(user.avatar_url)
+        try:
+            await ctx.embed(
+                image=str(user.avatar_url),
+                title=f"{user}'s avatar",
+                description=f"[jpg]({user.avatar_url_as(format='jpeg')}) "
+                            f"[png]({user.avatar_url_as(format='png')}) "
+                            f"[webp]({user.avatar_url_as(format='webp')}) "
+                            f"[gif]({user.avatar_url_as(format='gif')}) "
+            )
+        except discord.InvalidArgument:
+            await ctx.embed(
+                image=str(user.avatar_url),
+                title=f"{user}'s avatar",
+                description=f"[jpg]({user.avatar_url_as(format='jpeg')}) "
+                            f"[png]({user.avatar_url_as(format='png')}) "
+                            f"[webp]({user.avatar_url_as(format='webp')}) "
+            )
 
     @commands.command()
-    async def role(self, ctx: discord.ext.commands.Context, r: discord.Role):
+    async def role(self, ctx: AnsuraContext, r: discord.Role):
         """
         Lists members of a role
         """
@@ -24,16 +42,11 @@ class Misc(commands.Cog):
         def val_or_space(val: str):
             return "-" if val == "" else val
 
-        e = discord.Embed()
-        e.title = "Role: " + r.name
-        e.colour = r.colour
         online = []
         offline = []
         m: discord.Member
         if len(r.members) == 0:
-            e.description = f"No members with role"
-            await ctx.send(embed=e)
-            return
+            return await ctx.send_info(f"No members with role {r}")
         for m in r.members:
             if m.status == discord.Status.offline:
                 offline.append(m)
@@ -42,20 +55,28 @@ class Misc(commands.Cog):
         online_t = []
         for x in online:
             online_t.append(x)
-            if len(online_t) > 30: break
+            if len(online_t) > 30:
+                break
         offline_t = []
         for x in offline:
             offline_t.append(x)
-            if len(offline_t) > 30: break
-        e.description = f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}"
-        e.add_field(name=f"Online ({len(online_t)} of {len(online)})",
-                    value=val_or_space(" ".join([m.mention for m in online_t])))
-        e.add_field(name=f"Offline ({len(offline_t)} of {len(offline)})",
-                    value=val_or_space(" ".join([m.mention for m in offline_t])))
-        await ctx.send(embed=e)
+            if len(offline_t) > 30:
+                break
+        await ctx.embed(
+            title=("Role: " + r.name),
+            description=f"Listing {len(online_t) + len(offline_t)} of {len(r.members)}",
+            fields=[
+                (f"Online ({len(online_t)} of {len(online)})",
+                 val_or_space(" ".join([m.mention for m in online_t]))),
+                (f"Offline ({len(offline_t)} of {len(offline)})",
+                 val_or_space(" ".join([m.mention for m in offline_t])))
+            ],
+            clr=r.colour
+
+        )
 
     @role.error
-    async def role_error(self, ctx: discord.ext.commands.Context, error: Exception):
+    async def role_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send("Oops. I can't seem to find that role. Double-check capitalization and spaces.")
@@ -65,7 +86,7 @@ class Misc(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     @commands.has_permissions(manage_messages=True)
-    async def embed(self, ctx: discord.ext.commands.Context, title: str, desc: str, ch: discord.TextChannel = None,
+    async def embed(self, ctx: AnsuraContext, title: str, desc: str, ch: discord.TextChannel = None,
                     color: discord.Colour = None, id: int = None):
         """
         Creates or edits an embed
@@ -87,26 +108,44 @@ class Misc(commands.Cog):
             await message.edit(embed=e)
 
     @commands.command()
-    async def info(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None):
+    async def info(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None):
         """Gets info about a user"""
         if user is None:
             user = ctx.author
-        e = discord.Embed()
-        e.title = user.name + "#" + user.discriminator
-        e.set_thumbnail(url=user.avatar_url)
-        e.add_field(name="ID", value=user.id)
-        if type(user) == discord.Member:
-            e.add_field(name="Display Name", value=user.display_name)
-            e.add_field(name="Top Role", value=user.top_role.name + " (" + str(user.top_role.id) + ")")
-            e.add_field(name="Created on", value=user.created_at)
-            e.add_field(name="Joined on", value=user.joined_at)
-            e.add_field(name="Mobile", value=str(user.is_on_mobile()))
-            e.colour = user.color
-        await ctx.send(embed=e)
+        fields = [
+            ("ID", f"{user.id}{' (Bot)' if user.bot else ''}"),
+            ("Display Name", user.display_name),
+            ("Top Role", user.top_role.name + " (" + str(user.top_role.id) + ")"),
+            ("Created on", user.created_at),
+            ("Joined on", user.joined_at),
+            ("Mobile", str(user.is_on_mobile()))]
+        if not user.bot:
+            flags: discord.PublicUserFlags = user.public_flags
+            f = []
+            print(flags.all())
+            for _prop, text in {
+                "staff": "Discord Staff Member",
+                "partner": "Discord Partner",
+                "hypesquad": "HypeSquad Events Member",
+                "hypesquad_bravery": "HypeSquad Bravery",
+                "hypesquad_brilliance": "HypeSquad Brilliance",
+                "hypesquad_balance": "HypeSquad Balance",
+                "early_supporter": "Early Supporter",
+                "verified_bot": "Verified Bot",
+                "verified_bot_developer": "Verified Bot Developer"
+            }.items():
+                if discord.UserFlags.__dict__[_prop] in flags.all():
+                    f.append(text)
+            fields.append(("Flags", ", ".join(f) if f else "None"))
+        await ctx.embed(
+            title=f"{user}",
+            thumbnail=user.avatar_url,
+            fields=fields
+        )
 
     @commands.command()
-    async def ping(self, ctx: discord.ext.commands.Context):
-        await ctx.send("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
+    async def ping(self, ctx: AnsuraContext):
+        await ctx.send_info("Pong :D " + str(int(self.bot.latency * 1000)) + "ms")
 
 
 def setup(bot):

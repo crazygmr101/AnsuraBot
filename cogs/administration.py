@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 
 import cogs.gamertags
+from ansura.ansurabot import AnsuraBot
+from ansura.ansuracontext import AnsuraContext
 
 
 class Administration(commands.Cog):
@@ -15,12 +17,12 @@ class Administration(commands.Cog):
             e.add_field(name=k, value=message[k])
         return e
 
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     @commands.is_owner()
     @commands.command(aliases=["sgv"])
-    async def setgtval(self, ctx: discord.ext.commands.Context,
+    async def setgtval(self, ctx: AnsuraContext,
                        typ: str, user: Union[discord.Member, discord.User],
                        val: str):
         ch: discord.TextChannel = \

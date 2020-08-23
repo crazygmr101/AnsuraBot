@@ -1,32 +1,38 @@
-from itertools import chain
 import os
+from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
 import discord
 import discord.errors
-from discord import Guild, TextChannel
 from discord.ext import commands
-from ruamel.yaml import YAML
 from disputils import BotEmbedPaginator
+from ruamel.yaml import YAML
+
+from ansura import *
 from lib.utils import pages
 
-def ansura_staff():
-    def predicate(ctx: commands.Context):
+
+def ansura_staff_or_selfhost_owner():
+    def predicate(ctx: AnsuraContext):
+        if ctx.bot.user.id not in [643869468774105099, 603640674234925107]:
+            return ctx.bot.is_owner(ctx.author)
         ansura_guild: discord.Guild = ctx.bot.get_guild(604823602973376522)
         if not ansura_guild.get_member(ctx.author.id):
             return
         return 691752324787339351 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
+
     return commands.check(predicate)
 
+
 class Crosschat(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.colors = {}
         self.bot = bot
         self._cd = commands.CooldownMapping.from_cooldown(3, 15, commands.BucketType.user)
         self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
-        self.messages: List[List[int, int, int, List[Tuple[int, int]]]] = []
+        self.messages: List[List[int, int, int, List[Tuple[int, int]], str]] = []
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
 
     def _resolve(self, u):
@@ -37,8 +43,8 @@ class Crosschat(commands.Cog):
         return None
 
     @commands.command()
-    @ansura_staff()
-    async def xclist(self, ctx: commands.Context):
+    @ansura_staff_or_selfhost_owner()
+    async def xclist(self, ctx: AnsuraContext):
         channels = pages([f"{self.bot.get_guild(k)} ({k})\n - {self.bot.get_channel(v)} ({v})"
                           for k, v in self.channels.items()], 10, fmt="%s", title="Channels")
         banned = pages([f"{self._resolve(u)} - {u}"
@@ -47,8 +53,8 @@ class Crosschat(commands.Cog):
         await BotEmbedPaginator(ctx, list(chain(channels, banned, exempt))).run()
 
     @commands.command()
-    @ansura_staff()
-    async def xcreload(self, ctx: commands.Context):
+    @ansura_staff_or_selfhost_owner()
+    async def xcreload(self, ctx: AnsuraContext):
         self._reload()
         await ctx.send("Reloaded")
 
@@ -70,8 +76,8 @@ class Crosschat(commands.Cog):
             YAML().dump({"banned": self.banned, "channels": self.channels, "exempt": self.exempt}, fp)
 
     @commands.command()
-    @ansura_staff()
-    async def xcbans(self, ctx: commands.Context):
+    @ansura_staff_or_selfhost_owner()
+    async def xcbans(self, ctx: AnsuraContext):
         await BotEmbedPaginator(ctx,
                                 pages(
                                     [f"{self._resolve(x)} - {x}" for x in self.banned],
@@ -79,8 +85,8 @@ class Crosschat(commands.Cog):
                                 )).run()
 
     @commands.command()
-    @ansura_staff()
-    async def xcservers(self, ctx: commands.Context):
+    @ansura_staff_or_selfhost_owner()
+    async def xcservers(self, ctx: AnsuraContext):
         await BotEmbedPaginator(ctx,
                                 pages(
                                     [f"**{self.bot.get_guild(int(x))}** ({x})\n- "
@@ -93,28 +99,28 @@ class Crosschat(commands.Cog):
         commands.has_permissions(administrator=True),
         commands.has_guild_permissions(administrator=True)
     )
-    async def crosschat(self, ctx: commands.Context, arg: Union[discord.TextChannel, str] = None):
+    async def crosschat(self, ctx: AnsuraContext, arg: Union[discord.TextChannel, str] = None):
         if ctx.guild.id in self.banned:
-            await ctx.send("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
+            await ctx.send_error("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
                            "go to https://discord.gg/t5MGS2X to appeal.")
             return
         if not arg:
             if ctx.guild.id in self.channels.keys():
-                await ctx.send(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
+                await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
                                f"`%crosschat #channel` to change this or `%crosschat clear` to "
                                f"turn off crosschat")
             else:
-                await ctx.send(f"Crosschat is not enabled on this server. Do "
+                await ctx.send_ok(f"Crosschat is not enabled on this server. Do "
                                f"`%crosschat #channel` to change this.")
             return
         if isinstance(arg, discord.TextChannel):
             self.channels[ctx.guild.id] = arg.id
-            await ctx.send(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
+            await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
                            f"`%crosschat #channel` to change this or `%crosschat clear` to "
                            f"turn off crosschat")
         elif arg == "clear":
             del self.channels[ctx.guild.id]
-            await ctx.send(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
+            await ctx.send_ok(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
         else:
             return
         self._save()
@@ -132,46 +138,46 @@ class Crosschat(commands.Cog):
             self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x10, gr * 0x10, bl * 0x10)
 
     @commands.command()
-    @ansura_staff()
-    async def xcgban(self, ctx: commands.Context, guild: int):
+    @ansura_staff_or_selfhost_owner()
+    async def xcgban(self, ctx: AnsuraContext, guild: int):
         if guild in self.banned:
-            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} already banned.")
+            return await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name} already banned.")
         self.banned.append(guild)
         self._save()
-        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
+        await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name or guild} banned.")
 
     @commands.command()
-    @ansura_staff()
-    async def xcgunban(self, ctx: commands.Context, guild: int):
+    @ansura_staff_or_selfhost_owner()
+    async def xcgunban(self, ctx: AnsuraContext, guild: int):
         if guild not in self.banned:
-            return await ctx.send(f"Guild {self.bot.get_guild(guild).name} not banned.")
+            return await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name} not banned.")
         self.banned.remove(guild)
         self._save()
-        await ctx.send(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
+        await ctx.send_ok(f"Guild {self.bot.get_guild(guild).name or guild} unbanned.")
 
     @commands.command()
-    @ansura_staff()
-    async def xcban(self, ctx: commands.Context, member: Union[discord.Member, int]):
+    @ansura_staff_or_selfhost_owner()
+    async def xcban(self, ctx: AnsuraContext, member: Union[discord.Member, int]):
         if isinstance(member, discord.Member):
             member = member.id
         if member not in self.banned:
             self.banned.append(member)
             self._save()
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) xchat banned")
         else:
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) already xchat banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) already xchat banned")
 
     @commands.command()
-    @ansura_staff()
-    async def xcunban(self, ctx: commands.Context, member: Union[discord.Member, int]):
+    @ansura_staff_or_selfhost_owner()
+    async def xcunban(self, ctx: AnsuraContext, member: Union[discord.Member, int]):
         if isinstance(member, discord.Member):
             member = member.id
         if member in self.banned:
             self.banned.remove(member)
             self._save()
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) xchat unbanned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) xchat unbanned")
         else:
-            await ctx.send(f"{self.bot.get_user(member)} ({member}) already not banned")
+            await ctx.send_ok(f"{self.bot.get_user(member)} ({member}) already not banned")
 
     async def init_channels(self):
         print("[XCHAT] Looking for channels")
@@ -199,20 +205,20 @@ class Crosschat(commands.Cog):
             await message.channel.send(f"{message.author.mention}, you're sending messages too fast! "
                                        f"Try again in {round(time)} seconds.", delete_after=30)
             return
-
         guild: discord.Guild = channel.guild
         author: discord.Member = message.author
         e = discord.Embed()
-        g: discord.Guild = self.bot.get_guild(604823602973376522)
-        m: discord.Member = g.get_member(author.id)
-        e.title = f"Chat from **{guild.name}**"
-        e.colour = self.colors[int(guild.id)]
-        if m and 691752324787339351 in [r.id for r in m.roles]:
-            e.set_author(name="Ansura Developer" if author.id == 267499094090579970 else
-                         "Ansura Staff Member",
-                         icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
-                                  "cab59a4cb92c877f5b7c3fc1ae402298.png")
-            e.colour = self.ansura_color
+        if self.bot.user.id in [643869468774105099, 603640674234925107]:
+            g: discord.Guild = self.bot.get_guild(604823602973376522)
+            m: discord.Member = g.get_member(author.id)
+            e.title = f"Chat from **{guild.name}**"
+            e.colour = self.colors[int(guild.id)]
+            if m and 691752324787339351 in [r.id for r in m.roles]:
+                e.set_author(name="Ansura Developer" if author.id == 267499094090579970 else
+                "Ansura Staff Member",
+                             icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
+                                      "cab59a4cb92c877f5b7c3fc1ae402298.png")
+                e.colour = self.ansura_color
         user: discord.User = message.author
         e.description = message.content
         err_s = ""
@@ -244,7 +250,7 @@ class Crosschat(commands.Cog):
                 else:
                     msg = await c.send(embed=e)
                 sent.append((c.id, msg.id))
-        self.messages.append([message.guild.id, message.channel.id, message.author.id, sent])
+        self.messages.append([message.guild.id, message.channel.id, message.author.id, sent, message.content])
         if len(self.messages) > 250:
             del self.messages[0]
         if file:
@@ -258,51 +264,42 @@ class Crosschat(commands.Cog):
             return False
 
     @commands.command()
-    @ansura_staff()
-    async def xclookup(self, ctx: commands.Context, message: Union[discord.Message, int]):
+    @ansura_staff_or_selfhost_owner()
+    async def xclookup(self, ctx: AnsuraContext, message: Union[discord.Message, int]):
         if isinstance(message, discord.Message):
             msg_id = message.id
         else:
             msg_id = message
-        guild = None
-        messages = None
-        msgs = None
-        author = None
         found = False
-        channel = None
         for i in self.messages:
             guild = i[0]
             channel = i[1]
             author = i[2]
             msgs = i[3]
+            content = i[4]
+
             for m in msgs:
                 if m[1] == msg_id:
                     found = True
                     break
-            if found: break
+            if found:
+                break
         else:
-            return await ctx.send("Message not found")
-        await ctx.send(
-            embed=discord.Embed(
-                title="Message lookup",
-            ).add_field(
-                name="Guild",
-                value=f"{self.bot.get_guild(guild)} - {guild}",
-                inline=False
-            ).add_field(
-                name="Channel",
-                value=f"{self.bot.get_channel(channel)} - {channel}",
-                inline=False
-            ).add_field(
-                name="Author",
-                value=f"{self.bot.get_user(author)} - {author}",
-                inline=False
-            )
+            return await ctx.send_error("Message not found")
+        await ctx.embed(
+            title="Message lookup",
+            fields=[
+                ("Guild", f"{self.bot.get_guild(guild)} - {guild}"),
+                ("Channel", f"{self.bot.get_guild(channel)} - {channel}"),
+                ("Author", f"{self.bot.get_guild(author)} - {author}"),
+                ("Content", content[":800"]),
+            ],
+            not_inline=[0, 1, 2, 3]
         )
 
     @commands.command()
-    @ansura_staff()
-    async def xcdelete(self, ctx: commands.Context, message: Union[discord.Message, int]):
+    @ansura_staff_or_selfhost_owner()
+    async def xcdelete(self, ctx: AnsuraContext, message: Union[discord.Message, int]):
         if isinstance(message, discord.Message):
             msg_id = message.id
         else:
@@ -322,7 +319,8 @@ class Crosschat(commands.Cog):
                 if m[1] == msg_id:
                     found = True
                     break
-            if found: break
+            if found:
+                break
         else:
             return await ctx.send("Message not found")
         count = 0
@@ -338,10 +336,9 @@ class Crosschat(commands.Cog):
                         pass
         await ctx.send(f"Deleted message from {count} servers. {fail} failed")
 
-
     @commands.command()
-    @ansura_staff()
-    async def xchelp(self, ctx: commands.Context):
+    @ansura_staff_or_selfhost_owner()
+    async def xchelp(self, ctx: AnsuraContext):
         await ctx.send(embed=discord.Embed(
             title="Ansura Crosschat Moderation",
             description="**Guild Ban Management**:`xcgunban guild_id` `xcgban guild_id`\n"
@@ -350,6 +347,7 @@ class Crosschat(commands.Cog):
                         "**Lookup a message**: `xclookup message_link`\n"
                         "**Delete a message**: `xcldelete message_link`"
         ))
+
 
 def setup(bot):
     bot.add_cog(Crosschat(bot))

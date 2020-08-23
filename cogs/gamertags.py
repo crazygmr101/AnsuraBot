@@ -5,17 +5,16 @@ import discord
 import pytz
 from discord.ext import commands
 
-import lib.database as AD
+from ansura import AnsuraBot, AnsuraContext
 
 
 class Gamertags(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
-        bot.db = AD.AnsuraDatabase()
         self.db = bot.db
 
     @commands.command()
-    async def private(self, ctx: commands.Context, status: bool = None):
+    async def private(self, ctx: AnsuraContext, status: bool = None):
         """
         Sets your privacy for %gt. People with manage server permissions can always see gamertags of people in a server
         """
@@ -28,7 +27,7 @@ class Gamertags(commands.Cog):
         ))
 
     @commands.command()
-    async def webprivate(self, ctx: commands.Context, status: bool = None):
+    async def webprivate(self, ctx: AnsuraContext, status: bool = None):
         """
         Sets your profile privacy for the website.
         """
@@ -40,9 +39,8 @@ class Gamertags(commands.Cog):
                         f"Servers: {'Private' if p else 'Public if you share a server'}"
         ))
 
-
     @commands.command()
-    async def setbio(self, ctx: commands.Context, *, bio: str):
+    async def setbio(self, ctx: AnsuraContext, *, bio: str):
         """
         Sets your bio
         """
@@ -55,7 +53,7 @@ class Gamertags(commands.Cog):
         ))
 
     @commands.command()
-    async def bio(self, ctx: commands.Context, member: discord.Member = None):
+    async def bio(self, ctx: AnsuraContext, member: discord.Member = None):
         """
         Gets your or another user's bio
         """
@@ -77,7 +75,7 @@ class Gamertags(commands.Cog):
             ))
 
     @commands.command()
-    async def profile(self, ctx: commands.Context, member: discord.Member = None):
+    async def profile(self, ctx: AnsuraContext, member: discord.Member = None):
         """
         Gets a link to someone's profile on Ansura's website
         """
@@ -89,63 +87,63 @@ class Gamertags(commands.Cog):
         ))
 
     @commands.command()
-    async def xbox(self, ctx: discord.ext.commands.Context, *, username):
+    async def xbox(self, ctx: AnsuraContext, *, username):
         """
         Sets your xbox username
         """
         self.db.set_gaming_record(ctx.author.id, "xboxlive", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mojang(self, ctx: discord.ext.commands.Context, *, username):
+    async def mojang(self, ctx: AnsuraContext, *, username):
         """
         Sets your mojang username
         """
         self.db.set_gaming_record(ctx.author.id, "mojang", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["yt"])
-    async def youtube(self, ctx: discord.ext.commands.Context, *, username):
+    async def youtube(self, ctx: AnsuraContext, *, username):
         """
         Sets your youtube username
         """
         self.db.set_gaming_record(ctx.author.id, "youtube", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def mixer(self, ctx: discord.ext.commands.Context, *, username):
+    async def mixer(self, ctx: AnsuraContext, *, username):
         """
         Sets your mixer username
         """
         self.db.set_gaming_record(ctx.author.id, "mixer", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def twitch(self, ctx: discord.ext.commands.Context, *, username):
+    async def twitch(self, ctx: AnsuraContext, *, username):
         """
         Sets your twitch username
         """
         self.db.set_gaming_record(ctx.author.id, "twitch", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def reddit(self, ctx: discord.ext.commands.Context, *, username):
+    async def reddit(self, ctx: AnsuraContext, *, username):
         """
         Sets your reddit username
         """
         self.db.set_gaming_record(ctx.author.id, "reddit", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command()
-    async def steam(self, ctx: discord.ext.commands.Context, *, username):
+    async def steam(self, ctx: AnsuraContext, *, username):
         """
         Sets your steam username/link
         """
         self.db.set_gaming_record(ctx.author.id, "steam", username)
-        await ctx.send(ctx.author.mention + ": Set to " + username)
+        await ctx.send_info(ctx.author.mention + ": Set to " + username)
 
     @commands.command(aliases=["gt"])
-    async def gametags(self, ctx: discord.ext.commands.Context, user: Union[discord.Member, discord.User] = None,
+    async def gametags(self, ctx: AnsuraContext, user: Union[discord.Member, discord.User] = None,
                        override: bool = False):
         """
         Lists a user's gamertags
@@ -158,8 +156,6 @@ class Gamertags(commands.Cog):
         if isinstance(user, discord.User) and not override:
             await ctx.send("That user isn't in this server")
             return
-        guild: discord.Guild = self.bot.get_guild(604823602973376522)
-        member: discord.Member = guild.get_member(user.id)
         rec = self.db.lookup_gaming_record(user.id)
         priv = self.db.isprivate(user.id)
         if priv[0] == 1 and not ctx.author.guild_permissions.manage_guild:
@@ -171,16 +167,19 @@ class Gamertags(commands.Cog):
         if priv[0] == 1:
             await ctx.send("This profile is private. Do you want to continue to display it anyway?")
             resp = await self.bot.wait_for("message", timeout=60, check=lambda m: m.author.id == ctx.author.id and
-                                           m.channel.id == ctx.channel.id)
+                                                                                  m.channel.id == ctx.channel.id)
             if resp.content.lower()[0] != "y":
                 await resp.add_reaction("👍")
                 return
         e = discord.Embed()
-        if member and 691752324787339351 in [r.id for r in member.roles]:
-            e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else
-                         "Ansura Staff Member",
-                         icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
-                                  "cab59a4cb92c877f5b7c3fc1ae402298.png")
+        if self.bot.user.id in [643869468774105099, 603640674234925107]:
+            guild: discord.Guild = self.bot.get_guild(604823602973376522)
+            member: discord.Member = guild.get_member(user.id)
+            if member and 691752324787339351 in [r.id for r in member.roles]:
+                e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else
+                "Ansura Staff Member",
+                             icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
+                                      "cab59a4cb92c877f5b7c3fc1ae402298.png")
         e.colour = user.color
         e.title = user.display_name
         e.set_thumbnail(url=user.avatar_url)
@@ -199,7 +198,7 @@ class Gamertags(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def who(self, ctx: discord.ext.commands.Context, tag: str):
+    async def who(self, ctx: AnsuraContext, tag: str):
         """
         Finds users with a gamertag of <tag>
         """

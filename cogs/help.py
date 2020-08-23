@@ -3,13 +3,15 @@ import inspect
 import discord
 from discord.ext import commands
 
+from ansura import AnsuraBot, AnsuraContext
+
 
 class Help(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
     @commands.command(aliases=["h"])
-    async def help(self, ctx: commands.Context, command: str = None):
+    async def help(self, ctx: AnsuraContext, command: str = None):
         """Lists modules, or help for a command"""
         if not command:
             help = discord.Embed(title="Module List",
@@ -46,7 +48,7 @@ class Help(commands.Cog):
             ).set_footer(text=f"Module: {c.cog.qualified_name}"))
 
     @commands.command(aliases=["cmds"])
-    async def commands(self, ctx: commands.Context, module: str = None):
+    async def commands(self, ctx: AnsuraContext, module: str = None):
         """Lists commands in a module"""
         if module is None:
             await self.help(ctx)
