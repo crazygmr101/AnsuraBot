@@ -209,16 +209,15 @@ class Crosschat(commands.Cog):
         guild: discord.Guild = channel.guild
         author: discord.Member = message.author
         e = discord.Embed()
+        dev = ""
+        e.set_author(name=guild.name, icon_url=str(guild.icon_url))
         if self.bot.user.id in [643869468774105099, 603640674234925107]:
             g: discord.Guild = self.bot.get_guild(604823602973376522)
             m: discord.Member = g.get_member(author.id)
-            e.title = f"Chat from **{guild.name}**"
             e.colour = self.colors[int(guild.id)]
             if m and 691752324787339351 in [r.id for r in m.roles]:
-                e.set_author(name="Ansura Developer" if author.id == 267499094090579970 else
-                "Ansura Staff Member",
-                             icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
-                                      "cab59a4cb92c877f5b7c3fc1ae402298.png")
+                dev = " | "
+                dev += "Ansura Developer" if author.id == 267499094090579970 else "Ansura Staff Member"
                 e.colour = self.ansura_color
         user: discord.User = message.author
         e.description = message.content
@@ -239,7 +238,8 @@ class Crosschat(commands.Cog):
                 err_s = " | Could not delete from source server"
         except discord.errors.NotFound as e:
             pass
-        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s, icon_url=user.avatar_url)
+        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
+                     icon_url=user.avatar_url)
         sent = []
 
         for k in self.channels.keys():
