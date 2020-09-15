@@ -215,6 +215,9 @@ class Crosschat(commands.Cog):
             g: discord.Guild = self.bot.get_guild(604823602973376522)
             m: discord.Member = g.get_member(author.id)
             e.colour = self.colors[int(guild.id)]
+            if m and 748674125353975857 in [r.id for r in m.roles]:
+                dev = " | Ansura Contributor"
+                e.colour = self.ansura_color
             if m and 691752324787339351 in [r.id for r in m.roles]:
                 dev = " | "
                 dev += "Ansura Developer" if author.id == 267499094090579970 else "Ansura Staff Member"
