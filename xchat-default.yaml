@@ -1,0 +1,7 @@
+banned:
+  - 123456
+channels:
+  0: 0
+
+exempt:
+  - 0
