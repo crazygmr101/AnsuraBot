@@ -85,7 +85,15 @@ class Fun(commands.Cog):
             description=f'{ctx.author.mention} kisses {user.mention}',
             image=requests.get("https://nekos.life/api/v2/img/kiss").json()["url"]
         )
-
+   
+    @commands.command()
+    async def pat(self, AnsuraContext, user: discord.Member):
+        """Pat A User"""
+        await ctx.embed(
+            description=f'{ctx.author.mention} pats {user.mention}',
+            image=request.get("https://nekos.life/api/v2/img/pat").json()["url"]
+        )
+    
     @commands.command(aliases=["bork"])
     async def woof(self, ctx: AnsuraContext):
         """Sends a dog pic"""
