@@ -8,14 +8,17 @@ from discord.ext import commands
 import math
 import asyncio
 
+from ansura import AnsuraBot, AnsuraContext
+
+
 class Image(commands.Cog):
-    def __init__(self, bot: discord.ext.commands.Bot):
+    def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.counter = 100000
         self.lock = asyncio.Lock()
 
     @commands.command(aliases=["ihelp"])
-    async def imagehelp(self, ctx: commands.Context, cmd: str = None):
+    async def imagehelp(self, ctx: AnsuraContext, cmd: str = None):
         if cmd:
             cmd = cmd.lower()
         clist = [
@@ -72,7 +75,7 @@ class Image(commands.Cog):
             ))
 
     @commands.command()
-    async def image(self, ctx: commands.Context, filter_list: str = None):
+    async def image(self, ctx: AnsuraContext, filter_list: str = None):
         """
         Do `%ihelp` to view filter list, and `%ihelp filter` to view help for a filter
         """

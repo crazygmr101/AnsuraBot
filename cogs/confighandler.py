@@ -4,9 +4,12 @@ import discord
 import yaml
 from discord.ext import commands
 
+from ansura.ansurabot import AnsuraBot
+from ansura.ansuracontext import AnsuraContext
+
 
 class ConfigHandler:
-    def __init__(self, bot):
+    def __init__(self, bot: AnsuraBot):
         print("[CONFIG] Loading internal config handler")
         bot.cfg = self
         self.bot = bot
@@ -54,14 +57,14 @@ class ConfigCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def reload(self, ctx: commands.Context):
+    async def reload(self, ctx: AnsuraContext):
         await ctx.send("Reloading streamer config...")
         self.cfg.reload()
         await ctx.send("Reloaded!")
 
     @commands.command()
     @commands.is_owner()
-    async def save(self, ctx: commands.Context):
+    async def save(self, ctx: AnsuraContext):
         await ctx.send("Saving streamer config...")
         self.cfg.reload()
         await ctx.send("Saved!")
