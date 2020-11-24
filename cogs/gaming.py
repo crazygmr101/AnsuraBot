@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import io
 import os
 import platform
 import re
@@ -193,24 +194,19 @@ class Gaming(commands.Cog):
             'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
             'Accept-Encoding': 'none',
             'Accept-Language': 'en-US,en;q=0.8'}
-        mod_info = {}
         async with aiohttp.ClientSession() as sess:
             async with sess.get(
                     f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
                     headers=hdr) as resp:
                 if resp.status == 404:
-                    await ctx.send(embed=discord.Embed(
-                        title="This mod doesn't exist",
-                        description="Check your spelling or try using the acronym for the"
-                                    " mod",
-                        colour=0xFF0000)
+                    return await ctx.send_error(
+                        "This mod doesn't exist\n"
+                        "Check your spelling or try using the acronym for the mod"
                     )
-                    return
-                with open(f"{mod}.html", "wb") as fp:
-                    fp.write(await resp.content.read())
-        with open(f"{mod}.html", "rb") as fp:
-            soup = BeautifulSoup(fp, features="html.parser")
-        os.remove(f"{mod}.html")
+        buf = io.BytesIO()
+        buf.write(await resp.content.read())
+        buf.seek(0)
+        soup = BeautifulSoup(buf, features="html.parser")
         mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
         mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"),
                                 get="text")
@@ -223,22 +219,16 @@ class Gaming(commands.Cog):
         mod_avatar = soup.find_all(
             "div",
             class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
-        mod_info["name"] = mod_name
-        mod_info["game version"] = mod_version
-        mod_info["downloads"] = mod_downloads
-        mod_info["last updated"] = mod_updated
-        mod_info["files"] = mod_files
-        mod_info["source"] = mod_source
-        mod_info["avatar"] = mod_avatar
-        mod_embed = discord.Embed(title=mod_info["name"],
-                                  description=f"**{mod_info['downloads']}**" + "\n"
-                                              + f"**{mod_info['last updated']}**"
-                                              + "\n" + f"**{mod_info['game version']}**",
-                                  colour=0x6441a5)
-        mod_embed.add_field(name="Game Files:", value=f"[Files]({mod_info['files']})")
-        mod_embed.add_field(name="Source Files:", value=f"[Source]({mod_info['source']})")
-        mod_embed.set_thumbnail(url=mod_info["avatar"])
-        await ctx.send(embed=mod_embed)
+        await ctx.embed(title=mod_name,
+                        description=f"**{mod_downloads}**" + "\n" +
+                                    f"**{mod_updated}**" + "\n" +
+                                    f"**{mod_version}**",
+                        clr=discord.Color.from_rgb(103, 65, 165),
+                        fields=[
+                            ("Game Files", f"[Files]({mod_files})"),
+                            ("Source Files", f"[Source]({mod_source})")
+                        ],
+                        thumbnail=mod_avatar)
 
 
 def setup(bot):
