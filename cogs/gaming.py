@@ -7,13 +7,16 @@ import socket
 import subprocess
 from typing import Union
 
+import aiohttp
 import discord
 import mcstatus
+from bs4 import BeautifulSoup
 from discord import Embed
 from discord.ext import commands
 
 import lib.hypixel
 from ansura import AnsuraBot, AnsuraContext
+from lib.utils import find_text
 
 
 async def ping(url: str):
@@ -180,6 +183,57 @@ class Gaming(commands.Cog):
                                                                "tag with `%mojang username`"))
                 return
         await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
+
+    @commands.command()
+    async def mod(self, ctx: AnsuraContext, mod: str):
+        hdr = {
+            'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko)'
+                           ' Chrome/23.0.1271.64 Safari/537.11'),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+            'Accept-Encoding': 'none',
+            'Accept-Language': 'en-US,en;q=0.8'}
+        mod_info = {}
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
+                                headers=hdr) as resp:
+                if resp.status == 404:
+                    await ctx.send(embed=discord.Embed(
+                        title="This mod doesn't exist",
+                        description="Check your spelling or try using the acronym for the"
+                                    " mod",
+                        colour=0xFF0000)
+                    )
+                    return
+                with open(f"{mod}.html", "wb") as fp:
+                    fp.write(await resp.content.read())
+        with open(f"{mod}.html", "rb") as fp:
+            soup = BeautifulSoup(fp, features="html.parser")
+        os.remove(f"{mod}.html")
+        mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
+        mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"), get="text")
+        mod_updated = find_text("last updated", soup.find_all("span", class_="text-gray-500"), get="text")
+        mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"), get="text")
+        mod_files = find_text("files", soup.find_all("a"), get="href")
+        mod_source = find_text("source", soup.find_all("a"), get="href")
+        mod_avatar = soup.find_all("div",
+                                   class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
+        mod_info["name"] = mod_name
+        mod_info["game version"] = mod_version
+        mod_info["downloads"] = mod_downloads
+        mod_info["last updated"] = mod_updated
+        mod_info["files"] = mod_files
+        mod_info["source"] = mod_source
+        mod_info["avatar"] = mod_avatar
+        mod_embed = discord.Embed(title=mod_info["name"],
+                                  description=f"**{mod_info['downloads']}**" + "\n"
+                                              + f"**{mod_info['last updated']}**"
+                                              + "\n" + f"**{mod_info['game version']}**",
+                                  colour=0x6441a5)
+        mod_embed.add_field(name="Game Files:", value=f"[Files]({mod_info['files']})")
+        mod_embed.add_field(name="Source Files:", value=f"[Source]({mod_info['source']})")
+        mod_embed.set_thumbnail(url=mod_info["avatar"])
+        await ctx.send(embed=mod_embed)
 
 
 def setup(bot):
