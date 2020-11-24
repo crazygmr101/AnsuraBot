@@ -99,13 +99,13 @@ class Gaming(commands.Cog):
             await ctx.send(embed=e)
         except socket.timeout as t:
             await ctx.send_error("*Oops ):*\n Looks like the ping I made to " + url + ":" + str(port) + " timed out. "
-                                                                                                  "Either the server is down, not responding, or I was given a wrong URL or port.")
+                                                                                                        "Either the server is down, not responding, or I was given a wrong URL or port.")
         except socket.gaierror as e:
             await ctx.send_error("I can't figure out how to reach that URL. ): Double check that it's correct.")
             return
         except Exception as e:
             await ctx.send_error("*Uh-oh D:*\n An error happened"
-                           " while I was pinging the server.")
+                                 " while I was pinging the server.")
             print(e)
 
     @commands.command()
@@ -195,8 +195,9 @@ class Gaming(commands.Cog):
             'Accept-Language': 'en-US,en;q=0.8'}
         mod_info = {}
         async with aiohttp.ClientSession() as sess:
-            async with sess.get(f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
-                                headers=hdr) as resp:
+            async with sess.get(
+                    f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
+                    headers=hdr) as resp:
                 if resp.status == 404:
                     await ctx.send(embed=discord.Embed(
                         title="This mod doesn't exist",
@@ -211,13 +212,17 @@ class Gaming(commands.Cog):
             soup = BeautifulSoup(fp, features="html.parser")
         os.remove(f"{mod}.html")
         mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
-        mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"), get="text")
-        mod_updated = find_text("last updated", soup.find_all("span", class_="text-gray-500"), get="text")
-        mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"), get="text")
+        mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"),
+                                get="text")
+        mod_updated = find_text("last updated", soup.find_all("span", class_="text-gray-500"),
+                                get="text")
+        mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"),
+                                  get="text")
         mod_files = find_text("files", soup.find_all("a"), get="href")
         mod_source = find_text("source", soup.find_all("a"), get="href")
-        mod_avatar = soup.find_all("div",
-                                   class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
+        mod_avatar = soup.find_all(
+            "div",
+            class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
         mod_info["name"] = mod_name
         mod_info["game version"] = mod_version
         mod_info["downloads"] = mod_downloads
