@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import io
 import os
 import platform
 import re
@@ -7,13 +8,16 @@ import socket
 import subprocess
 from typing import Union
 
+import aiohttp
 import discord
 import mcstatus
+from bs4 import BeautifulSoup
 from discord import Embed
 from discord.ext import commands
 
 import lib.hypixel
 from ansura import AnsuraBot, AnsuraContext
+from lib.utils import find_text
 
 
 async def ping(url: str):
@@ -96,13 +100,13 @@ class Gaming(commands.Cog):
             await ctx.send(embed=e)
         except socket.timeout as t:
             await ctx.send_error("*Oops ):*\n Looks like the ping I made to " + url + ":" + str(port) + " timed out. "
-                                                                                                  "Either the server is down, not responding, or I was given a wrong URL or port.")
+                                                                                                        "Either the server is down, not responding, or I was given a wrong URL or port.")
         except socket.gaierror as e:
             await ctx.send_error("I can't figure out how to reach that URL. ): Double check that it's correct.")
             return
         except Exception as e:
             await ctx.send_error("*Uh-oh D:*\n An error happened"
-                           " while I was pinging the server.")
+                                 " while I was pinging the server.")
             print(e)
 
     @commands.command()
@@ -180,6 +184,51 @@ class Gaming(commands.Cog):
                                                                "tag with `%mojang username`"))
                 return
         await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
+
+    @commands.command()
+    async def mod(self, ctx: AnsuraContext, mod: str):
+        hdr = {
+            'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko)'
+                           ' Chrome/23.0.1271.64 Safari/537.11'),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+            'Accept-Encoding': 'none',
+            'Accept-Language': 'en-US,en;q=0.8'}
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(
+                    f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
+                    headers=hdr) as resp:
+                if resp.status == 404:
+                    return await ctx.send_error(
+                        "This mod doesn't exist\n"
+                        "Check your spelling or try using the acronym for the mod"
+                    )
+        buf = io.BytesIO()
+        buf.write(await resp.content.read())
+        buf.seek(0)
+        soup = BeautifulSoup(buf, features="html.parser")
+        mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
+        mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"),
+                                get="text")
+        mod_updated = find_text("last updated", soup.find_all("span", class_="text-gray-500"),
+                                get="text")
+        mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"),
+                                  get="text")
+        mod_files = find_text("files", soup.find_all("a"), get="href")
+        mod_source = find_text("source", soup.find_all("a"), get="href")
+        mod_avatar = soup.find_all(
+            "div",
+            class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
+        await ctx.embed(title=mod_name,
+                        description=f"**{mod_downloads}**" + "\n" +
+                                    f"**{mod_updated}**" + "\n" +
+                                    f"**{mod_version}**",
+                        clr=discord.Color.from_rgb(103, 65, 165),
+                        fields=[
+                            ("Game Files", f"[Files]({mod_files})"),
+                            ("Source Files", f"[Source]({mod_source})")
+                        ],
+                        thumbnail=mod_avatar)
 
 
 def setup(bot):
