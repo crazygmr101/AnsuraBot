@@ -194,6 +194,7 @@ class Gaming(commands.Cog):
             'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
             'Accept-Encoding': 'none',
             'Accept-Language': 'en-US,en;q=0.8'}
+        buf = io.BytesIO()
         async with aiohttp.ClientSession() as sess:
             async with sess.get(
                     f"https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')}",
@@ -203,8 +204,7 @@ class Gaming(commands.Cog):
                         "This mod doesn't exist\n"
                         "Check your spelling or try using the acronym for the mod"
                     )
-        buf = io.BytesIO()
-        buf.write(await resp.content.read())
+                buf.write(await resp.content.read())
         buf.seek(0)
         soup = BeautifulSoup(buf, features="html.parser")
         mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
