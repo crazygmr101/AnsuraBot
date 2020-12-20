@@ -7,6 +7,7 @@ def descend(obj: Dict, keys: List[str]):
         temp = temp[k]
     return temp
 
+
 import asyncio
 from typing import Any, List
 
@@ -95,3 +96,26 @@ def numbered(lst: List[Any]) -> List[str]:
     Returns a numbered version of a list
     """
     return [f"{i} - {a}" for i, a in enumerate(lst)]
+
+
+def find_text(text: str, find_all, get: str):
+    """
+    Function to loop through the tags in find_all and
+    return the desired one using the desired return format
+    :param text: the text that will be searched for
+    :param find_all: a find_all() from BeautifulSoup
+    :param get: the desired format of return, e.g: text, link, etc.
+    """
+    for result in find_all:
+        if result:
+            if get == "text":
+                if text.lower() in result.text.lower():
+                    return result.text
+            if get == "href":
+                if text.lower() in result.text.lower():
+                    if result["href"].startswith("/"):
+                        return "https://www.curseforge.com" + result["href"]
+                    else:
+                        return result["href"]
+        else:
+            return "Unknown"
