@@ -55,11 +55,11 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
         s = "```"
         s += f"Level {_get_level(player['Experience'])}\n"
         for _prefix in prefixes:
-            w = player[f"{prefixes[_prefix]}_wins_bedwars"]
-            l = player[f"{prefixes[_prefix]}_losses_bedwars"]
-            fk = player[f"{prefixes[_prefix]}_final_kills_bedwars"]
-            k = player[f"{prefixes[_prefix]}_kills_bedwars"]
-            d = player[f"{prefixes[_prefix]}_deaths_bedwars"]
+            w = player.get(f"{prefixes[_prefix]}_wins_bedwars", 0)
+            l = player.get(f"{prefixes[_prefix]}_losses_bedwars", 0)
+            fk = player.get(f"{prefixes[_prefix]}_final_kills_bedwars", 0)
+            k = player.get(f"{prefixes[_prefix]}_kills_bedwars", 0)
+            d = player.get(f"{prefixes[_prefix]}_deaths_bedwars", 0)
             s += _prefix.center(13, "=") + "\n"
             s += f"{w}/{w + l} Won\n"
             s += f"{k}:{d} KDR ({round(k / d, 2)}\n"
