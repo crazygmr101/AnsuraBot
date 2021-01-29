@@ -71,6 +71,7 @@ async def on_ready():
     await bot.cfg.start()
     print("Ansura online! :D")
     print(f" {len(bot.guilds)} Guilds")
+    print(bot.user)
 
 
 @bot.event
