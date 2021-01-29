@@ -11,8 +11,8 @@ import aiohttp
 import discord
 import discord.utils
 import pytz
-from disputils import BotMultipleChoice
 from discord.ext import commands
+from disputils import BotMultipleChoice
 
 import ansura
 
@@ -45,7 +45,8 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
         timel = time.astimezone(pytz.timezone(player_tz)) if player_tz else None
         #
         e.add_field(name="Last Seen",
-                    value=f"{time.strftime('%x %X')} (Server)\n{timel.strftime('%x %X') if timel else 'N/A'} (Local)"
+                    value=f"{time.strftime('%x %X')}"
+                          f" (Server)\n{timel.strftime('%x %X') if timel else 'N/A'} (Local)"
                     if player["lastLogout"] > player["lastLogin"] else "Now")
         e.add_field(name="Hypixel Level",
                     value=f"{await _get_level(exp=player['networkExp'])}")
@@ -136,7 +137,8 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
         player_sb = profile["members"][player_sb_id]
         if "slayer_bosses" in player_sb:
             e.add_field(name="Slayers", value="\n".join(
-                [f"{k.title()}: {_slayer_level(v.get('xp', 0), k)}" for k, v in player_sb["slayer_bosses"].items()]
+                [f"{k.title()}:"
+                 f" {_slayer_level(v.get('xp', 0), k)}" for k, v in player_sb["slayer_bosses"].items()]
             ))
             e.add_field(name="Money",
                         value=f"Bank: {round(float(profile.get('banking', {'balance': 0})['balance']), 1)} Coins\n"
@@ -212,15 +214,14 @@ async def _get_level(username: str = None, profile_id: str = None, exp=None):
     skills = "taming,farming,mining,combat,foraging,fishing,enchanting,alchemy,carpentry,runecrafting"
     if exp:
         return floor((sqrt(exp + 15312.5) - 88.38834764831843) / 35.35533905932738)
-    else:
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(f"https://sky.shiiyu.moe/api/v2/profile/{username}") as resp:
-                data = await resp.json()
-        levels = data["profiles"][profile_id]["data"]["levels"]
-        for skill in skills.split(","):
-            if skill in levels.keys():
-                skill_list.append((skill, levels[skill]["level"]))
-        return skill_list
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(f"https://sky.shiiyu.moe/api/v2/profile/{username}") as resp:
+            data = await resp.json()
+    levels = data["profiles"][profile_id]["data"]["levels"]
+    for skill in skills.split(","):
+        if skill in levels.keys():
+            skill_list.append((skill, levels[skill]["level"]))
+    return skill_list
 
 
 def _sub_one(string, repl: Dict[str, str]):
