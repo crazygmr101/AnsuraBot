@@ -13,6 +13,7 @@ import discord.utils
 import pytz
 from discord.ext import commands
 from disputils import BotMultipleChoice
+import pastebin
 
 import ansura
 
@@ -153,14 +154,14 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
                           " Skyblock profile.")
     # TODO: _raw not working
     elif profile_type in ["raw"]:
-        e.description = await asyncio.get_event_loop().run_in_executor(None, _raw, data)
+        e.description = await _raw(data)
 
     await ctx.send(embed=e)
 
 
-def _raw(data):
+async def _raw(data):
     dstr = json.dumps(data, indent=2)
-    url = "http://pastebin.com/api/api_post.php"
+    url = "https://pastebin.com/api/api_post.php"
     values = {'api_option': 'paste',
               'api_dev_key': os.getenv("PASTEBIN"),
               'api_paste_code': dstr,
@@ -172,10 +173,8 @@ def _raw(data):
 
     data = urllib.parse.urlencode(values)
     data = data.encode('utf-8')  # data should be bytes
-    req = urllib.request.Request(url, data)
-    with urllib.request.urlopen(req) as response:
-        resp = response.read()
-    return str(resp, "utf-8")
+    url = urllib.request.urlopen(url, data)
+    return url.read().decode("utf-8")
 
 
 async def _get(player: str, token: str):
