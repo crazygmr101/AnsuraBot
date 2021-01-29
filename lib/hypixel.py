@@ -4,16 +4,22 @@ import os
 import urllib.parse
 import urllib.request
 from datetime import datetime
+from math import sqrt, floor
 from typing import Dict
 
 import aiohttp
 import discord
 import discord.utils
 import pytz
+from disputils import BotMultipleChoice
 from discord.ext import commands
 
+import ansura
 
-async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, key: str = None):
+
+async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, token, key: str = None):
+    if key and len(key.split(" ")) > 1:
+        return
     with ctx.typing():
         data = await _get(player, token)
     if data["player"] is None:
@@ -23,7 +29,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
     player = data["player"]
     player_name = player["displayname"]
 
-    e = _mk_embed(player_name, key.split(" ")[0] if key else None)
+    e = _mk_embed(player_name, key if key else None)
     key = key.lower() if key else key
 
     if key is None:
@@ -42,10 +48,10 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
                     value=f"{time.strftime('%x %X')} (Server)\n{timel.strftime('%x %X') if timel else 'N/A'} (Local)"
                     if player["lastLogout"] > player["lastLogin"] else "Now")
         e.add_field(name="Hypixel Level",
-                    value=f"{_get_level(player['networkExp'])}")
+                    value=f"{await _get_level(exp=player['networkExp'])}")
 
     elif key in ["bedwars", "bw"]:
-        player = player["stats"]["Bedwars"]
+        player_bw = player["stats"]["Bedwars"]
         prefixes = {
             "2v2": "eight_two",
             "3v3v3v3": "four_three",
@@ -53,15 +59,15 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
             "4v4": "two_four"
         }
         s = "```"
-        s += f"Level {_get_level(player['Experience'])}\n"
+        s += f"Level {player['achievements']['bedwars_level']}\n"
         for _prefix in prefixes:
-            w = player.get(f"{prefixes[_prefix]}_wins_bedwars", 0)
-            l = player.get(f"{prefixes[_prefix]}_losses_bedwars", 0)
-            fk = player.get(f"{prefixes[_prefix]}_final_kills_bedwars", 0)
-            k = player.get(f"{prefixes[_prefix]}_kills_bedwars", 0)
-            d = player.get(f"{prefixes[_prefix]}_deaths_bedwars", 0)
+            w = player_bw.get(f"{prefixes[_prefix]}_wins_bedwars", 0)
+            loss = player_bw.get(f"{prefixes[_prefix]}_losses_bedwars", 0)
+            fk = player_bw.get(f"{prefixes[_prefix]}_final_kills_bedwars", 0)
+            k = player_bw.get(f"{prefixes[_prefix]}_kills_bedwars", 0)
+            d = player_bw.get(f"{prefixes[_prefix]}_deaths_bedwars", 0)
             s += _prefix.center(13, "=") + "\n"
-            s += f"{w}/{w + l} Won\n"
+            s += f"{w}/{w + loss} Won\n"
             s += f"{k}:{d} KDR ({round(k / d, 2)}\n"
             s += f"({fk} Final Kills)\n"
 
@@ -98,56 +104,49 @@ async def hypixel(ctx: commands.Context, player: str, bot: commands.Bot, token, 
     elif key in ["uhc"]:
         player = player["stats"]["UHC"]
         e.description = "```" \
-                        f"{player['kills']} K\n" \
-                        f"{player['deaths']} D" \
+                        f"{player.get('kills', 0)} K\n" \
+                        f"{player.get('deaths', 0)} D" \
                         "```"
 
-    elif key.split(" ")[0] in ["sb", "skyblock"]:
+    elif key in ["sb", "skyblock"]:
         player = player["stats"]["SkyBlock"]["profiles"]
-        if len(key.split(" ")) == 1:
-            e.description = f"Profiles:\n" + \
-                            '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
+        profile_id = None
+        profiles = []
+        for i in player.values():
+            profiles.append((i["profile_id"], i["cute_name"]))
+        mult_choice = BotMultipleChoice(ctx,
+                                        [profile["cute_name"] for profile in player.values()],
+                                        "Choose a SkyBlock profile")
+        await mult_choice.run()
+        await mult_choice.quit()
+        if mult_choice.choice:
+            for i in profiles:
+                if i[1] == mult_choice.choice:
+                    profile_id = i[0]
+                    break
         else:
-            for pro in player.values():
-                if pro["cute_name"].lower() == key.split(" ")[1].lower():
-                    profile_id = pro["profile_id"]
-                    name = pro["cute_name"].title()
-                    e.url = f"https://sky.lea.moe/stats/{player_name}/{name}"
-                    e.title = "Skyblock temporarily disabled"
-                    e.description = f"This is currently disabled as it is being redone. Visit " \
-                                    f"[here](https://sky.lea.moe/stats/{player_name}/{name}) to view profile info"
-                    await ctx.send(embed=e)
-                    return
-                    # break
-            else:
-                e.description = f"Profiles:\n" + \
-                                '\n'.join(['-' + pro['cute_name'] for pro in player.values()])
-                await ctx.send(embed=e)
-                return
-            e.title += f" ({name})"
-            async with aiohttp.ClientSession() as sess:
+            return
+        async with aiohttp.ClientSession() as sess:
+            if profile_id:
                 async with sess.get(
                         f"https://api.hypixel.net/skyblock/profile?key={token}&profile={profile_id}") as resp:
-                    status = resp.status
                     data2 = await resp.json()
-            profile = data2["profile"]
-            player_sb_id = data["player"]["uuid"]
-            player_sb = profile["members"][player_sb_id]
-            if "slayer_bosses" in player_sb:
-                e.add_field(name="Slayers", value="\n".join(
-                    [f"{k.title()}: {_slayer_level(v.get('xp', 0), k)}" for k, v in player_sb["slayer_bosses"].items()]
-                ))
-                e.add_field(name="Money",
-                            value=f"Bank: {round(float(profile.get('banking', {'balance': 0})['balance']), 1)} Coins\n"
-                                  f"Purse: {round(float(player_sb['coin_purse']), 1)} Coins")
-            e.add_field(name="Experience", value="\n".join([
-                k.title() + ": " + str(_get_level(player_sb.get(f"experience_skill_{k}", 0)))
-                for k in "alchemy,runecrafting,farming,combat,mining,enchanting,fishing,foraging,carpentry".split(",")
-            ]))
-            e.add_field(name="Misc", value=f"Fairy Souls: {player_sb.get('fairy_souls_collected', 0)}\n")
-            e.set_footer(text="Click the link for more data.")
-            print(player_sb)
-
+        profile = data2["profile"]
+        player_sb_id = data["player"]["uuid"]
+        player_sb = profile["members"][player_sb_id]
+        if "slayer_bosses" in player_sb:
+            e.add_field(name="Slayers", value="\n".join(
+                [f"{k.title()}: {_slayer_level(v.get('xp', 0), k)}" for k, v in player_sb["slayer_bosses"].items()]
+            ))
+            e.add_field(name="Money",
+                        value=f"Bank: {round(float(profile.get('banking', {'balance': 0})['balance']), 1)} Coins\n"
+                              f"Purse: {round(float(player_sb['coin_purse']), 1)} Coins")
+        skills_list = await _get_level(player_name, profile_id)
+        e.add_field(name="Experience", value="\n".join([f"{tup[0]}: {tup[1]}" for tup in skills_list]))
+        e.add_field(name="Misc", value=f"Fairy Souls: {player_sb.get('fairy_souls_collected', 0)}\n")
+        e.set_footer(text="If skills/exp appear as 0, you may not have API visibility on for your"
+                          " Skyblock profile.")
+    # TODO: _raw not working
     elif key in ["raw"]:
         e.description = await asyncio.get_event_loop().run_in_executor(None, _raw, data)
 
@@ -177,7 +176,6 @@ def _raw(data):
 async def _get(player: str, token: str):
     async with aiohttp.ClientSession() as sess:
         async with sess.get(f"https://api.hypixel.net/player?key={token}&name={player}") as resp:
-            status = resp.status
             data = await resp.json()
     return data
 
@@ -209,18 +207,20 @@ def _slayer_level(exp: int, name: str):
         return 0
 
 
-def _get_level(exp: int):
-    lvl = 1
-    cnt = 0
-    if exp == 0:
-        return 0
-    while exp >= 0:
-        need = 10000 + 2500 * (lvl - 1)
-        exp -= need
-        if exp < 0:
-            return lvl
-        lvl += 1
-    return -1  # this should never happen
+async def _get_level(username: str = None, profile_id: str = None, exp=None):
+    skill_list = []
+    skills = "taming,farming,mining,combat,foraging,fishing,enchanting,alchemy,carpentry,runecrafting"
+    if exp:
+        return floor((sqrt(exp + 15312.5) - 88.38834764831843) / 35.35533905932738)
+    else:
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(f"https://sky.shiiyu.moe/api/v2/profile/{username}") as resp:
+                data = await resp.json()
+        levels = data["profiles"][profile_id]["data"]["levels"]
+        for skill in skills.split(","):
+            if skill in levels.keys():
+                skill_list.append((skill, levels[skill]["level"]))
+        return skill_list
 
 
 def _sub_one(string, repl: Dict[str, str]):
