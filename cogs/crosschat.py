@@ -8,7 +8,7 @@ from discord.ext import commands
 from disputils import BotEmbedPaginator
 from ruamel.yaml import YAML
 
-from ansura import *
+from ansura import AnsuraContext, AnsuraBot
 from lib.utils import pages
 
 
@@ -103,22 +103,22 @@ class Crosschat(commands.Cog):
     async def crosschat(self, ctx: AnsuraContext, arg: Union[discord.TextChannel, str] = None):
         if ctx.guild.id in self.banned:
             await ctx.send_error("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
-                           "go to https://discord.gg/t5MGS2X to appeal.")
+                                 "go to https://discord.gg/t5MGS2X to appeal.")
             return
         if not arg:
             if ctx.guild.id in self.channels.keys():
                 await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
-                               f"`%crosschat #channel` to change this or `%crosschat clear` to "
-                               f"turn off crosschat")
+                                  f"`%crosschat #channel` to change this or `%crosschat clear` to "
+                                  f"turn off crosschat")
             else:
                 await ctx.send_ok(f"Crosschat is not enabled on this server. Do "
-                               f"`%crosschat #channel` to change this.")
+                                  f"`%crosschat #channel` to change this.")
             return
         if isinstance(arg, discord.TextChannel):
             self.channels[ctx.guild.id] = arg.id
             await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
-                           f"`%crosschat #channel` to change this or `%crosschat clear` to "
-                           f"turn off crosschat")
+                              f"`%crosschat #channel` to change this or `%crosschat clear` to "
+                              f"turn off crosschat")
         elif arg == "clear":
             del self.channels[ctx.guild.id]
             await ctx.send_ok(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
@@ -187,7 +187,7 @@ class Crosschat(commands.Cog):
         print(f" - Found {len(self.banned)} banned members")
         print("[XCHAT] Channel search done")
 
-    async def xchat(self, message: discord.Message):
+    async def xchat(self, message: discord.Message):  # noqa c901
         channel: discord.TextChannel = message.channel
         if channel.id not in self.channels.values():
             return
@@ -239,7 +239,7 @@ class Crosschat(commands.Cog):
         except discord.errors.Forbidden as err:
             if err.status == 403:
                 err_s = " | Could not delete from source server"
-        except discord.errors.NotFound as e:
+        except discord.errors.NotFound:
             pass
         e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
                      icon_url=user.avatar_url)
@@ -303,21 +303,17 @@ class Crosschat(commands.Cog):
 
     @commands.command()
     @ansura_staff_or_selfhost_owner()
-    async def xcdelete(self, ctx: AnsuraContext, message: Union[discord.Message, int]):
+    async def xcdelete(self, ctx: AnsuraContext, message: Union[discord.Message, int]):  # noqa c901
         if isinstance(message, discord.Message):
             msg_id = message.id
         else:
             msg_id = message
-        guild = None
-        messages = None
         msgs = None
-        author = None
         found = False
-        channel = None
         for i in self.messages:
-            guild = i[0]
-            channel = i[1]
-            author = i[2]
+            i[0]
+            i[1]
+            i[2]
             msgs = i[3]
             for m in msgs:
                 if m[1] == msg_id:
@@ -336,7 +332,7 @@ class Crosschat(commands.Cog):
                     try:
                         await (await chan.fetch_message(m[1])).delete()
                         count += 1
-                    except:
+                    except (discord.HTTPException, discord.Forbidden):
                         pass
         await ctx.send(f"Deleted message from {count} servers. {fail} failed")
 

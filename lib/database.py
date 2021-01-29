@@ -1,6 +1,6 @@
 import sqlite3
 from typing import List, Dict
-import logging
+
 
 class AnsuraDatabase:
     def __init__(self):
@@ -32,13 +32,13 @@ class AnsuraDatabase:
         return self.isprivate(userid)
 
     def get_bio(self, userid: int):
-        row = self.cursor.execute("select * from bios where id=?", (userid, )).fetchone()
+        row = self.cursor.execute("select * from bios where id=?", (userid,)).fetchone()
         if not row:
             return None
         return row[1]
 
     def set_bio(self, userid: int, bio: str):
-        row = self.cursor.execute("select * from bios where id=?", (userid, )).fetchone()
+        row = self.cursor.execute("select * from bios where id=?", (userid,)).fetchone()
         if row:
             self.cursor.execute("update bios set bio=? where id=?", (bio, userid))
         else:

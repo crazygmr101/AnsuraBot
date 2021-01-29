@@ -3,7 +3,7 @@ import traceback
 
 from discord.ext import commands
 
-from ansura import *
+from ansura import AnsuraBot, AnsuraContext
 
 
 class ErrorHandler(commands.Cog):
@@ -25,11 +25,11 @@ class ErrorHandler(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send_error("You can't do that! >.>\n" +
-                           str(error))
+                                 str(error))
 
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send_error("Oops. Doesn't look like I was given the proper permissions for that!\n" +
-                           str(error))
+                                 str(error))
 
         else:
             print(error)

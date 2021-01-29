@@ -1,17 +1,17 @@
+import asyncio
+import math
 import os
 
 import PIL
 import discord
 from PIL import ImageOps, ImageFilter
-from PIL.Image import Image, WEB, ADAPTIVE
+from PIL.Image import Image, ADAPTIVE
 from discord.ext import commands
-import math
-import asyncio
 
 from ansura import AnsuraBot, AnsuraContext
 
 
-class Image(commands.Cog):
+class ImageManipulation(commands.Cog):
     def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.counter = 100000
@@ -24,12 +24,14 @@ class Image(commands.Cog):
         clist = [
             "rotate [n] - rotates an image n degrees counter-clockwise",
             "autocontrast [cutoff] - stretches the image over the widest range possible, cutting off a percentage "
-            "of pixels off the edge of the histogram, defaulting to 0 - image is converted to RGB first, then back to RGBAp",
+            "of pixels off the edge of the histogram, defaulting to 0 - image is converted to RGB first, "
+            "then back to RGBA",
             "invert - inverts the image's colors",
             "grayscale - grayscales an image",
             "sepia - turns an image to sepia, equivalent to colorize 704214",
             "posterize [n] - keeps n bits of the image's colors",
-            "solarize [n] - inverts values with a luminance above n. n defaults to 128 or half-brightness - image is converted to RGB first, then back to RGBA",
+            "solarize [n] - inverts values with a luminance above n. n defaults to 128 or half-brightness - "
+            "image is converted to RGB first, then back to RGBA",
             "flip - flips an image top-to-bottom",
             "mirror - flips an image right-to-left",
             "blur [n] - applies a gaussian blur with a radius of n pixels. n defaults to 2",
@@ -47,7 +49,8 @@ class Image(commands.Cog):
             "matrix [w] [h] - scales the image to a matrix of w by h, and scales it back to the image size",
             "colorize [rgb] - colorize an image",
             "bw - converts an image to only black and white - image is converted to RGB first, then back to RGBA",
-            "luma - converts an image to grayscale according to apparent brightness - image is converted to RGB first, then back to RGBA",
+            "luma - converts an image to grayscale according to apparent brightness - image is converted to RGB first, "
+            "then back to RGBA",
             "format [format] - select the output format for the final image (jpg, gif, png)",
             "convert [params] - convert an image's colorspace - **Note: this will stop some filters from working, as"
             "some require an RGB color space** - params can be `bw` (1 bit), `rgb`, `rgba`, `luma` (no color), `web` "
@@ -122,7 +125,7 @@ class Image(commands.Cog):
             try:
                 c = tuple(int(clr[i:i + 2], 16) for i in range(0, len(clr), 2))
                 return c
-            except:
+            except ValueError:
                 raise commands.ConversionError("Oops! There's an invalid color ): Colors must be formatted "
                                                "`rgb` or `rrggbb`",
                                                original=None)
@@ -130,7 +133,7 @@ class Image(commands.Cog):
                                        "`rgb` or `rrggbb`",
                                        original=None)
 
-    async def _process_commands(self, command: str, path: str):
+    async def _process_commands(self, command: str, path: str):  # noqa c901
         ar = [x.split(" ") for x in [a.strip(" ") for a in command.split(',')]]
         im: Image = PIL.Image.open(path)
         # im.load()
@@ -255,4 +258,4 @@ class Image(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Image(bot))
+    bot.add_cog(ImageManipulation(bot))

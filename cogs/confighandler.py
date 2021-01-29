@@ -25,7 +25,7 @@ class ConfigHandler:
             print(self.bot.guilds)
             async for g in self.bot.fetch_guilds():
                 y[g.id] = {"streamer-role": 0, "streamer-announce-channel": 1}
-            docs = yaml.dump(y, file)
+            yaml.dump(y, file)
             file.close()
         print("[CONFIG] Opening config file")
         self.config_file = open("config.yaml")

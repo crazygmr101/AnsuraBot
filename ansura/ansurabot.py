@@ -28,8 +28,7 @@ class AnsuraBot(commands.Bot):
             await self.process_commands(message)
             return
         xchat = self.get_cog("Crosschat")
-        hello_regex = r"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!" + str(
-            self.user.id) + ">)[!\.]*\s*$"
+        hello_regex = rf"^\s*(?:hi|hiya|hi there|hello|hei|hola|hey),?\s*(?:[Aa]nsura|<@!{self.user.id}>)[!\.]*\s*$"
         if message.content == "<@!" + str(self.user.id) + ">":
             await message.channel.send(random.choice("I'm alive!,Hm?,Yea? :3,:D,That's me!".split(",")))
         if re.findall(hello_regex, message.content.lower(), re.MULTILINE).__len__() != 0:

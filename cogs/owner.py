@@ -51,9 +51,8 @@ class Owner(commands.Cog):
                 n = re.sub(r"<disc>", str(i.discriminator), n)
                 n = re.sub(r"<name>", str(i.name), n)
                 await i.edit(nick=n)
-            except:
+            except:  # noqa e722
                 f += 1
-                pass
         await ctx.send("Nicked " + str(s) + " (" + str(f) + " failed)")
 
     @commands.command()
@@ -72,7 +71,7 @@ class Owner(commands.Cog):
             try:
                 await b[u].edit(nick=a[u].name)
                 print(b[u].name + " , " + b[u].nick)
-            except:
+            except:  # noqa e722
                 pass
 
     @commands.command()
@@ -101,13 +100,11 @@ class Owner(commands.Cog):
                 f += 1
                 print("Failed on " + str(i.display_name))
                 print(e)
-                pass
         await ctx.send("Gave " + r.mention + " to " + str(s) + " (" + str(f) + " failed)")
 
     @commands.command()
     @commands.is_owner()
     async def guilds(self, ctx: AnsuraContext):
-        tts: cogs.voice.TTS = self.bot.get_cog("TTS")
         g: discord.Guild
         m: discord.Message = await ctx.send("Building list...")
         s = """```"""

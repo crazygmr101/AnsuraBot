@@ -1,7 +1,6 @@
 import glob
 import logging
 import os
-import random
 import re
 
 import discord
@@ -50,13 +49,13 @@ filelist = glob.glob("*.mp3")
 for file in filelist:
     try:
         os.remove(file)
-    except:
+    except FileNotFoundError:
         print(f"err removing {file}")
 filelist = glob.glob("attachments/*")
 for file in filelist:
     try:
         os.remove(file)
-    except:
+    except FileNotFoundError:
         print(f"err removing {file}")
 
 
@@ -82,8 +81,10 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         return
     streamer: cogs.streamer.Streamer = bot.get_cog("Streamer")
     rec = streamer._lookup_stream_record(guild)
-    if rec is None: return
-    if rec[1] == 0 or rec[3] == 0: return
+    if rec is None:
+        return
+    if rec[1] == 0 or rec[3] == 0:
+        return
     if rec[1] in [r.id for r in before.roles]:
         channel = guild.get_channel(rec[3])
         s: discord.Streaming
@@ -95,7 +96,6 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         msg = re.sub("%user%", after.display_name, msg)
         msg = re.sub("%url%", s.url, msg)
         await channel.send(msg)
-
 
 
 bot.run(os.getenv("ANSURA"))

@@ -20,7 +20,8 @@ class Fun(commands.Cog):
 
         def split(s: str):
             import re
-            if s == "crazygmr101": return ["crazy", "gmr101"]
+            if s == "crazygmr101":
+                return ["crazy", "gmr101"]
             if len(s.split(" ")) > 1:
                 ar = s.split(" ")
                 return [
@@ -94,7 +95,7 @@ class Fun(commands.Cog):
             "eVFf6Oy", "JL4jVlG", "C4E5iAl", "Ck08zJG", "k18Raxy", "aJG7iXc", "CThNFi4", "jg2zL7E", "DaHdglt",
             "FRstrnz", "0HrTq3Y", "ZK7VcJN", "8lPbfAJ", "E7dje1b", "1Hy1Ivm"
         ]
-        e = discord.Embed()
+        discord.Embed()
         woof_text = random.choice(["Woof!", "Arf!", "Bork!"])
         woof_emoji = random.choice(["▼・ᴥ・▼", "▼(´ᴥ`)▼", "U ´ᴥ` U", "U・ᴥ・U", "U・ﻌ・U", "U ´x` U", "(U・x・U)",
                                     "υ´• ﻌ •`υ", "૮ ・ﻌ・ა", "(❍ᴥ❍ʋ)", "( ͡° ᴥ ͡° ʋ)", "V●ω●V", "V✪ω✪V", "V✪⋏✪V",
@@ -108,7 +109,7 @@ class Fun(commands.Cog):
     @commands.command()
     async def meow(self, ctx: AnsuraContext):
         """Sends a cat pic"""
-        e = discord.Embed()
+        discord.Embed()
         meow_text = random.choice(["(^-人-^)", "(^・ω・^ )", "(=;ェ;=)", "(=^・^=)", "(=^・ｪ・^=)", "(=^‥^=)", "(=ＴェＴ=)",
                                    "(=ｘェｘ=)", "＼(=^‥^)/`", "~(=^‥^)/", "└(=^‥^=)┐", "ヾ(=ﾟ・ﾟ=)ﾉ", "ヽ(=^・ω・^=)丿",
                                    "d(=^・ω・^=)b", "o(^・x・^)o"])
@@ -125,7 +126,7 @@ class Fun(commands.Cog):
     @commands.command()
     async def maddify(self, ctx: AnsuraContext):
         """Vöïds a message"""
-        e = discord.Embed()
+        discord.Embed()
         msg: str = ctx.message.content
         msg_o: discord.Message = ctx.message
         msg = " ".join(msg.split(" ")[1::])

@@ -78,8 +78,8 @@ class Streamer(commands.Cog):
         self._edit_stream_record(guild=ctx.guild, stream_channel=ch.id)
         await ctx.send_ok(f"Streamer channel set to {ch.mention}")
 
-    @setstreamrole.error
-    async def setstreamrole_error(self, ctx: AnsuraContext, error: Exception):
+    @setstreamchannel.error
+    async def setstreamchannel_error(self, ctx: AnsuraContext, error: Exception):
         if isinstance(error, discord.ext.commands.ConversionError) or \
                 isinstance(error, discord.ext.commands.BadArgument):
             await ctx.send_error("Oops. I can't seem to find that channel. Double-check capitalization.")
@@ -97,7 +97,7 @@ class Streamer(commands.Cog):
         Sets the streamer message on a server
         """
         self._edit_stream_record(guild=ctx.guild, stream_message=msg)
-        await ctx.send_ok(f"Streamer message set to\n{role.mention}")
+        await ctx.send_ok(f"Streamer message set to\n{msg}")
 
     @commands.command(aliases=["gss"])
     async def getstreamsettings(self, ctx: AnsuraContext):

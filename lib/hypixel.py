@@ -17,8 +17,11 @@ from disputils import BotMultipleChoice
 import ansura
 
 
-async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, token, key: str = None):
-    if key and len(key.split(" ")) > 1:
+
+async def hypixel(ctx: commands.Context, player: str, # noqa c901
+                  bot: ansura.AnsuraBot, token: str,
+                  profile_type: str = None):
+    if profile_type and len(profile_type.split(" ")) > 1:
         return
     with ctx.typing():
         data = await _get(player, token)
@@ -29,10 +32,10 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
     player = data["player"]
     player_name = player["displayname"]
 
-    e = _mk_embed(player_name, key if key else None)
-    key = key.lower() if key else key
+    e = _mk_embed(player_name, profile_type if profile_type else None)
+    profile_type = profile_type.lower() if profile_type else profile_type
 
-    if key is None:
+    if profile_type is None:
         e.add_field(name="Previous Names",
                     value=_("\n".join(player["knownAliases"])))
         if "mcVersionRp" in player.keys():
@@ -51,7 +54,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
         e.add_field(name="Hypixel Level",
                     value=f"{await _get_level(exp=player['networkExp'])}")
 
-    elif key in ["bedwars", "bw"]:
+    elif profile_type in ["bedwars", "bw"]:
         player_bw = player["stats"]["Bedwars"]
         prefixes = {
             "2v2": "eight_two",
@@ -74,7 +77,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
 
         e.description = s + "```"
 
-    elif key in ["skywars", "sw"]:
+    elif profile_type in ["skywars", "sw"]:
         player = player["stats"]["SkyWars"]
         prefixes = {
             "Solo": "solo",
@@ -102,14 +105,14 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
             e.add_field(name=r[0],
                         value="```" + "\n".join(r[1:4]) + "```")
 
-    elif key in ["uhc"]:
+    elif profile_type in ["uhc"]:
         player = player["stats"]["UHC"]
         e.description = "```" \
                         f"{player.get('kills', 0)} K\n" \
                         f"{player.get('deaths', 0)} D" \
                         "```"
 
-    elif key in ["sb", "skyblock"]:
+    elif profile_type in ["sb", "skyblock"]:
         player = player["stats"]["SkyBlock"]["profiles"]
         profile_id = None
         profiles = []
@@ -149,7 +152,7 @@ async def hypixel(ctx: commands.Context, player: str, bot: ansura.AnsuraBot, tok
         e.set_footer(text="If skills/exp appear as 0, you may not have API visibility on for your"
                           " Skyblock profile.")
     # TODO: _raw not working
-    elif key in ["raw"]:
+    elif profile_type in ["raw"]:
         e.description = await asyncio.get_event_loop().run_in_executor(None, _raw, data)
 
     await ctx.send(embed=e)

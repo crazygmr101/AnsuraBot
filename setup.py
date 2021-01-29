@@ -52,7 +52,7 @@ def _hr():
 
 
 resp = 0
-while True:
+while True:  # noqa c901
     _hr()
     while True:
         print("Select an option\n"
@@ -116,8 +116,6 @@ while True:
                 "PASTEBIN": "pastebin token"
             }.items():
                 fp.write(f"{i}={input(f'Input {v}: ')}\n")
-
-
 
     elif resp == 9:
         break

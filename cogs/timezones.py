@@ -3,11 +3,11 @@ import datetime
 import discord
 import pytz
 from discord.ext import commands
+from disputils import BotEmbedPaginator
 
 from ansura import AnsuraBot, AnsuraContext
 from lib.database import AnsuraDatabase as DB
 from lib.utils import pages
-from disputils import BotEmbedPaginator
 
 
 class Timezones(commands.Cog):
