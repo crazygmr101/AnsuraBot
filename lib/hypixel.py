@@ -152,7 +152,6 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
         e.add_field(name="Misc", value=f"Fairy Souls: {player_sb.get('fairy_souls_collected', 0)}\n")
         e.set_footer(text="If skills/exp appear as 0, you may not have API visibility on for your"
                           " Skyblock profile.")
-    # TODO: _raw not working
     elif profile_type in ["raw"]:
         e.description = await _raw(data)
 
@@ -240,6 +239,7 @@ def _mk_embed(name: str, game: str = None) -> discord.Embed:
         "sw": "Skywars",
         "sb": "Skyblock"
     })
+    print(name)
     e.title = f"{name}'s {game.title()} Profile"
     e.set_thumbnail(url=f"https://minotar.net/helm/{name}/128.png")
     return e
