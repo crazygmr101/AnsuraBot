@@ -244,10 +244,11 @@ class Crosschat(commands.Cog):
         messages = None
         author_id = None
         content = None
+        cache = {}
+        found = False
         if reference:
             ref_id = reference.message_id
             # find message in xchat cache
-            found = False
             for i in self.messages:
                 # guild_id = i[0]
                 # channel_id = i[1]
@@ -261,7 +262,6 @@ class Crosschat(commands.Cog):
                         break
                 if found:
                     break
-        cache = {}
         if messages:
             for m in messages:
                 c: discord.TextChannel = self.bot.get_channel(m[0])
