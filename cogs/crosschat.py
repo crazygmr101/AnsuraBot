@@ -44,6 +44,19 @@ class Crosschat(commands.Cog):
 
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
         self._reload()
+        for i in self.channels:
+            color = int(i) // 64 % (14 ** 3) + 0x222
+            rd = color >> 8
+            gr = (color & 0x0f0) >> 4
+            bl = (color & 0xf)
+            if abs(rd - self.ansura_color.r) < 0x20:
+                rd = (rd + 0x40) % 0x100
+            if abs(gr - self.ansura_color.g) < 0x20:
+                gr = (gr + 0x40) % 0x100
+            if abs(bl - self.ansura_color.b) < 0x20:
+                bl = (bl + 0x40) % 0x100
+            self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x10, gr * 0x10, bl * 0x10)
+            print(self.colors[int(i)])
 
     def _resolve(self, u):
         if self.bot.get_user(u):
@@ -221,11 +234,11 @@ class Crosschat(commands.Cog):
         author: discord.Member = message.author
         e = discord.Embed()
         dev = ""
+        e.colour = self.colors[int(guild.id)]
         e.set_author(name=guild.name, icon_url=str(guild.icon_url))
-        if self.bot.user.id in [643869468774105099, 603640674234925107]:
-            g: discord.Guild = self.bot.get_guild(604823602973376522)
+        if self.bot.user.id in [791266463305957377, 804791983884992608]:
+            g: discord.Guild = self.bot.get_guild(788661880343363625)
             m: discord.Member = g.get_member(author.id)
-            e.colour = self.colors[int(guild.id)]
             if m and 788661880431312906 in [r.id for r in m.roles]:
                 dev = " | "
                 dev += "Developer" if author.id == 569362627935862784 else "Crosschat Moderator"
