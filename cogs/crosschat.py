@@ -14,12 +14,12 @@ from lib.utils import pages
 
 def ansura_staff_or_selfhost_owner():
     def predicate(ctx: AnsuraContext):
-        if ctx.bot.user.id not in [643869468774105099, 603640674234925107]:
+        if ctx.bot.user.id not in [791266463305957377, 804791983884992608]:
             return ctx.bot.is_owner(ctx.author)
-        ansura_guild: discord.Guild = ctx.bot.get_guild(604823602973376522)
+        ansura_guild: discord.Guild = ctx.bot.get_guild(788661880343363625)
         if not ansura_guild.get_member(ctx.author.id):
             return
-        return 691752324787339351 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
+        return 788661880431312906 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
 
     return commands.check(predicate)
 
