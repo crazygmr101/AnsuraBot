@@ -249,8 +249,8 @@ class Crosschat(commands.Cog):
             # find message in xchat cache
             found = False
             for i in self.messages:
-                guild_id = i[0]
-                channel_id = i[1]
+                # guild_id = i[0]
+                # channel_id = i[1]
                 author_id = i[2]
                 content = i[4]
                 messages = i[3]
