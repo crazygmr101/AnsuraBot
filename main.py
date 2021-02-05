@@ -18,10 +18,10 @@ dotenv.load_dotenv(".env")
 
 
 def get_prefix(bot, message):
-    return commands.when_mentioned_or("%")(bot, message)
+    return commands.when_mentioned_or("!" if bot.user.id == 804791983884992608 else "%")(bot, message)
 
 
-bot = AnsuraBot(command_prefix=get_prefix)
+bot = AnsuraBot(command_prefix=get_prefix, intents=discord.Intents.all())
 bot.remove_command('help')
 
 bot.vm = VoiceManager(bot)
