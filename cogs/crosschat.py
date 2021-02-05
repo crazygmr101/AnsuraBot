@@ -32,7 +32,16 @@ class Crosschat(commands.Cog):
         self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
+
         self.messages: List[List[int, int, int, List[Tuple[int, int]], str]] = []
+        """
+        Originating Guild ID
+        Originating Channel ID
+        Message Author ID
+        Channel ID + Message ID list
+        Message content
+        """
+
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
         self._reload()
 
@@ -191,6 +200,8 @@ class Crosschat(commands.Cog):
         channel: discord.TextChannel = message.channel
         if channel.id not in self.channels.values():
             return
+        if message.type in (discord.MessageType.pins_add, discord.MessageType.new_member):
+            return
         if message.author.id in self.banned or message.guild.id in self.banned:
             try:
                 await message.delete()
@@ -215,17 +226,48 @@ class Crosschat(commands.Cog):
             g: discord.Guild = self.bot.get_guild(604823602973376522)
             m: discord.Member = g.get_member(author.id)
             e.colour = self.colors[int(guild.id)]
-            if m and 748674125353975857 in [r.id for r in m.roles]:
+            if m and 788661880431312906 in [r.id for r in m.roles]:
+                dev = " | "
+                dev += "Developer" if author.id == 569362627935862784 else "Crosschat Moderator"
+                e.colour = self.ansura_color
+            elif m and 788661880343363632 in [r.id for r in m.roles]:
+                dev = " | Aoi Contributor"
+                e.colour = self.ansura_color
+            elif m and 803034721595424798 in [r.id for r in m.roles]:
                 dev = " | Ansura Contributor"
                 e.colour = self.ansura_color
-            if m and 691752324787339351 in [r.id for r in m.roles]:
-                dev = " | "
-                dev += "Ansura Developer" if author.id == 267499094090579970 else "Ansura Staff Member"
-                e.colour = self.ansura_color
         user: discord.User = message.author
-        e.description = message.content
+        e.description = AnsuraContext.escape(message.content, message)
         err_s = ""
         file = None
+        reference: Optional[discord.MessageReference] = message.reference
+        messages = None
+        author_id = None
+        content = None
+        if reference:
+            ref_id = reference.message_id
+            # find message in xchat cache
+            found = False
+            for i in self.messages:
+                # guild_id = i[0]
+                # channel_id = i[1]
+                author_id = i[2]
+                content = i[4]
+                messages = i[3]
+
+                for m in i[3]:
+                    if m[1] == ref_id:
+                        found = True
+                        break
+                if found:
+                    break
+        cache = {}
+        if messages:
+            for m in messages:
+                c: discord.TextChannel = self.bot.get_channel(m[0])
+                if c:
+                    cache[c.guild.id] = (c.id, m[1])
+
         if message.attachments:
             if self._is_image(message.attachments[0].filename):
                 with open(f"attachments/{message.attachments[0].filename}", "wb") as fp:
@@ -238,15 +280,26 @@ class Crosschat(commands.Cog):
             await message.delete()
         except discord.errors.Forbidden as err:
             if err.status == 403:
-                err_s = " | Could not delete from source server"
+                err_s = " | Could not delete original message. Make sure I have manage messages in this channel."
         except discord.errors.NotFound:
             pass
-        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
-                     icon_url=user.avatar_url)
         sent = []
-
+        desc = e.description
+        content = "\n".join(f"> {line}" for line in content.splitlines()) if content else None
         for k in self.channels.keys():
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
+            if cache and k in cache:
+                e.description = f"Reply to [{self.bot.get_user(author_id).name}#" \
+                                f"{str(self.bot.get_user(author_id).discriminator)[:2]}xx]" \
+                                f"(https://discord.com/channels/{k}/{c.id}/{cache[k][1]})\n{content}\n\n" + desc
+            else:
+                e.description = desc
+            if k == message.guild.id:
+                e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
+                             icon_url=user.avatar_url)
+            else:
+                e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + dev,
+                             icon_url=user.avatar_url)
             if c is not None:
                 if file:
                     with open(f"attachments/{message.attachments[0].filename}", "rb") as fp:

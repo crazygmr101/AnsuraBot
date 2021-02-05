@@ -179,10 +179,12 @@ class Gaming(commands.Cog):
         if isinstance(player, discord.Member):
             player = self.bot.db.lookup_gaming_record(player.id)[1]
             if not player:
-                await ctx.send(embed=discord.Embed(title="No mojang linked",
-                                                   description="The person mentioned needs to set their mojang "
-                                                               "tag with `%mojang username`"))
-                return
+                if re.match(r"<@!?\d{17,21}>", ctx.message.content.split()[1]):
+                    await ctx.send(embed=discord.Embed(title="No mojang linked",
+                                                       description="The person mentioned needs to set their mojang "
+                                                                   "tag with `%mojang username`"))
+                    return
+                player = ctx.message.content.split()[1]
         await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
 
     @commands.command()
