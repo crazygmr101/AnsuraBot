@@ -1,11 +1,8 @@
 import asyncio
-import os
 import re
-from typing import List, Dict
 
 import discord
 import gtts
-import youtube_dl
 from discord.ext import commands
 
 from ansura import AnsuraBot, AnsuraContext
@@ -16,7 +13,6 @@ class Voice(commands.Cog):
     def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.vm: VoiceManager = bot.vm
-
 
     @commands.command(aliases=["radio"])
     async def stream(self, ctx, *, url):
@@ -49,7 +45,7 @@ class Voice(commands.Cog):
         try:
             del self.vm.tts_mutes[ctx.guild.id][self.vm.tts_mutes[ctx.guild.id].index(member.id)]
             await ctx.send(f"TTS unmuted **{member.display_name}**")
-        except:
+        except:  # noqa e722
             self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"**{member.display_name}** isn't TTS muted")
 
@@ -75,7 +71,7 @@ class Voice(commands.Cog):
         try:
             self.vm.tts_mutes[ctx.guild.id].index(member.id)
             await ctx.send(f"**{member.display_name}** is already TTS muted")
-        except:
+        except:  # noqa e722
             self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"TTS muted **{member.display_name}**")
 
@@ -99,7 +95,7 @@ class Voice(commands.Cog):
         await ctx.send("Watching this channel for messages, do %stoptts to stop")
         try:
             await ctx.author.voice.channel.connect()
-        except:
+        except:  # noqa e722
             pass
         # TODO fix this
         self.vm.guild_states[ctx.guild.id] = 1
@@ -118,14 +114,14 @@ class Voice(commands.Cog):
         await ctx.send("Stopping")
         await ctx.guild.voice_client.disconnect()
 
-    async def tts(self, message: discord.Message):
+    async def tts(self, message: discord.Message):  # noqa c901
         def create_tts(m: str):
             msg = gtts.gTTS(m)
             fname = f"{message.id}"
             msg.save(f"{fname}.mp3")
             return fname
 
-        if message.content.startswith("%")\
+        if message.content.startswith("%") \
                 or message.content.startswith("ab!"):
             return
         try:
@@ -134,7 +130,7 @@ class Voice(commands.Cog):
                     del self.vm.active_guilds[message.guild.id]
                     del self.vm.queues[message.guild.id]
                     return
-                except:
+                except:  # noqa e722
                     pass
             if message.guild.id not in self.vm.active_guilds.keys():
                 return
@@ -150,7 +146,8 @@ class Voice(commands.Cog):
                 "[^0-9A-Za-z.\u0020\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u02af\u1d00-\u1d25\u1d62-\u1d65\u1d6b-\u1d77"
                 "\u1d79-\u1d9a\u1e00-\u1eff\u2090-\u2094\u2184-\u2184\u2488-\u2490\u271d-\u271d\u2c60-\u2c7c"
                 "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
-            if m.strip(" .") == "": return
+            if m.strip(" .") == "":
+                return
             fname = await self.bot.loop.run_in_executor(None, create_tts, f"{message.author.display_name} says {m}")
             self.vm.queues[message.guild.id].add(fname)
             await message.add_reaction("✅")
@@ -164,5 +161,5 @@ class Voice(commands.Cog):
             raise
 
 
-
-def setup(bot): bot.add_cog(Voice(bot))
+def setup(bot):
+    bot.add_cog(Voice(bot))

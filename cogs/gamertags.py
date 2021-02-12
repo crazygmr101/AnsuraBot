@@ -176,8 +176,7 @@ class Gamertags(commands.Cog):
             guild: discord.Guild = self.bot.get_guild(604823602973376522)
             member: discord.Member = guild.get_member(user.id)
             if member and 691752324787339351 in [r.id for r in member.roles]:
-                e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else
-                "Ansura Staff Member",
+                e.set_author(name="Ansura Developer" if member.id == 267499094090579970 else "Ansura Staff Member",
                              icon_url="https://cdn.discordapp.com/icons/604823602973376522/"
                                       "cab59a4cb92c877f5b7c3fc1ae402298.png")
         e.colour = user.color
@@ -215,7 +214,6 @@ class Gamertags(commands.Cog):
             await ctx.send("Tag " + tag + " not found in the database.")
             return
         s = "```\nSearch results for " + tag + "\n"
-        not_in_guild = []
         for i in users:
             u: discord.User = (await self.bot.fetch_user(int(i[0])))
             s += u.name + "#" + u.discriminator + " - " + i[1] + ": " + i[2] + "\n"

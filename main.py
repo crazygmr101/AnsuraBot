@@ -1,7 +1,6 @@
 import glob
 import logging
 import os
-import random
 import re
 
 import discord
@@ -19,30 +18,30 @@ dotenv.load_dotenv(".env")
 
 
 def get_prefix(bot, message):
-    return commands.when_mentioned_or("%")(bot, message)
+    return commands.when_mentioned_or("!" if bot.user.id == 804791983884992608 else "%")(bot, message)
 
 
-bot = AnsuraBot(command_prefix=get_prefix)
+bot = AnsuraBot(command_prefix=get_prefix, intents=discord.Intents.all())
 bot.remove_command('help')
 
 bot.vm = VoiceManager(bot)
 
-initial_extensions = ['cogs.gamertags',
-                      'cogs.administration',
-                      'cogs.misc',
-                      'cogs.gaming',
-                      'cogs.fun',
-                      'cogs.owner',
-                      'cogs.image',
-                      'cogs.error-handler',
-                      'cogs.streamer',
-                      'cogs.confighandler',
-                      'cogs.timezones',
-                      'cogs.voice',
-                      'cogs.help',
-                      'cogs.crosschat']
+bot.initial_extensions = ['cogs.gamertags',
+                          'cogs.administration',
+                          'cogs.misc',
+                          'cogs.gaming',
+                          'cogs.fun',
+                          'cogs.owner',
+                          'cogs.image',
+                          'cogs.error-handler',
+                          'cogs.streamer',
+                          'cogs.confighandler',
+                          'cogs.timezones',
+                          'cogs.voice',
+                          'cogs.help',
+                          'cogs.crosschat']
 if __name__ == '__main__':
-    for ext in initial_extensions:
+    for ext in bot.initial_extensions:
         print(f"[COGS] Loading {ext}")
         bot.load_extension(ext)
 
@@ -50,13 +49,13 @@ filelist = glob.glob("*.mp3")
 for file in filelist:
     try:
         os.remove(file)
-    except:
+    except FileNotFoundError:
         print(f"err removing {file}")
 filelist = glob.glob("attachments/*")
 for file in filelist:
     try:
         os.remove(file)
-    except:
+    except FileNotFoundError:
         print(f"err removing {file}")
 
 
@@ -72,6 +71,7 @@ async def on_ready():
     await bot.cfg.start()
     print("Ansura online! :D")
     print(f" {len(bot.guilds)} Guilds")
+    print(bot.user)
 
 
 @bot.event
@@ -82,8 +82,10 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         return
     streamer: cogs.streamer.Streamer = bot.get_cog("Streamer")
     rec = streamer._lookup_stream_record(guild)
-    if rec is None: return
-    if rec[1] == 0 or rec[3] == 0: return
+    if rec is None:
+        return
+    if rec[1] == 0 or rec[3] == 0:
+        return
     if rec[1] in [r.id for r in before.roles]:
         channel = guild.get_channel(rec[3])
         s: discord.Streaming
@@ -95,7 +97,6 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         msg = re.sub("%user%", after.display_name, msg)
         msg = re.sub("%url%", s.url, msg)
         await channel.send(msg)
-
 
 
 bot.run(os.getenv("ANSURA"))

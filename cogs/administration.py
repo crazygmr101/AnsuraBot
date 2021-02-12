@@ -28,22 +28,21 @@ class Administration(commands.Cog):
         ch: discord.TextChannel = \
             ctx.channel
         if not ch.permissions_for(ctx.author).administrator:
-            await ctx.send(embed=
-                           self.error("Permission error",
-                                      message={
-                                          "Message":
-                                              "You must have administrator permission"
-                                      })
+            await ctx.send(embed=self.error("Permission error",
+                                            message={
+                                                "Message":
+                                                    "You must have administrator permission"
+                                            })
                            )
             return
         if typ not in "xbox,mojang,youtube,twitch,mixer".split(","):
-            await ctx.send(embed=
-                           self.error("Invalid gametag type"))
+            await ctx.send(embed=self.error("Invalid gametag type"))
             await self.bot.get_cog("Help").help_(ctx, "setgtval")
             return
         util: cogs.gamertags.Util = self.bot.get_cog("Util")
         db = util.db
-        if typ == "xbox": typ = "xboxlive"
+        if typ == "xbox":
+            typ = "xboxlive"
         rec = db.lookup_gaming_record(user.id)
         e = discord.Embed()
         e.colour = user.color

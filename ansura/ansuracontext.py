@@ -1,5 +1,6 @@
 import asyncio
 import io
+import re
 from typing import Union, List, Tuple
 
 import discord
@@ -118,3 +119,19 @@ class AnsuraContext(commands.Context):
             embed.add_field(name=r[0], value=r[1] or "None", inline=n not in not_inline)
         msg = await self.send(embed=embed, file=f)
         await self.trash_reaction(msg)
+
+    @staticmethod
+    def escape(text: str, ctx):
+        role_mentions = re.findall(r"<@&\d{17,21}>", text)
+        for mention in role_mentions:
+            role = ctx.guild.get_role(int(mention[3:-1]))
+            text = text.replace(mention, f"**@{role.name}**" if role else mention)
+        user_mentions = re.findall(r"<@!?\d{17,21}>", text)
+        for mention in user_mentions:
+            user = ctx.guild.get_member(int(mention.replace('!', '')[2:-1]))
+            text = text.replace(mention, f"**@{user.name}**" if user else mention)
+        channel_mentions = re.findall(r"<#\d{17,21}>", text)
+        for mention in channel_mentions:
+            channel = ctx.guild.get_channel(int(mention[2:-1]))
+            text = text.replace(mention, f"**#{channel.name}**" if channel else mention)
+        return text

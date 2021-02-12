@@ -1,4 +1,5 @@
 import os
+import pickle
 from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -8,18 +9,18 @@ from discord.ext import commands
 from disputils import BotEmbedPaginator
 from ruamel.yaml import YAML
 
-from ansura import *
+from ansura import AnsuraContext, AnsuraBot
 from lib.utils import pages
 
 
 def ansura_staff_or_selfhost_owner():
     def predicate(ctx: AnsuraContext):
-        if ctx.bot.user.id not in [643869468774105099, 603640674234925107]:
+        if ctx.bot.user.id not in [791266463305957377, 804791983884992608]:
             return ctx.bot.is_owner(ctx.author)
-        ansura_guild: discord.Guild = ctx.bot.get_guild(604823602973376522)
+        ansura_guild: discord.Guild = ctx.bot.get_guild(788661880343363625)
         if not ansura_guild.get_member(ctx.author.id):
             return
-        return 691752324787339351 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
+        return 788661880431312906 in [r.id for r in ansura_guild.get_member(ctx.author.id).roles]
 
     return commands.check(predicate)
 
@@ -32,9 +33,36 @@ class Crosschat(commands.Cog):
         self.channels: Optional[Dict[int, int]] = None
         self.banned: Optional[List[int]] = None
         self.exempt: Optional[List[int]] = None
+
         self.messages: List[List[int, int, int, List[Tuple[int, int]], str]] = []
+        """
+        Originating Guild ID
+        Originating Channel ID
+        Message Author ID
+        Channel ID + Message ID list
+        Message content
+        """
+
+        if os.path.exists("crosschat_persistence.pickle"):
+            with open("crosschat_persistence.pickle", "rb") as fp:
+                self.messages = pickle.load(fp)
+            os.remove("crosschat_persistence.pickle")
+
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
         self._reload()
+        for i in self.channels:
+            color = int(i) // 64 % (14 ** 3) + 0x222
+            rd = color >> 8
+            gr = (color & 0x0f0) >> 4
+            bl = (color & 0xf)
+            if abs(rd - self.ansura_color.r) < 0x20:
+                rd = (rd + 0x40) % 0x100
+            if abs(gr - self.ansura_color.g) < 0x20:
+                gr = (gr + 0x40) % 0x100
+            if abs(bl - self.ansura_color.b) < 0x20:
+                bl = (bl + 0x40) % 0x100
+            self.colors[int(i)] = discord.Colour.from_rgb(rd * 0x10, gr * 0x10, bl * 0x10)
+            print(self.colors[int(i)])
 
     def _resolve(self, u):
         if self.bot.get_user(u):
@@ -103,22 +131,22 @@ class Crosschat(commands.Cog):
     async def crosschat(self, ctx: AnsuraContext, arg: Union[discord.TextChannel, str] = None):
         if ctx.guild.id in self.banned:
             await ctx.send_error("This guild is banned from crosschat. If this is a mistake, or to appeal this ban, "
-                           "go to https://discord.gg/t5MGS2X to appeal.")
+                                 "go to https://discord.gg/t5MGS2X to appeal.")
             return
         if not arg:
             if ctx.guild.id in self.channels.keys():
                 await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
-                               f"`%crosschat #channel` to change this or `%crosschat clear` to "
-                               f"turn off crosschat")
+                                  f"`%crosschat #channel` to change this or `%crosschat clear` to "
+                                  f"turn off crosschat")
             else:
                 await ctx.send_ok(f"Crosschat is not enabled on this server. Do "
-                               f"`%crosschat #channel` to change this.")
+                                  f"`%crosschat #channel` to change this.")
             return
         if isinstance(arg, discord.TextChannel):
             self.channels[ctx.guild.id] = arg.id
             await ctx.send_ok(f"Crosschat is set to <#{self.channels[ctx.guild.id]}>. Do "
-                           f"`%crosschat #channel` to change this or `%crosschat clear` to "
-                           f"turn off crosschat")
+                              f"`%crosschat #channel` to change this or `%crosschat clear` to "
+                              f"turn off crosschat")
         elif arg == "clear":
             del self.channels[ctx.guild.id]
             await ctx.send_ok(f"Crosschat channel cleared. Do `%crosschat #channel` to change this.")
@@ -187,9 +215,11 @@ class Crosschat(commands.Cog):
         print(f" - Found {len(self.banned)} banned members")
         print("[XCHAT] Channel search done")
 
-    async def xchat(self, message: discord.Message):
+    async def xchat(self, message: discord.Message):  # noqa c901
         channel: discord.TextChannel = message.channel
         if channel.id not in self.channels.values():
+            return
+        if message.type in (discord.MessageType.pins_add, discord.MessageType.new_member):
             return
         if message.author.id in self.banned or message.guild.id in self.banned:
             try:
@@ -210,22 +240,53 @@ class Crosschat(commands.Cog):
         author: discord.Member = message.author
         e = discord.Embed()
         dev = ""
+        e.colour = self.colors[int(guild.id)]
         e.set_author(name=guild.name, icon_url=str(guild.icon_url))
-        if self.bot.user.id in [643869468774105099, 603640674234925107]:
-            g: discord.Guild = self.bot.get_guild(604823602973376522)
+        if self.bot.user.id in [791266463305957377, 804791983884992608]:
+            g: discord.Guild = self.bot.get_guild(788661880343363625)
             m: discord.Member = g.get_member(author.id)
-            e.colour = self.colors[int(guild.id)]
-            if m and 748674125353975857 in [r.id for r in m.roles]:
+            if m and 788661880431312906 in [r.id for r in m.roles]:
+                dev = " | "
+                dev += "Developer" if author.id == 569362627935862784 else "Crosschat Moderator"
+                e.colour = self.ansura_color
+            elif m and 788661880343363632 in [r.id for r in m.roles]:
+                dev = " | Aoi Contributor"
+                e.colour = self.ansura_color
+            elif m and 803034721595424798 in [r.id for r in m.roles]:
                 dev = " | Ansura Contributor"
                 e.colour = self.ansura_color
-            if m and 691752324787339351 in [r.id for r in m.roles]:
-                dev = " | "
-                dev += "Ansura Developer" if author.id == 267499094090579970 else "Ansura Staff Member"
-                e.colour = self.ansura_color
         user: discord.User = message.author
-        e.description = message.content
+        e.description = AnsuraContext.escape(message.content, message)
         err_s = ""
         file = None
+        reference: Optional[discord.MessageReference] = message.reference
+        messages = None
+        author_id = None
+        content = None
+        cache = {}
+        found = False
+        if reference:
+            ref_id = reference.message_id
+            # find message in xchat cache
+            for i in self.messages:
+                # guild_id = i[0]
+                # channel_id = i[1]
+                author_id = i[2]
+                content = i[4]
+                messages = i[3]
+
+                for m in i[3]:
+                    if m[1] == ref_id:
+                        found = True
+                        break
+                if found:
+                    break
+        if messages:
+            for m in messages:
+                c: discord.TextChannel = self.bot.get_channel(m[0])
+                if c:
+                    cache[c.guild.id] = (c.id, m[1])
+
         if message.attachments:
             if self._is_image(message.attachments[0].filename):
                 with open(f"attachments/{message.attachments[0].filename}", "wb") as fp:
@@ -238,15 +299,26 @@ class Crosschat(commands.Cog):
             await message.delete()
         except discord.errors.Forbidden as err:
             if err.status == 403:
-                err_s = " | Could not delete from source server"
-        except discord.errors.NotFound as e:
+                err_s = " | Could not delete original message. Make sure I have manage messages in this channel."
+        except discord.errors.NotFound:
             pass
-        e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
-                     icon_url=user.avatar_url)
         sent = []
-
+        desc = e.description
+        content = "\n".join(f"> {line}" for line in content.splitlines()) if content else None
         for k in self.channels.keys():
             c: discord.TextChannel = self.bot.get_channel(self.channels[k])
+            if cache and k in cache:
+                e.description = f"Reply to [{self.bot.get_user(author_id).name}#" \
+                                f"{str(self.bot.get_user(author_id).discriminator)[:2]}xx]" \
+                                f"(https://discord.com/channels/{k}/{c.id}/{cache[k][1]})\n{content}\n\n" + desc
+            else:
+                e.description = desc
+            if k == message.guild.id:
+                e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + err_s + dev,
+                             icon_url=user.avatar_url)
+            else:
+                e.set_footer(text=user.name + "#" + str(user.discriminator)[0:2] + "xx" + dev,
+                             icon_url=user.avatar_url)
             if c is not None:
                 if file:
                     with open(f"attachments/{message.attachments[0].filename}", "rb") as fp:
@@ -303,21 +375,17 @@ class Crosschat(commands.Cog):
 
     @commands.command()
     @ansura_staff_or_selfhost_owner()
-    async def xcdelete(self, ctx: AnsuraContext, message: Union[discord.Message, int]):
+    async def xcdelete(self, ctx: AnsuraContext, message: Union[discord.Message, int]):  # noqa c901
         if isinstance(message, discord.Message):
             msg_id = message.id
         else:
             msg_id = message
-        guild = None
-        messages = None
         msgs = None
-        author = None
         found = False
-        channel = None
         for i in self.messages:
-            guild = i[0]
-            channel = i[1]
-            author = i[2]
+            i[0]
+            i[1]
+            i[2]
             msgs = i[3]
             for m in msgs:
                 if m[1] == msg_id:
@@ -336,7 +404,7 @@ class Crosschat(commands.Cog):
                     try:
                         await (await chan.fetch_message(m[1])).delete()
                         count += 1
-                    except:
+                    except (discord.HTTPException, discord.Forbidden):
                         pass
         await ctx.send(f"Deleted message from {count} servers. {fail} failed")
 
@@ -353,5 +421,17 @@ class Crosschat(commands.Cog):
         ))
 
 
+xchat: Optional[Crosschat] = None
+
+
 def setup(bot):
-    bot.add_cog(Crosschat(bot))
+    global xchat
+    xchat = Crosschat(bot)
+    bot.add_cog(xchat)
+
+
+def teardown(bot):
+    print("[XCHAT] Calling teardown function")
+    with open("crosschat_persistence.pickle", "wb") as fp:
+        pickle.dump(xchat.messages, fp)
+    print("[XCHAT] Saved messages")
