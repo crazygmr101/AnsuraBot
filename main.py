@@ -26,22 +26,22 @@ bot.remove_command('help')
 
 bot.vm = VoiceManager(bot)
 
-initial_extensions = ['cogs.gamertags',
-                      'cogs.administration',
-                      'cogs.misc',
-                      'cogs.gaming',
-                      'cogs.fun',
-                      'cogs.owner',
-                      'cogs.image',
-                      'cogs.error-handler',
-                      'cogs.streamer',
-                      'cogs.confighandler',
-                      'cogs.timezones',
-                      'cogs.voice',
-                      'cogs.help',
-                      'cogs.crosschat']
+bot.initial_extensions = ['cogs.gamertags',
+                          'cogs.administration',
+                          'cogs.misc',
+                          'cogs.gaming',
+                          'cogs.fun',
+                          'cogs.owner',
+                          'cogs.image',
+                          'cogs.error-handler',
+                          'cogs.streamer',
+                          'cogs.confighandler',
+                          'cogs.timezones',
+                          'cogs.voice',
+                          'cogs.help',
+                          'cogs.crosschat']
 if __name__ == '__main__':
-    for ext in initial_extensions:
+    for ext in bot.initial_extensions:
         print(f"[COGS] Loading {ext}")
         bot.load_extension(ext)
 

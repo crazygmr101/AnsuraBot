@@ -77,7 +77,11 @@ class Owner(commands.Cog):
             "): Okay",
             "D: But..why? *sighs* fInE"
         ]))
-        exit()
+        for ext in self.bot.initial_extensions:  # noqa
+            if "owner" not in ext:
+                print(f"[SHUTDOWN] Unloading {ext}")
+                self.bot.unload_extension(ext)
+        await self.bot.logout()
 
 
 def setup(bot):

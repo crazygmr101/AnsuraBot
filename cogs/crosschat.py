@@ -1,4 +1,5 @@
 import os
+import pickle
 from itertools import chain
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -41,6 +42,11 @@ class Crosschat(commands.Cog):
         Channel ID + Message ID list
         Message content
         """
+
+        if os.path.exists("crosschat_persistence.pickle"):
+            with open("crosschat_persistence.pickle", "rb") as fp:
+                self.messages = pickle.load(fp)
+            os.remove("crosschat_persistence.pickle")
 
         self.ansura_color = discord.Colour.from_rgb(0x4a, 0x14, 0x8c)
         self._reload()
@@ -415,5 +421,17 @@ class Crosschat(commands.Cog):
         ))
 
 
+xchat: Optional[Crosschat] = None
+
+
 def setup(bot):
-    bot.add_cog(Crosschat(bot))
+    global xchat
+    xchat = Crosschat(bot)
+    bot.add_cog(xchat)
+
+
+def teardown(bot):
+    print("[XCHAT] Calling teardown function")
+    with open("crosschat_persistence.pickle", "wb") as fp:
+        pickle.dump(xchat.messages, fp)
+    print("[XCHAT] Saved messages")
