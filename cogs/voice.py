@@ -54,8 +54,10 @@ class Voice(commands.Cog):
         """Lists TTS-muted members"""
         if ctx.guild.id not in self.vm.tts_mutes.keys():
             await ctx.send("No members TTS muted")
+            return
         if len(self.vm.tts_mutes[ctx.guild.id]) == 0:
             await ctx.send("No members TTS muted")
+            return
         embed = discord.Embed(title="TTS muted members")
         embed.add_field(name=f"{len(self.vm.tts_mutes[ctx.guild.id])} members TTS-muted",
                         value=" ".join([f"<@{x}>" for x in self.vm.tts_mutes[ctx.guild.id]]))
@@ -68,10 +70,12 @@ class Voice(commands.Cog):
         if member is None:
             await ctx.send("You must tag a member")
             return
+        if ctx.guild.id not in self.vm.tts_mutes.keys():
+            self.vm.tts_mutes[ctx.guild.id] = []
         try:
             self.vm.tts_mutes[ctx.guild.id].index(member.id)
             await ctx.send(f"**{member.display_name}** is already TTS muted")
-        except:  # noqa e722
+        except ValueError:
             self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"TTS muted **{member.display_name}**")
 
