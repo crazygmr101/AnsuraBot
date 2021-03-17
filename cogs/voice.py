@@ -126,7 +126,7 @@ class Voice(commands.Cog):
             return fname
 
         if message.content.startswith("%") \
-                or message.content.startswith("ab!"):
+                or message.content.startswith("!"): # beta's prefix
             return
         try:
             if message.guild.voice_client is None:
