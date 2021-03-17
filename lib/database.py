@@ -1,13 +1,73 @@
 import sqlite3
 from typing import List, Dict
 
+SQL_STRING="""
+CREATE TABLE IF NOT EXISTS "bios" (
+      "id" INTEGER NOT NULL,
+      "bio" TEXT,
+      PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "gaming" (
+      "id"  int NOT NULL,
+      "mojang"  varchar,
+      "xboxlive"  varchar,
+      "youtube"  varchar,
+      "twitch"  varchar,
+      "mixer"  varchar,
+      "reddit"  varchar,
+      "steam"  varchar,
+      "private"  INTEGER NOT NULL DEFAULT 0,
+      "webprivate"  INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS messages(
+      id int not null,
+      timestamp int not null);
+CREATE TABLE IF NOT EXISTS "oauth" (
+      "userid"INTEGER NOT NULL,
+      "access_token"TEXT NOT NULL,
+      PRIMARY KEY("userid")
+);
+CREATE TABLE IF NOT EXISTS "streamer" (
+      "guildid"INTEGER NOT NULL,
+      "streamrole"INTEGER NOT NULL,
+      "streammsg"TEXT NOT NULL,
+      "streamchannel"INTEGER NOT NULL,
+      PRIMARY KEY("guildid")
+);
+CREATE TABLE IF NOT EXISTS "timezones" (
+      "user"INTEGER UNIQUE,
+      "timezone"TEXT,
+      PRIMARY KEY("user")
+);
+CREATE TABLE IF NOT EXISTS "prefixes" (
+    "guild" INTEGER UNIQUE,
+    "prefix" TEXT
+)
+"""
+
 
 class AnsuraDatabase:
     def __init__(self):
         print("[DATABASE] Loading database")
         self.conn: sqlite3.Connection = sqlite3.connect("users.db")
         self.cursor: sqlite3.Cursor = self.conn.cursor()
+        self.conn.executescript(SQL_STRING)
+
+        r = self.cursor.execute("select * from prefixes").fetchall()
+        self.prefixes: Dict[int, str] = {int(row[0]): row[1] for row in r}
+
         print("[DATABASE] Loaded database")
+
+    def get_prefix(self, guild: int) -> str:
+        return self.prefixes.get(guild, "%")
+
+    def set_prefix(self, guild: int, prefix: str):
+        if guild in self.prefixes:
+            self.conn.execute("update prefixes set prefix=? where guild=?", (prefix, guild))
+        else:
+            self.conn.execute("insert into prefixes values (?,?)", (guild, prefix))
+        self.conn.commit()
+        self.prefixes[guild] = prefix
 
     def isprivate(self, userid: int):
         """

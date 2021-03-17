@@ -20,6 +20,15 @@ class Administration(commands.Cog):
     def __init__(self, bot: AnsuraBot):
         self.bot = bot
 
+    @commands.has_permissions(administrator=True)
+    @commands.command()
+    async def prefix(self, ctx: AnsuraContext, prefix: str = None):
+        if not prefix:
+            await ctx.send_info(f"Prefix for this server is `{self.bot.db.get_prefix(ctx.guild.id)}`")
+        else:
+            self.bot.db.set_prefix(ctx.guild.id, prefix)
+            await ctx.send_info(f"Prefix for this server set to `{self.bot.db.get_prefix(ctx.guild.id)}`")
+
     @commands.is_owner()
     @commands.command(aliases=["sgv"])
     async def setgtval(self, ctx: AnsuraContext,
