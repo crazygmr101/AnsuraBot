@@ -188,7 +188,7 @@ class Gaming(commands.Cog):
         await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
 
     @commands.command()
-    async def mod(self, ctx: AnsuraContext, mod: str):
+    async def mod(self, ctx: AnsuraContext, *, mod: str):
         hdr = {
             'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko)'
                            ' Chrome/23.0.1271.64 Safari/537.11'),
@@ -221,15 +221,24 @@ class Gaming(commands.Cog):
         mod_avatar = soup.find_all(
             "div",
             class_="project-avatar project-avatar-64")[0].contents[1].contents[1]["src"]
+        mod_image = soup.select_one(
+            ".project-detail__content img",
+        ).attrs["src"]
+        mod_desc = soup.select_one(
+            ".project-detail__content p",
+        ).text
         await ctx.embed(title=mod_name,
-                        description=f"**{mod_downloads}**" + "\n" +
-                                    f"**{mod_updated}**" + "\n" +
+                        description=f"[Link](https://www.curseforge.com/minecraft/mc-mods/{mod.replace(' ', '-')})\n"
+                                    f"{mod_desc[:500]}\n"
+                                    f"**{mod_downloads}**" + "\n"
+                                    f"**{mod_updated}**" + "\n"
                                     f"**{mod_version}**",
                         clr=discord.Color.from_rgb(103, 65, 165),
                         fields=[
                             ("Game Files", f"[Files]({mod_files})"),
                             ("Source Files", f"[Source]({mod_source})")
                         ],
+                        image=mod_image,
                         thumbnail=mod_avatar)
 
 
