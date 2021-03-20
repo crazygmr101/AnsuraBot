@@ -17,8 +17,8 @@ logging.basicConfig(level=logging.WARN)
 dotenv.load_dotenv(".env")
 
 
-def get_prefix(bot, message):
-    return commands.when_mentioned_or("!" if bot.user.id == 804791983884992608 else "%")(bot, message)
+def get_prefix(_bot: AnsuraBot, message: discord.Message):
+    return commands.when_mentioned_or(_bot.db.get_prefix(message.guild.id) if message.guild else "%")(_bot, message)
 
 
 bot = AnsuraBot(command_prefix=get_prefix, intents=discord.Intents.all())

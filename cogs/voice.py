@@ -1,4 +1,5 @@
 import asyncio
+import io
 import re
 
 import discord
@@ -54,8 +55,10 @@ class Voice(commands.Cog):
         """Lists TTS-muted members"""
         if ctx.guild.id not in self.vm.tts_mutes.keys():
             await ctx.send("No members TTS muted")
+            return
         if len(self.vm.tts_mutes[ctx.guild.id]) == 0:
             await ctx.send("No members TTS muted")
+            return
         embed = discord.Embed(title="TTS muted members")
         embed.add_field(name=f"{len(self.vm.tts_mutes[ctx.guild.id])} members TTS-muted",
                         value=" ".join([f"<@{x}>" for x in self.vm.tts_mutes[ctx.guild.id]]))
@@ -68,10 +71,12 @@ class Voice(commands.Cog):
         if member is None:
             await ctx.send("You must tag a member")
             return
+        if ctx.guild.id not in self.vm.tts_mutes.keys():
+            self.vm.tts_mutes[ctx.guild.id] = []
         try:
             self.vm.tts_mutes[ctx.guild.id].index(member.id)
             await ctx.send(f"**{member.display_name}** is already TTS muted")
-        except:  # noqa e722
+        except ValueError:
             self.vm.tts_mutes[ctx.guild.id].append(member.id)
             await ctx.send(f"TTS muted **{member.display_name}**")
 
@@ -117,12 +122,13 @@ class Voice(commands.Cog):
     async def tts(self, message: discord.Message):  # noqa c901
         def create_tts(m: str):
             msg = gtts.gTTS(m)
-            fname = f"{message.id}"
-            msg.save(f"{fname}.mp3")
-            return fname
+            buf = io.BytesIO()
+            msg.write_to_fp(buf)
+            buf.seek(0)
+            return buf
 
         if message.content.startswith("%") \
-                or message.content.startswith("ab!"):
+                or message.content.startswith("!"):  # beta's prefix
             return
         try:
             if message.guild.voice_client is None:
@@ -148,8 +154,8 @@ class Voice(commands.Cog):
                 "\u2c7e-\u2c7f\ua722-\ua76f\ua771-\ua787\ua78b-\ua78c\ua7fb-\ua7ff\ufb00-\ufb06]", "", m)
             if m.strip(" .") == "":
                 return
-            fname = await self.bot.loop.run_in_executor(None, create_tts, f"{message.author.display_name} says {m}")
-            self.vm.queues[message.guild.id].add(fname)
+            buf = await self.bot.loop.run_in_executor(None, create_tts, f"{message.author.display_name} says {m}")
+            self.vm.queues[message.guild.id].add(buf)
             await message.add_reaction("✅")
             await asyncio.sleep(10)
             await message.remove_reaction("✅", self.bot.user)

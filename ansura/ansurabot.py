@@ -5,6 +5,7 @@ import re
 from typing import Optional
 
 import aiohttp
+import discord
 from discord.ext import commands
 
 from lib.database import AnsuraDatabase
@@ -15,8 +16,8 @@ from .ansuracontext import AnsuraContext
 class AnsuraBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         print("[BOT] Initializing bot")
-        super(AnsuraBot, self).__init__(*args, **kwargs)
         self.db: AnsuraDatabase = AnsuraDatabase()
+        super(AnsuraBot, self).__init__(*args, **kwargs)
         self.vm: Optional[VoiceManager] = None
 
     async def on_message(self, message):
