@@ -3,8 +3,11 @@ from __future__ import annotations
 import asyncio
 import concurrent.futures
 import io
+import os
+import pathlib
 import platform
 import re
+import shutil
 import socket
 import subprocess
 from typing import Union, Optional, TYPE_CHECKING
@@ -214,6 +217,12 @@ def setup(gaming_cog: Gaming):
     global cog
     global group
     cog = gaming_cog
+
+    # initialize minecraft stuff
+    if not os.path.isdir("data"):
+        os.mkdir("data")
+    if not os.path.isdir("recipes"):
+        os.mkdir("data/recipes")
 
     group = commands.Group(name="minecraft", func=group_command)
     for i in (jping, bping, hypixel, mod):
