@@ -135,3 +135,11 @@ class AnsuraContext(commands.Context):
             channel = ctx.guild.get_channel(int(mention[2:-1]))
             text = text.replace(mention, f"**#{channel.name}**" if channel else mention)
         return text
+
+    @staticmethod
+    def bold(text: str):
+        return f"**{text}**"
+
+    @staticmethod
+    def italic(text: str):
+        return f"*{text}*"
