@@ -177,7 +177,7 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
                               get="text")
     mod_categories = LINQ(soup.select("div.px-1 > a[href*=mc-mods]:not([class])"))\
         .select(lambda elem: elem.attrs["href"])\
-        .select(lambda text: text.split("/")[-1].replace("-", "/").title())\
+        .select(lambda text: text.split("/")[-1].replace("world-gen", "worldgen").replace("-", "/").title())\
         .join(", ")
     recent_files = LINQ(soup.find("h3",text="Recent Files").parent.parent.select("h4>a"))\
         .select(lambda elem: elem.text.replace("Minecraft", "").strip())\
