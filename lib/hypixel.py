@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import urllib.parse
@@ -13,13 +12,11 @@ import discord.utils
 import pytz
 from discord.ext import commands
 from disputils import BotMultipleChoice
-import pastebin
 
 import ansura
 
 
-
-async def hypixel(ctx: commands.Context, player: str, # noqa c901
+async def hypixel(ctx: commands.Context, player: str,  # noqa c901
                   bot: ansura.AnsuraBot, token: str,
                   profile_type: str = None):
     if profile_type and len(profile_type.split(" ")) > 1:

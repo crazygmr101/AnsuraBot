@@ -1,7 +1,7 @@
 import sqlite3
 from typing import List, Dict
 
-SQL_STRING="""
+SQL_STRING = """
 CREATE TABLE IF NOT EXISTS "bios" (
       "id" INTEGER NOT NULL,
       "bio" TEXT,

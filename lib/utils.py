@@ -1,4 +1,10 @@
-from typing import List, Dict
+import asyncio
+from typing import Any, List
+from typing import Dict
+
+import discord
+from bs4 import ResultSet
+from discord.ext import commands
 
 
 def descend(obj: Dict, keys: List[str]):
@@ -7,12 +13,6 @@ def descend(obj: Dict, keys: List[str]):
         temp = temp[k]
     return temp
 
-
-import asyncio
-from typing import Any, List
-
-import discord
-from discord.ext import commands
 
 NBSP = "͔"
 
@@ -27,16 +27,6 @@ def letter_emoji(a: str):
 
 def quote(st: str):
     return "\n".join(f"> {n}" for n in st.split("\n"))
-
-
-def trim(st: str, length: int = 300) -> str:
-    """
-    Trims a string to be less than `length` characters
-    :param st: the string to trim
-    :param length: the length to trim to
-    :return: the trimmed string
-    """
-    return st if len(st) < length else st[:length]
 
 
 async def trash_reaction(msg: discord.Message, bot: commands.Bot, ctx: commands.Context):
@@ -77,7 +67,7 @@ def pages(lst: List[Any], n: int, title: str, *, fmt: str = "```%s```", sep: str
         :param lst: the list to paginate
         :param n: the number of elements per page
         :param title: the title of the embed
-        :param fmt: a % string used to format the resulting page
+        :param fmt: a format string used to format the resulting page
         :param sep: the string to join the list elements with
         :return: a list of embeds
         """
@@ -98,12 +88,12 @@ def numbered(lst: List[Any]) -> List[str]:
     return [f"{i} - {a}" for i, a in enumerate(lst)]
 
 
-def find_text(text: str, find_all, get: str):
+def find_text(text: str, find_all: ResultSet, get: str):
     """
     Function to loop through the tags in find_all and
     return the desired one using the desired return format
     :param text: the text that will be searched for
-    :param find_all: a find_all() from BeautifulSoup
+    :param find_all: a :class:`bs4.ResultSet` from BeautifulSoup
     :param get: the desired format of return, e.g: text, link, etc.
     """
     for result in find_all:

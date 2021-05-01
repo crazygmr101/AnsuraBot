@@ -1,8 +1,9 @@
 import os
 
 from discord.ext import commands
-from cogs.gaming_additions import minecraft
+
 from ansura import AnsuraBot
+from cogs.gaming_additions import minecraft
 
 
 class Gaming(commands.Cog):

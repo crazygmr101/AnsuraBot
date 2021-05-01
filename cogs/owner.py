@@ -1,11 +1,9 @@
 import random
-import re
-from typing import List, Union
+from typing import List
 
 import discord
 from discord.ext import commands
 
-import cogs
 from ansura import AnsuraBot, AnsuraContext
 
 

@@ -5,7 +5,6 @@ import re
 from typing import Optional
 
 import aiohttp
-import discord
 from discord.ext import commands
 
 from lib.database import AnsuraDatabase

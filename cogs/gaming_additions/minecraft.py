@@ -8,17 +8,17 @@ import re
 import socket
 import subprocess
 from typing import Union, Optional, TYPE_CHECKING
-from lib.linq import LINQ
 
 import aiohttp
 import discord
 import mcstatus
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from discord import Embed
 from discord.ext import commands
 
 import lib.hypixel
 from ansura import AnsuraContext
+from lib.linq import LINQ
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -175,12 +175,12 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
                                  get="text").split()).skip(2).join(" ")
     mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"),
                               get="text")
-    mod_categories = LINQ(soup.select("div.px-1 > a[href*=mc-mods]:not([class])"))\
-        .select(lambda elem: elem.attrs["href"])\
-        .select(lambda text: text.split("/")[-1].replace("world-gen", "worldgen").replace("-", "/").title())\
+    mod_categories = LINQ(soup.select("div.px-1 > a[href*=mc-mods]:not([class])")) \
+        .select(lambda elem: elem.attrs["href"]) \
+        .select(lambda text: text.split("/")[-1].replace("world-gen", "worldgen").replace("-", "/").title()) \
         .join(", ")
-    recent_files = LINQ(soup.find("h3",text="Recent Files").parent.parent.select("h4>a"))\
-        .select(lambda elem: elem.text.replace("Minecraft", "").strip())\
+    recent_files = LINQ(soup.find("h3", text="Recent Files").parent.parent.select("h4>a")) \
+        .select(lambda elem: elem.text.replace("Minecraft", "").strip()) \
         .distinct().join(", ")
     mod_files = find_text("files", soup.find_all("a"), get="href")
     mod_source = find_text("source", soup.find_all("a"), get="href")
