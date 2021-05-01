@@ -168,8 +168,6 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
             buf.write(await resp.content.read())
     buf.seek(0)
     soup = BeautifulSoup(buf, features="html.parser")
-    buf.seek(0)
-    html = str(buf.read(), encoding=soup.declared_html_encoding)
     mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
     mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"),
                             get="text")
