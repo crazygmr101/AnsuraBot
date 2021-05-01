@@ -96,7 +96,7 @@ class LINQ(Generic[T], Iterable):
     def first(self, function: Optional[Callable[[T], bool]] = None):
         if self.empty():
             raise IndexError
-        for element in self:
+        for element in self._iterable:
             if function is None or function(element):
                 return element
         raise IndexError

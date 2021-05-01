@@ -13,7 +13,7 @@ from lib.linq import LINQ
 import aiohttp
 import discord
 import mcstatus
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from discord import Embed
 from discord.ext import commands
 
@@ -168,6 +168,8 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
             buf.write(await resp.content.read())
     buf.seek(0)
     soup = BeautifulSoup(buf, features="html.parser")
+    buf.seek(0)
+    html = str(buf.read(), encoding=soup.declared_html_encoding)
     mod_name = soup.find_all("h2", class_="font-bold text-lg break-all")[0].text
     mod_version = find_text("game version", soup.find_all("span", class_="text-gray-500"),
                             get="text")
@@ -175,6 +177,13 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
                                  get="text").split()).skip(2).join(" ")
     mod_downloads = find_text("downloads", soup.find_all("span", class_="text-gray-500"),
                               get="text")
+    mod_categories = LINQ(soup.select("div.px-1 > a[href*=mc-mods]:not([class])"))\
+        .select(lambda elem: elem.attrs["href"])\
+        .select(lambda text: text.split("/")[-1].replace("-", "/").title())\
+        .join(", ")
+    recent_files = LINQ(soup.find("h3",text="Recent Files").parent.parent.select("h4>a"))\
+        .select(lambda elem: elem.text.replace("Minecraft", "").strip())\
+        .distinct().join(", ")
     mod_files = find_text("files", soup.find_all("a"), get="href")
     mod_source = find_text("source", soup.find_all("a"), get="href")
     mod_avatar = soup.find_all(
@@ -191,7 +200,9 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
                     description=f"{mod_desc[:500]}\n"
                                 f"**Downloads:** {mod_downloads.split(' ')[0]}\n"
                                 f"**Updated:** {mod_updated}\n"
-                                f"**Version:** {mod_version.split(' ')[2]}",
+                                f"**Version:** {mod_version.split(' ')[2]}\n"
+                                f"**Categories:** {mod_categories}\n"
+                                f"**Recent Updates:** {recent_files}",
                     clr=discord.Color.from_rgb(103, 65, 165),
                     fields=[
                         ("Game Files", f"[Files]({mod_files})"),
