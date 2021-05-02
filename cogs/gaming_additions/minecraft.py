@@ -23,7 +23,7 @@ from ansura import AnsuraContext
 from lib.linq import LINQ
 from lib.minecraft import load_recipes, Recipe, ShapedCraftingRecipe, StonecuttingRecipe, BlastingRecipe, \
     SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
-    CatGift, HeroGift
+    CatGift, HeroGift, FishingLoot
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -272,6 +272,8 @@ async def recipe(_, ctx: AnsuraContext, *, result: str):
             st += "__**Cat Morning Gift**__\n"
         elif isinstance(rec, HeroGift):
             drops.append(f"{rec.entity} *Hero of the village*")
+        elif isinstance(rec, FishingLoot):
+            drops.append(f"Fishing *{rec.pool}*")
 
     if drops:
         st += "__**Drops from**__\n" + "\n".join(f"> {drop}" for drop in drops) + "\n"

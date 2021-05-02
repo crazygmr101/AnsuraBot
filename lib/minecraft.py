@@ -83,17 +83,25 @@ class ChestLoot(Recipe):
 class EntityDrop(Recipe):
     entity: str
 
+
 @dataclass
 class Barter(Recipe):
     pass
+
 
 @dataclass
 class CatGift(Recipe):
     pass
 
+
 @dataclass
 class HeroGift(Recipe):
     entity: str
+
+
+@dataclass
+class FishingLoot(Recipe):
+    pool: str
 
 
 def flatten_loot(js):
@@ -234,5 +242,13 @@ def load_recipes(recipes: List[str]) -> List[Recipe]:
                     recipe_list.append(HeroGift(
                         result=i[0].replace("minecraft:", ""),
                         entity=fn.split(os.sep)[-1].split(".")[0][:-5].replace("_", " ").title()
+                    ))
+            if "/fishing/" in fn:
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(FishingLoot(
+                        result=i[0].replace("minecraft:", ""),
+                        pool=fn.split(os.sep)[-1].split(".")[0].title()
                     ))
     return recipe_list
