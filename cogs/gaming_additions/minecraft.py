@@ -22,7 +22,7 @@ import lib.hypixel
 from ansura import AnsuraContext
 from lib.linq import LINQ
 from lib.minecraft import load_recipes, Recipe, ShapedCraftingRecipe, StonecuttingRecipe, BlastingRecipe, \
-    SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop
+    SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop, ChestLoot, EntityDrop
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -218,6 +218,7 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
 async def recipe(_, ctx: AnsuraContext, *, result: str):
     found = []
     drops = []
+    found_in = []
     for rec in recipes:
         if rec.result.replace("_", "").lower() == result.replace(" ", "").replace("_", "").lower():
             found.append(rec)
@@ -229,10 +230,10 @@ async def recipe(_, ctx: AnsuraContext, *, result: str):
         if isinstance(rec, ShapedCraftingRecipe):
             pattern = "\n> ".join(rec.pattern)
             ingredients = "\n> ".join(f"**{k}**: {v}" for k, v in rec.keys.items())
-            res_str = f"Makes **{rec.result_count}**\n" if rec.result_count != 1 else ""
+            res_str = f"> Makes **{rec.result_count}**\n" if rec.result_count != 1 else ""
             st += f"__**Crafting table**__\n> ```\n> {pattern}```" \
                   f"{ingredients}\n" \
-                  f"> {res_str}"
+                  f"{res_str}"
         elif isinstance(rec, StonecuttingRecipe):
             st += f"__**Stonecutter**__\n> **{rec.ingredient}** → **{fr_result}** ×{rec.result_count}\n"
         elif isinstance(rec, SmokingRecipe):
@@ -260,8 +261,16 @@ async def recipe(_, ctx: AnsuraContext, *, result: str):
                 fortune = (" (" +
                            " ".join(f"F{n}: **{int(rec.fortune_chances[n] * 100)}**%" for n in [0, 1, 2, 3]) + ")")
             drops.append(f"**{rec.block}**{silk}{fortune}")
+        elif isinstance(rec, ChestLoot):
+            found_in.append(f"**{rec.location.replace('_', ' ').title()}**")
+        elif isinstance(rec, EntityDrop):
+            drops.append(f"**{rec.entity.replace('_', ' ').title()}**")
+
     if drops:
-        st += "__**Drops from**__\n" + "\n".join(f"> {drop}" for drop in drops)
+        st += "__**Drops from**__\n" + "\n".join(f"> {drop}" for drop in drops) + "\n"
+
+    if found_in:
+        st += "__**Found in**__\n" + "\n".join(f"> {loc}" for loc in found_in) + "\n"
 
     await ctx.send(st)
 

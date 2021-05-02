@@ -74,6 +74,16 @@ class BlockDrop(Recipe):
     fortune_chances: List[float]
 
 
+@dataclass
+class ChestLoot(Recipe):
+    location: str
+
+
+@dataclass
+class EntityDrop(Recipe):
+    entity: str
+
+
 def flatten_loot(js):
     flat = []
 
@@ -174,5 +184,21 @@ def load_recipes(recipes: List[str]) -> List[Recipe]:
                         block=Item(type="item", name=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title()),
                         silk=i[1],
                         fortune_chances=i[2]
+                    ))
+            if content["type"] == "minecraft:chest":
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(ChestLoot(
+                        result=i[0].replace("minecraft:", ""),
+                        location=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title(),
+                    ))
+            if content["type"] == "minecraft:entity":
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(EntityDrop(
+                        result=i[0].replace("minecraft:", ""),
+                        entity=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title(),
                     ))
     return recipe_list
