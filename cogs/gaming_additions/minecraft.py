@@ -22,7 +22,8 @@ import lib.hypixel
 from ansura import AnsuraContext
 from lib.linq import LINQ
 from lib.minecraft import load_recipes, Recipe, ShapedCraftingRecipe, StonecuttingRecipe, BlastingRecipe, \
-    SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop, ChestLoot, EntityDrop
+    SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
+    CatGift, HeroGift
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -260,11 +261,17 @@ async def recipe(_, ctx: AnsuraContext, *, result: str):
             else:
                 fortune = (" (" +
                            " ".join(f"F{n}: **{int(rec.fortune_chances[n] * 100)}**%" for n in [0, 1, 2, 3]) + ")")
-            drops.append(f"**{rec.block}**{silk}{fortune}")
+            drops.append(f"{rec.block}{silk}{fortune}")
         elif isinstance(rec, ChestLoot):
-            found_in.append(f"**{rec.location.replace('_', ' ').title()}**")
+            found_in.append(f"{rec.location.replace('_', ' ').title()}")
         elif isinstance(rec, EntityDrop):
-            drops.append(f"**{rec.entity.replace('_', ' ').title()}**")
+            drops.append(f"{rec.entity.replace('_', ' ').title()}")
+        elif isinstance(rec, Barter):
+            st += "__**Bartering**__\n"
+        elif isinstance(rec, CatGift):
+            st += "__**Cat Morning Gift**__\n"
+        elif isinstance(rec, HeroGift):
+            drops.append(f"{rec.entity} *Hero of the village*")
 
     if drops:
         st += "__**Drops from**__\n" + "\n".join(f"> {drop}" for drop in drops) + "\n"

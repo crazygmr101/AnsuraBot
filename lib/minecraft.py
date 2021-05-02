@@ -83,6 +83,18 @@ class ChestLoot(Recipe):
 class EntityDrop(Recipe):
     entity: str
 
+@dataclass
+class Barter(Recipe):
+    pass
+
+@dataclass
+class CatGift(Recipe):
+    pass
+
+@dataclass
+class HeroGift(Recipe):
+    entity: str
+
 
 def flatten_loot(js):
     flat = []
@@ -191,7 +203,7 @@ def load_recipes(recipes: List[str]) -> List[Recipe]:
                 for i in flatten_loot(content):
                     recipe_list.append(ChestLoot(
                         result=i[0].replace("minecraft:", ""),
-                        location=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title(),
+                        location=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title()
                     ))
             if content["type"] == "minecraft:entity":
                 if "pools" not in content:
@@ -199,6 +211,28 @@ def load_recipes(recipes: List[str]) -> List[Recipe]:
                 for i in flatten_loot(content):
                     recipe_list.append(EntityDrop(
                         result=i[0].replace("minecraft:", ""),
-                        entity=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title(),
+                        entity=fn.split(os.sep)[-1].split(".")[0].replace("_", " ").title()
+                    ))
+            if content["type"] == "minecraft:barter":
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(Barter(
+                        result=i[0].replace("minecraft:", "")
+                    ))
+            if "cat_morning_gift" in fn:
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(CatGift(
+                        result=i[0].replace("minecraft:", "")
+                    ))
+            if "hero" in fn:
+                if "pools" not in content:
+                    continue
+                for i in flatten_loot(content):
+                    recipe_list.append(HeroGift(
+                        result=i[0].replace("minecraft:", ""),
+                        entity=fn.split(os.sep)[-1].split(".")[0][:-5].replace("_", " ").title()
                     ))
     return recipe_list
