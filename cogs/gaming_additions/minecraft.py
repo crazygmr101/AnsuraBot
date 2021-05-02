@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import glob
 import io
 import os
-import pathlib
 import platform
 import re
-import shutil
 import socket
 import subprocess
-from typing import Union, Optional, TYPE_CHECKING
+from typing import Union, Optional, TYPE_CHECKING, List
 
 import aiohttp
 import discord
@@ -22,6 +21,8 @@ from discord.ext import commands
 import lib.hypixel
 from ansura import AnsuraContext
 from lib.linq import LINQ
+from lib.minecraft import load_recipes, Recipe, ShapedCraftingRecipe, StonecuttingRecipe, BlastingRecipe, \
+    SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
 
 cog: Optional[Gaming] = None
 group: Optional[commands.Group] = None
+recipes: List[Recipe] = []
 
 
 async def ping(url: str):
@@ -213,19 +215,81 @@ async def mod(_, ctx: AnsuraContext, *, _mod: str):
                     thumbnail=mod_avatar)
 
 
+async def recipe(_, ctx: AnsuraContext, *, result: str):
+    found = []
+    drops = []
+    for rec in recipes:
+        if rec.result.replace("_", "").lower() == result.replace(" ", "").replace("_", "").lower():
+            found.append(rec)
+    if not found:
+        return await ctx.send(f"No recipes for {result} found.")
+    fr_result = found[0].result.replace('_', ' ').title()
+    st = f"Recipe for **{fr_result}**\n"
+    for rec in found:
+        if isinstance(rec, ShapedCraftingRecipe):
+            pattern = "\n> ".join(rec.pattern)
+            ingredients = "\n> ".join(f"**{k}**: {v}" for k, v in rec.keys.items())
+            res_str = f"Makes **{rec.result_count}**\n" if rec.result_count != 1 else ""
+            st += f"__**Crafting table**__\n> ```\n> {pattern}```" \
+                  f"{ingredients}\n" \
+                  f"> {res_str}"
+        elif isinstance(rec, StonecuttingRecipe):
+            st += f"__**Stonecutter**__\n> **{rec.ingredient}** → **{fr_result}** ×{rec.result_count}\n"
+        elif isinstance(rec, SmokingRecipe):
+            st += f"__**Smoker**__\n> **{rec.ingredient}** → **{fr_result}**\n" \
+                  f"> Gives **{rec.experience}** XP and takes **{rec.cooking_time}** ticks\n"
+        elif isinstance(rec, BlastingRecipe):
+            st += f"__**Blast Furnace**__\n> **{rec.ingredient}** → **{fr_result}**\n" \
+                  f"> Gives **{rec.experience}** XP and takes **{rec.cooking_time}** ticks\n"
+        elif isinstance(rec, SmeltingRecipe):
+            st += f"__**Furnace**__\n> **{rec.ingredient}** → **{fr_result}**\n" \
+                  f"> Gives **{rec.experience}** XP and takes **{rec.cooking_time}** ticks\n"
+        elif isinstance(rec, SmithingRecipe):
+            st += f"__**Smithing**__\n> **{rec.base}** + **{rec.addition}** → **{fr_result}**\n"
+        elif isinstance(rec, ShapelessCraftingRecipe):
+            ingredients = " + ".join(f"**{i[0]}** × **{i[1]}**" for i in rec.ingredients)
+            count = f" × **{rec.result_count}**" if rec.result_count != 1 else ""
+            st += f"__**Shapeless crafting**__\n> {ingredients} → **{fr_result}**{count}\n"
+        elif isinstance(rec, BlockDrop):
+            silk = " *Silk*" if rec.silk else ""
+            if rec.fortune_chances == [1]:
+                fortune = " *Fortune*"
+            elif not rec.fortune_chances:
+                fortune = ""
+            else:
+                fortune = (" (" +
+                           " ".join(f"F{n}: **{int(rec.fortune_chances[n] * 100)}**%" for n in [0, 1, 2, 3]) + ")")
+            drops.append(f"**{rec.block}**{silk}{fortune}")
+    if drops:
+        st += "__**Drops from**__\n" + "\n".join(f"> {drop}" for drop in drops)
+
+    await ctx.send(st)
+
+
 def setup(gaming_cog: Gaming):
     global cog
     global group
+    global recipes
     cog = gaming_cog
 
     # initialize minecraft stuff
     if not os.path.isdir("data"):
         os.mkdir("data")
-    if not os.path.isdir("recipes"):
+    if not os.path.isdir("data/recipes"):
         os.mkdir("data/recipes")
+    if not os.path.isdir("data/blocks"):
+        os.mkdir("data/blocks")
+    if not os.path.isdir("data/chests"):
+        os.mkdir("data/chests")
+    if not os.path.isdir("data/entities"):
+        os.mkdir("data/entities")
+    if not os.path.isdir("data/gameplay"):
+        os.mkdir("data/gameplay")
+
+    recipes = load_recipes(glob.glob("data/**/*.json", recursive=True))
 
     group = commands.Group(name="minecraft", func=group_command)
-    for i in (jping, bping, hypixel, mod):
+    for i in (jping, bping, hypixel, mod, recipe):
         cmd = commands.Command(name=i.__name__, func=i)
         cmd.cog = gaming_cog
         group.add_command(

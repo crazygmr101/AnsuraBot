@@ -80,6 +80,16 @@ class LINQ(Generic[T], Iterable):
                 lst.append(element)
         return LINQ(lst)
 
+    def distinct_by(self, func: Callable[[T, T], bool]):
+        lst = []
+        for element in self._iterable:
+            for compared in lst:
+                if func(compared, element):
+                    break
+            else:
+                lst.append(element)
+        return LINQ(lst)
+
     def element_at(self, index: int):
         return self.to_list()[index]
 
@@ -140,6 +150,12 @@ class LINQ(Generic[T], Iterable):
 
     def order_by(self, function: Callable[[T], {__lt__}]):
         return LINQ(sorted())
+
+    def counted(self):
+        lst = {}
+        for i in self.distinct():
+            lst[i] = lst.get(i, 0) + 1
+        return LINQ(lst.items())
 
     def __iter__(self):
         yield from self._iterable
