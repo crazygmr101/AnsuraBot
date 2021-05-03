@@ -162,3 +162,6 @@ class LINQ(Generic[T], Iterable):
 
     def join(self, c: str):
         return self.aggregate(lambda x, y: f"{x}{c}{y}")
+
+    def format(self, fmt: str):
+        return self.select(lambda t: fmt % t)
