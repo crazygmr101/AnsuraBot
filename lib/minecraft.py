@@ -104,6 +104,12 @@ class FishingLoot(Recipe):
     pool: str
 
 
+@dataclass
+class Tag:
+    name: str
+    items: List[str]
+
+
 def flatten_loot(js):
     flat = []
 
@@ -252,3 +258,16 @@ def load_recipes(recipes: List[str]) -> List[Recipe]:
                         pool=fn.split(os.sep)[-1].split(".")[0].title()
                     ))
     return recipe_list
+
+
+def load_tags(files: List[str]) -> List[Tag]:
+    tags = []
+    for fn in files:
+        with open(fn) as fp:
+            tags.append(Tag(
+                fn.split(os.sep)[-1].split(".")[0],
+                LINQ(json.load(fp)["values"])
+                    .select(lambda x: x.replace("minecraft:", ""))  # noqa
+                    .to_list()
+            ))
+    return tags

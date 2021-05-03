@@ -23,7 +23,7 @@ from ansura import AnsuraContext
 from lib.linq import LINQ
 from lib.minecraft import load_recipes, Recipe, ShapedCraftingRecipe, StonecuttingRecipe, BlastingRecipe, \
     SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, SmokingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
-    CatGift, HeroGift, FishingLoot
+    CatGift, HeroGift, FishingLoot, Tag, load_tags
 from lib.utils import find_text
 
 if TYPE_CHECKING:
@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 cog: Optional[Gaming] = None
 group: Optional[commands.Group] = None
 recipes: List[Recipe] = []
+tags: List[Tag] = []
 
 
 async def ping(url: str):
@@ -284,10 +285,31 @@ async def recipe(_, ctx: AnsuraContext, *, result: str):
     await ctx.send(st)
 
 
+async def taginfo(_, ctx: AnsuraContext, *, tag: str):
+    def _get(tag_name: str):
+        for _t in tags:
+            if _t.name == tag_name:
+                return _t
+        return None
+
+    for _tag in tags:
+        if _tag.name.replace("_", "").lower() == \
+                tag.replace("_", "").replace(" ", "").replace("minecraft:", "").lower():
+            return await ctx.send(f"__**Items in `{_tag.name}`**__\n" +
+                                  LINQ(_tag.items)
+                                  .select(
+                                      lambda t:
+                                      f"> `{t}`: " + ", ".join(f"`{child}`" for child in _get(t[1:]).items)
+                                      if "#" in t else f"> `{t}`")
+                                  .join("\n"))
+    await ctx.send(f"No tag matching `{tag}` found")
+
+
 def setup(gaming_cog: Gaming):
     global cog
     global group
     global recipes
+    global tags
     cog = gaming_cog
 
     # initialize minecraft stuff
@@ -304,10 +326,12 @@ def setup(gaming_cog: Gaming):
     if not os.path.isdir("data/gameplay"):
         os.mkdir("data/gameplay")
 
-    recipes = load_recipes(glob.glob("data/**/*.json", recursive=True))
+    recipes = load_recipes(glob.glob("data/recipes/**/*.json", recursive=True)) + \
+              load_recipes(glob.glob("data/loot_tables/**/*.json", recursive=True))
+    tags = load_tags(glob.glob("data/tags/**/*json"))
 
     group = commands.Group(name="minecraft", func=group_command)
-    for i in (jping, bping, hypixel, mod, recipe):
+    for i in (jping, bping, hypixel, mod, recipe, taginfo):
         cmd = commands.Command(name=i.__name__, func=i)
         cmd.cog = gaming_cog
         group.add_command(
