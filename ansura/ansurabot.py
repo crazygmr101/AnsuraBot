@@ -5,6 +5,7 @@ import re
 from typing import Optional
 
 import aiohttp
+import inflect
 from discord.ext import commands
 
 from lib.database import AnsuraDatabase
@@ -18,6 +19,7 @@ class AnsuraBot(commands.Bot):
         self.db: AnsuraDatabase = AnsuraDatabase()
         super(AnsuraBot, self).__init__(*args, **kwargs)
         self.vm: Optional[VoiceManager] = None
+        self.inflect: inflect.engine = inflect.engine()
 
     async def on_message(self, message):
         if message.author.bot:

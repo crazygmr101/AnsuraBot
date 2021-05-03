@@ -4,6 +4,7 @@ import re
 from typing import Union, List, Tuple
 
 import discord
+import inflect
 from discord.ext import commands
 
 
@@ -18,6 +19,10 @@ class AnsuraContext(commands.Context):
     INFO = 0
     OK = 1
     ERROR = 2
+
+    @property
+    def inflect(self) -> inflect.engine:
+        return self.bot.inflect
 
     async def trash_reaction(self, message: discord.Message):
         if len(message.embeds) == 0:
