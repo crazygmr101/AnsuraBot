@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 from discord.ext import commands
@@ -12,10 +13,11 @@ class Gaming(commands.Cog):
         self.htoken = os.getenv("HYPIXEL")
 
 
-def setup(bot):
+def setup(bot: AnsuraBot):
     gaming = Gaming(bot)
     bot.add_cog(gaming)
-    minecraft.setup(gaming)
+    for addition in (minecraft):
+        bot.loop.create_task(addition.setup(gaming))
 
 
 """

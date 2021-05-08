@@ -109,3 +109,4 @@ def find_text(text: str, find_all: ResultSet, get: str):
                         return result["href"]
         else:
             return "Unknown"
+

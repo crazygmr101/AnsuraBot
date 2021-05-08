@@ -324,7 +324,7 @@ async def info(_, ctx: AnsuraContext, *, i: str):
                     + LINQ(found_tags).distinct().format("`%s`").join(" ") if found_tags else ""))
 
 
-def setup(gaming_cog: Gaming):
+async def setup(gaming_cog: Gaming):
     global cog
     global group
     global recipes
@@ -334,19 +334,21 @@ def setup(gaming_cog: Gaming):
     # initialize minecraft stuff
     if not os.path.isdir("data"):
         os.mkdir("data")
-    if not os.path.isdir("data/recipes"):
-        os.mkdir("data/recipes")
-    if not os.path.isdir("data/blocks"):
-        os.mkdir("data/blocks")
-    if not os.path.isdir("data/chests"):
-        os.mkdir("data/chests")
-    if not os.path.isdir("data/entities"):
-        os.mkdir("data/entities")
-    if not os.path.isdir("data/gameplay"):
-        os.mkdir("data/gameplay")
+    if not os.path.isdir("data/minecraft"):
+        os.mkdir("data/minecraft")
+    if not os.path.isdir("data/minecraft/recipes"):
+        os.mkdir("data/minecraft/recipes")
+    if not os.path.isdir("data/minecraft/blocks"):
+        os.mkdir("data/minecraft/blocks")
+    if not os.path.isdir("data/minecraft/chests"):
+        os.mkdir("data/minecraft/chests")
+    if not os.path.isdir("data/minecraft/entities"):
+        os.mkdir("data/minecraft/entities")
+    if not os.path.isdir("data/minecraft/gameplay"):
+        os.mkdir("data/minecraft/gameplay")
 
-    recipes = load_recipes(glob.glob("data/recipes/**/*.json", recursive=True)) + \
-              load_recipes(glob.glob("data/loot_tables/**/*.json", recursive=True))
+    recipes = load_recipes(glob.glob("data/minecraft/recipes/**/*.json", recursive=True)) + \
+              load_recipes(glob.glob("data/minecraft/loot_tables/**/*.json", recursive=True))
     tags = load_tags(glob.glob("data/tags/**/*json"))
 
     group = commands.Group(name="minecraft", func=group_command)
