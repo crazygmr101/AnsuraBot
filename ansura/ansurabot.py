@@ -2,13 +2,14 @@ import asyncio
 import logging
 import random
 import re
-from typing import Optional
+from typing import Optional, Callable, Dict, Coroutine, Awaitable
 
 import aiohttp
 import inflect
 from discord.ext import commands
 
 from lib.database import AnsuraDatabase
+from lib.slash_lib import SlashContext, process_slash
 from lib.voicemanager import VoiceManager
 from .ansuracontext import AnsuraContext
 
@@ -20,6 +21,16 @@ class AnsuraBot(commands.Bot):
         super(AnsuraBot, self).__init__(*args, **kwargs)
         self.vm: Optional[VoiceManager] = None
         self.inflect: inflect.engine = inflect.engine()
+        self.slashes: Dict[str, Callable[[SlashContext], Awaitable[None]]] = {}
+
+        async def on_socket_response(msg):
+            if msg["t"] != "INTERACTION_CREATE":
+                return
+            ctx = process_slash(self, msg)
+            if ctx.cmd_signature in self.slashes:
+                await self.slashes[ctx.cmd_signature](ctx)
+
+        self.add_listener(on_socket_response, "on_socket_response")
 
     async def on_message(self, message):
         if message.author.bot:

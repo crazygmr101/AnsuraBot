@@ -16,8 +16,6 @@ class Gaming(commands.Cog):
 def setup(bot: AnsuraBot):
     gaming = Gaming(bot)
     bot.add_cog(gaming)
-    for addition in (minecraft):
-        bot.loop.create_task(addition.setup(gaming))
 
 
 """

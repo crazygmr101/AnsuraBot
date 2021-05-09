@@ -42,7 +42,8 @@ bot.initial_extensions = ['cogs.gamertags',
                           'cogs.timezones',
                           'cogs.voice',
                           'cogs.help',
-                          'cogs.crosschat']
+                          'cogs.crosschat',
+                          "slash.minecraft_slash"]
 if __name__ == '__main__':
     for ext in bot.initial_extensions:
         print(f"[COGS] Loading {ext}")
