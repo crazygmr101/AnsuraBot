@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "name": "minecraft",
+      "description": "Minecraft related commands",
+      "options": [
+        {
+          "type": 1,
+          "name": "mod",
+          "description": "Looks up mod information",
+          "options": [
+            {
+              "type": 3,
+              "name": "mod-name",
+              "required": true,
+              "description": "Name of the mod"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "recipe",
+          "description": "Looks up recipe information",
+          "options": [
+            {
+              "type": 3,
+              "name": "item",
+              "required": true,
+              "description": "Name of the item"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
