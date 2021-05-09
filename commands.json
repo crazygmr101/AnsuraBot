@@ -29,6 +29,19 @@
               "description": "Name of the item"
             }
           ]
+        },
+        {
+          "type": 1,
+          "name": "tag-info",
+          "description": "Shows the items that have a specified tag",
+          "options": [
+            {
+              "type": 3,
+              "name": "tag",
+              "required": true,
+              "description": "Tag name"
+            }
+          ]
         }
       ]
     }

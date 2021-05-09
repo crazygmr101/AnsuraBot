@@ -12,31 +12,6 @@ from discord import Embed
 if TYPE_CHECKING:
     from ansura import AnsuraBot
 
-"""
-MIT License
-
-Copyright (c) 2020-2021 eunwoo1104
-Copyright (c) 2021 crazygmr101
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE."""
-# portions of this code were adapted from https://github.com/eunwoo1104/discord-py-slash-command
-
 BASE = "https://discord.com/api/v8"
 
 
@@ -70,40 +45,47 @@ class SlashContext:
                     content: str = None,
                     *,
                     embeds: List[Embed] = None,
-                    allowed_mentions: discord.AllowedMentions = None):
+                    allowed_mentions: discord.AllowedMentions = None,
+                    hidden: bool = False):
         embeds = embeds or []
         if self.deferred and not self.responded:
-            return await self.edit_original(content, embeds, allowed_mentions)
+            return await self.edit_original(content, embeds=embeds, allowed_mentions=allowed_mentions, hidden=hidden)
         async with aiohttp.ClientSession() as sess:
+            r = {
+                "content": content,
+                "embeds": [embed.to_dict() for embed in embeds],
+                "allowed_mentions": allowed_mentions.to_dict() if allowed_mentions else {}
+            }
+            if hidden:
+                r["data"] = {"flags": 64}
             resp = await sess.post(f"{BASE}/webhooks/{self.bot.user.id}/{self.token}",
-                                   json={
-                                       "content": content,
-                                       "embeds": [embed.to_dict() for embed in embeds],
-                                       "allowed_mentions": allowed_mentions.to_dict() if allowed_mentions else {}
-
-                                   })
+                                   json=r)
             resp.raise_for_status()
 
     async def edit_original(self,
                             content: str = None,
                             *,
                             embeds: List[Embed] = None,
-                            allowed_mentions: discord.AllowedMentions = None):
+                            allowed_mentions: discord.AllowedMentions = None,
+                            hidden: bool = False):
         self.responded = True
         async with aiohttp.ClientSession() as sess:
+            r = {
+                "content": content,
+                "embeds": [embed.to_dict() for embed in embeds],
+                "allowed_mentions": allowed_mentions.to_dict() if allowed_mentions else {}
+            }
+            if hidden:
+                r["data"] = {"flags": 64}
+            else:
+                r["data"] = {"flags": 0}
             resp = await sess.patch(f"{BASE}/webhooks/{self.bot.user.id}/{self.token}/messages/@original",
-                                    json={
-                                        "content": content,
-                                        "embeds": [embed.to_dict() for embed in embeds] if embeds else None,
-                                        "allowed_mentions": allowed_mentions.to_dict() if allowed_mentions else {}
-
-                                    })
+                                    json=r)
             resp.raise_for_status()
 
 
 def process_slash(bot: AnsuraBot, payload) -> SlashContext:
     data = payload["d"]
-    pprint(data)
     guild = bot.get_guild(int(data["guild_id"]))
     options = {}
     opt = data["data"]["options"]
