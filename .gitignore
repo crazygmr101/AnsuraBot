@@ -26,3 +26,5 @@ tests/
 *.yaml
 
 .env
+
+data/

@@ -2,6 +2,7 @@ import glob
 import logging
 import os
 import re
+import sys
 
 import discord
 import dotenv
@@ -13,6 +14,8 @@ from cogs.crosschat import Crosschat
 from lib.voicemanager import VoiceManager
 
 logging.basicConfig(level=logging.WARN)
+
+os.chdir(os.path.dirname(sys.argv[0]))
 
 dotenv.load_dotenv(".env")
 
@@ -29,7 +32,6 @@ bot.vm = VoiceManager(bot)
 bot.initial_extensions = ['cogs.gamertags',
                           'cogs.administration',
                           'cogs.misc',
-                          'cogs.gaming',
                           'cogs.fun',
                           'cogs.owner',
                           'cogs.image',
@@ -39,7 +41,8 @@ bot.initial_extensions = ['cogs.gamertags',
                           'cogs.timezones',
                           'cogs.voice',
                           'cogs.help',
-                          'cogs.crosschat']
+                          'cogs.crosschat',
+                          "slash.minecraft_slash"]
 if __name__ == '__main__':
     for ext in bot.initial_extensions:
         print(f"[COGS] Loading {ext}")

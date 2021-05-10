@@ -1,0 +1,118 @@
+{
+  "commands": [
+    {
+      "name": "minecraft",
+      "description": "Minecraft related commands",
+      "options": [
+        {
+          "type": 1,
+          "name": "mod",
+          "description": "Looks up mod information",
+          "options": [
+            {
+              "type": 3,
+              "name": "mod-name",
+              "required": true,
+              "description": "Name of the mod"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "recipe",
+          "description": "Looks up recipe information",
+          "options": [
+            {
+              "type": 3,
+              "name": "item",
+              "required": true,
+              "description": "Name of the item"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "tag-info",
+          "description": "Shows the items that have a specified tag",
+          "options": [
+            {
+              "type": 3,
+              "name": "tag",
+              "required": true,
+              "description": "Tag name"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "info",
+          "description": "Shows the recipes and tags for an item",
+          "options": [
+            {
+              "type": 3,
+              "name": "item",
+              "required": true,
+              "description": "Tag name"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "ping",
+          "description": "Pings a minecraft server",
+          "options": [
+            {
+              "type": 3,
+              "name": "type",
+              "required": true,
+              "description": "Server type",
+              "choices": [
+                {"name":  "Java", "value":  "java"},
+                {"name":  "Bedrock", "value":  "bedrock"}
+              ]
+            },
+            {
+              "type": 3,
+              "name": "url",
+              "required": true,
+              "description": "Server URL"
+            },
+            {
+              "type": 4,
+              "name": "port",
+              "required": false,
+              "description": "Server Port"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "hypixel",
+          "description": "Checks hypixel stats for a player",
+          "options": [
+            {
+              "type": 3,
+              "name": "profile-type",
+              "required": true,
+              "description": "Profile type",
+              "choices": [
+                {"name":  "Profile", "value":  "profile"},
+                {"name":  "Bedwars", "value":  "bedwars"},
+                {"name":  "Skywars", "value":  "skywars"},
+                {"name":  "UHC", "value":  "uhc"},
+                {"name":  "Skyblock", "value":  "skyblock"},
+                {"name":  "Upload to Pastebin", "value":  "raw"}
+              ]
+            },
+            {
+              "type": 3,
+              "name": "player-name",
+              "required": true,
+              "description": "Player name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

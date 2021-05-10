@@ -1,4 +1,13 @@
-from typing import List, Dict
+import asyncio
+import concurrent.futures
+import platform
+import subprocess
+from typing import Any, List, Tuple
+from typing import Dict
+
+import discord
+from bs4 import ResultSet
+from discord.ext import commands
 
 
 def descend(obj: Dict, keys: List[str]):
@@ -7,12 +16,6 @@ def descend(obj: Dict, keys: List[str]):
         temp = temp[k]
     return temp
 
-
-import asyncio
-from typing import Any, List
-
-import discord
-from discord.ext import commands
 
 NBSP = "͔"
 
@@ -27,16 +30,6 @@ def letter_emoji(a: str):
 
 def quote(st: str):
     return "\n".join(f"> {n}" for n in st.split("\n"))
-
-
-def trim(st: str, length: int = 300) -> str:
-    """
-    Trims a string to be less than `length` characters
-    :param st: the string to trim
-    :param length: the length to trim to
-    :return: the trimmed string
-    """
-    return st if len(st) < length else st[:length]
 
 
 async def trash_reaction(msg: discord.Message, bot: commands.Bot, ctx: commands.Context):
@@ -77,7 +70,7 @@ def pages(lst: List[Any], n: int, title: str, *, fmt: str = "```%s```", sep: str
         :param lst: the list to paginate
         :param n: the number of elements per page
         :param title: the title of the embed
-        :param fmt: a % string used to format the resulting page
+        :param fmt: a format string used to format the resulting page
         :param sep: the string to join the list elements with
         :return: a list of embeds
         """
@@ -98,12 +91,12 @@ def numbered(lst: List[Any]) -> List[str]:
     return [f"{i} - {a}" for i, a in enumerate(lst)]
 
 
-def find_text(text: str, find_all, get: str):
+def find_text(text: str, find_all: ResultSet, get: str):
     """
     Function to loop through the tags in find_all and
     return the desired one using the desired return format
     :param text: the text that will be searched for
-    :param find_all: a find_all() from BeautifulSoup
+    :param find_all: a :class:`bs4.ResultSet` from BeautifulSoup
     :param get: the desired format of return, e.g: text, link, etc.
     """
     for result in find_all:
@@ -119,3 +112,69 @@ def find_text(text: str, find_all, get: str):
                         return result["href"]
         else:
             return "Unknown"
+
+
+INFO = 0
+OK = 1
+ERROR = 2
+
+
+def mk_embed(*,
+             description: str = None,
+             title: str = None,
+             title_url: str = None,
+             typ: int = INFO,
+             fields: List[Tuple[str, str]] = None,
+             thumbnail: str = None,
+             clr: discord.Colour = None,
+             image_url: str = None,
+             footer: str = None,
+             not_inline: List[int] = []) -> discord.Embed:
+    if typ and clr:
+        raise ValueError("typ and clr can not be both defined")
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        colour=([
+                    discord.Colour.from_rgb(0x4a, 0x14, 0x8c),
+                    discord.Color.green(),
+                    discord.Color.red()
+                ][typ] if not clr else clr),
+        title_url=title_url
+    )
+    if image_url:
+        embed.set_image(url=image_url)
+    else:
+        f = None
+    if footer:
+        embed.set_footer(text=footer)
+    if thumbnail:
+        embed.set_thumbnail(url=thumbnail)
+    for n, r in enumerate(fields or []):
+        embed.add_field(name=r[0], value=r[1] or "None", inline=n not in not_inline)
+    return embed
+
+
+async def ping(url: str):
+    ping_var = "-n" if platform.system() == "Windows" else "-c"
+
+    def pshell(url: str):
+        return str(subprocess.check_output(["ping", url, ping_var, "2"]), "utf-8")
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            s = await asyncio.get_event_loop().run_in_executor(pool, pshell, url)
+        print(s)
+        try:
+            if platform.system() != "Windows":
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")[-2].split("/")
+                return f"{ar[0]} ms", f"{ar[2]} ms"
+            else:
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")
+                return ar[-7].strip(","), ar[-4].strip(",")
+        except Exception as e:
+            print(e)
+    except Exception as e:
+        print(e)
+        print(type(e))
+        return "ERR", "ERR"

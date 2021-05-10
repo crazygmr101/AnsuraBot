@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import urllib.parse
@@ -13,21 +12,20 @@ import discord.utils
 import pytz
 from discord.ext import commands
 from disputils import BotMultipleChoice
-import pastebin
+from lib.slash_lib import SlashContext
 
 import ansura
 
 
-
-async def hypixel(ctx: commands.Context, player: str, # noqa c901
+async def hypixel(ctx: SlashContext, player: str,  # noqa C901
                   bot: ansura.AnsuraBot, token: str,
                   profile_type: str = None):
     if profile_type and len(profile_type.split(" ")) > 1:
         return
-    with ctx.typing():
-        data = await _get(player, token)
+    await ctx.defer()
+    data = await _get(player, token)
     if data["player"] is None:
-        await ctx.send("That player doesn't seem to exist on hypixel.")
+        await ctx.reply("That player doesn't seem to exist on hypixel.")
         return
 
     player = data["player"]
@@ -36,7 +34,7 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
     e = _mk_embed(player_name, profile_type if profile_type else None)
     profile_type = profile_type.lower() if profile_type else profile_type
 
-    if profile_type is None:
+    if profile_type == "profile":
         e.add_field(name="Previous Names",
                     value=_("\n".join(player["knownAliases"])))
         if "mcVersionRp" in player.keys():
@@ -55,7 +53,7 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
         e.add_field(name="Hypixel Level",
                     value=f"{await _get_level(exp=player['networkExp'])}")
 
-    elif profile_type in ["bedwars", "bw"]:
+    elif profile_type == "bedwars":
         player_bw = player["stats"]["Bedwars"]
         prefixes = {
             "2v2": "eight_two",
@@ -78,7 +76,7 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
 
         e.description = s + "```"
 
-    elif profile_type in ["skywars", "sw"]:
+    elif profile_type == "skywars":
         player = player["stats"]["SkyWars"]
         prefixes = {
             "Solo": "solo",
@@ -106,14 +104,14 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
             e.add_field(name=r[0],
                         value="```" + "\n".join(r[1:4]) + "```")
 
-    elif profile_type in ["uhc"]:
+    elif profile_type == "uhc":
         player = player["stats"]["UHC"]
         e.description = "```" \
                         f"{player.get('kills', 0)} K\n" \
                         f"{player.get('deaths', 0)} D" \
                         "```"
 
-    elif profile_type in ["sb", "skyblock"]:
+    elif profile_type == "skyblock":
         player = player["stats"]["SkyBlock"]["profiles"]
         profile_id = None
         profiles = []
@@ -155,7 +153,7 @@ async def hypixel(ctx: commands.Context, player: str, # noqa c901
     elif profile_type in ["raw"]:
         e.description = await _raw(data)
 
-    await ctx.send(embed=e)
+    await ctx.reply(embeds=[e])
 
 
 async def _raw(data):

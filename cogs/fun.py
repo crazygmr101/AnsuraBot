@@ -205,6 +205,5 @@ class Fun(commands.Cog):
         await ctx.send(f"```{builder}```{'**Over 256 characters' if len(builder) > 256 else ''}")
 
 
-
 def setup(bot):
     bot.add_cog(Fun(bot))
