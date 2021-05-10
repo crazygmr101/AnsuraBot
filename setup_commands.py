@@ -23,13 +23,13 @@ if sys.argv[1] not in ["--global", "--guild"]:
     exit(-1)
 
 if sys.argv[1] == "--global":
-    exit(-1)
-
-guild = sys.argv[2]
+    url = f"{api_base}/applications/{application_id}/commands"
+else:
+    guild = sys.argv[2]
+    url = f"{api_base}/applications/{application_id}/guilds/{guild}/commands"
 
 # get current commands for the guild
-current_commands = requests.get(f"{api_base}/applications/{application_id}/guilds/{guild}/commands",
-                                headers=headers).json()
+current_commands = requests.get(url, headers=headers).json()
 current_command_names = {command["name"] for command in current_commands}
 current_commands_indexed = {command["name"]: command for command in current_commands}
 
@@ -42,7 +42,7 @@ to_overwrite = commands_names.intersection(current_command_names)
 
 for name in to_add:
     print(f"Adding {name}...", end="")
-    resp = requests.post(f"{api_base}/applications/{application_id}/guilds/{guild}/commands",
+    resp = requests.post(url,
                          json=commands_indexed[name],
                          headers={"Content-Type": "application/json",
                                   "Authorization": f"Bot {os.getenv('ANSURA')}"})
@@ -54,8 +54,7 @@ for name in to_add:
 
 for name in to_delete:
     print(f"Deleting {name}...", end="")
-    resp = requests.delete(f"{api_base}/applications/{application_id}/guilds/"
-                           f"{guild}/commands/{current_commands_indexed[name]['id']}",
+    resp = requests.delete(url + current_commands_indexed[name]['id'],
                            headers=headers)
     print(resp.status_code)
     if resp.status_code >= 300:
@@ -65,8 +64,7 @@ for name in to_delete:
 
 for name in to_overwrite:
     print(f"Overwriting {name}...", end="")
-    resp = requests.patch(f"{api_base}/applications/{application_id}/guilds/"
-                          f"{guild}/commands/{current_commands_indexed[name]['id']}",
+    resp = requests.patch(url + current_commands_indexed[name]['id'],
                           headers=headers, json=commands_indexed[name])
     print(resp.status_code)
     if resp.status_code >= 300:
