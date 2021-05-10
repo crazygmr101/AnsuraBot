@@ -15,7 +15,7 @@ from lib.voicemanager import VoiceManager
 
 logging.basicConfig(level=logging.WARN)
 
-os.chdir(os.path.dirname(sys.argv[0]))
+# os.chdir(os.path.dirname(sys.argv[0]))
 
 dotenv.load_dotenv(".env")
 
