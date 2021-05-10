@@ -32,7 +32,6 @@ bot.vm = VoiceManager(bot)
 bot.initial_extensions = ['cogs.gamertags',
                           'cogs.administration',
                           'cogs.misc',
-                          'cogs.gaming',
                           'cogs.fun',
                           'cogs.owner',
                           'cogs.image',

@@ -1,5 +1,4 @@
 import glob
-import glob
 import io
 import os
 import re
@@ -18,6 +17,7 @@ from lib.minecraft import load_recipes, load_tags, ShapedCraftingRecipe, Stonecu
     CatGift, HeroGift, FishingLoot
 from lib.slash_lib import SlashContext
 from lib.utils import find_text, ping
+import lib.hypixel
 
 
 class MinecraftSlash(commands.Cog):
@@ -42,11 +42,17 @@ class MinecraftSlash(commands.Cog):
                        load_recipes(glob.glob("data/minecraft/loot_tables/**/*.json", recursive=True))
         self.tags = load_tags(glob.glob("data/minecraft/tags/**/*.json", recursive=True))
         self.bot = bot
+        self.htoken = os.getenv("HYPIXEL")
         self.bot.slashes["minecraft.mod"] = self._mod
         self.bot.slashes["minecraft.recipe"] = self._recipe
         self.bot.slashes["minecraft.tag-info"] = self._tag_info
         self.bot.slashes["minecraft.info"] = self._info
         self.bot.slashes["minecraft.ping"] = self._ping
+        self.bot.slashes["minecraft.hypixel"] = self._hypixel
+
+    async def _hypixel(self, ctx: SlashContext):
+        await lib.hypixel.hypixel(ctx, ctx.options["player-name"],
+                                  self.bot, self.htoken, ctx.options["profile-type"])
 
     async def _ping(self, ctx: SlashContext):
         await ctx.defer()
