@@ -14,7 +14,7 @@ from lib.minecraft import load_recipes, load_tags, ShapedCraftingRecipe, Stonecu
     BlastingRecipe, SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
     CatGift, HeroGift, FishingLoot
 from lib.slash_lib import SlashContext
-from lib.utils import find_text
+from lib.utils import find_text, mk_embed
 
 
 class MinecraftSlash(commands.Cog):
@@ -42,6 +42,7 @@ class MinecraftSlash(commands.Cog):
         self.bot.slashes["minecraft.mod"] = self._mod
         self.bot.slashes["minecraft.recipe"] = self._recipe
         self.bot.slashes["minecraft.tag-info"] = self._tag_info
+        self.bot.slashes["minecraft.info"] = self._info
 
     async def _mod(self, ctx: SlashContext):
         await ctx.defer()
@@ -202,6 +203,25 @@ class MinecraftSlash(commands.Cog):
                                            if "#" in t else f"> `{t}`")
                                        .join("\n"))
         await ctx.reply(f"No tag matching `{ctx.options['tag']}` found")
+
+    async def _info(self, ctx: SlashContext):
+        await ctx.defer()
+        found_recipes = 0
+        found_tags = []
+        for rec in self.recipes:
+            if rec.result.replace("_", "").lower() == ctx.options["item"].replace(" ", "").replace("_", "").lower():
+                found_recipes += 1
+                ctx.options["item"] = rec.result
+        for tag in self.tags:
+            for item in tag.items:
+                if item.replace("_", "").lower() == ctx.options["item"].replace(" ", "").replace("_", "").lower():
+                    found_tags.append(tag.name)
+                    break
+        await ctx.reply(f"**__`{ctx.options['item']}`__**\n" +
+                        (f"> {found_recipes} {self.bot.inflect.plural('recipe', found_recipes)} found, "
+                         f"do `/minecraft recipe ` to view\n" if found_recipes else "") +
+                        (f"> {self.bot.inflect.plural('Tag', len(found_tags))}: "
+                         + LINQ(found_tags).distinct().format("`%s`").join(" ") if found_tags else ""))
 
 
 def setup(bot):

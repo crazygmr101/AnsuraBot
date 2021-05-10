@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, List
+from typing import Any, List, Tuple
 from typing import Dict
 
 import discord
@@ -110,3 +110,43 @@ def find_text(text: str, find_all: ResultSet, get: str):
         else:
             return "Unknown"
 
+
+INFO = 0
+OK = 1
+ERROR = 2
+
+
+def mk_embed(*,
+             description: str = None,
+             title: str = None,
+             title_url: str = None,
+             typ: int = INFO,
+             fields: List[Tuple[str, str]] = None,
+             thumbnail: str = None,
+             clr: discord.Colour = None,
+             image_url: str = None,
+             footer: str = None,
+             not_inline: List[int] = []) -> discord.Embed:
+    if typ and clr:
+        raise ValueError("typ and clr can not be both defined")
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        colour=([
+                    discord.Colour.from_rgb(0x4a, 0x14, 0x8c),
+                    discord.Color.green(),
+                    discord.Color.red()
+                ][typ] if not clr else clr),
+        title_url=title_url
+    )
+    if image_url:
+        embed.set_image(url=image_url)
+    else:
+        f = None
+    if footer:
+        embed.set_footer(text=footer)
+    if thumbnail:
+        embed.set_thumbnail(url=thumbnail)
+    for n, r in enumerate(fields or []):
+        embed.add_field(name=r[0], value=r[1] or "None", inline=n not in not_inline)
+    return embed

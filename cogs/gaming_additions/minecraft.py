@@ -152,26 +152,6 @@ async def hypixel(_, ctx: AnsuraContext, player: Union[discord.Member, str], *,
 
 
 
-
-async def info(_, ctx: AnsuraContext, *, i: str):
-    found_recipes = 0
-    found_tags = []
-    for rec in recipes:
-        if rec.result.replace("_", "").lower() == i.replace(" ", "").replace("_", "").lower():
-            found_recipes += 1
-            i = rec.result
-    for tag in tags:
-        for item in tag.items:
-            if item.replace("_", "").lower() == i.replace(" ", "").replace("_", "").lower():
-                found_tags.append(tag.name)
-                break
-    await ctx.send(f"**__`{i}`__**\n" +
-                   (f"> {found_recipes} {ctx.inflect.plural('recipe', found_recipes)} found, "
-                    f"do `{ctx.prefix}minecraft recipe {i}` to view\n" if found_recipes else "") +
-                   (f"> {ctx.inflect.plural('Tag', len(found_tags))}: "
-                    + LINQ(found_tags).distinct().format("`%s`").join(" ") if found_tags else ""))
-
-
 async def setup(gaming_cog: Gaming):
     global cog
     global group
