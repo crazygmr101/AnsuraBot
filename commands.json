@@ -55,6 +55,35 @@
               "description": "Tag name"
             }
           ]
+        },
+        {
+          "type": 1,
+          "name": "ping",
+          "description": "Pings a minecraft server",
+          "options": [
+            {
+              "type": 3,
+              "name": "type",
+              "required": false,
+              "description": "Server type",
+              "choices": [
+                {"name":  "Java", "value":  "java"},
+                {"name":  "Bedrock", "value":  "bedrock"}
+              ]
+            },
+            {
+              "type": 3,
+              "name": "url",
+              "required": true,
+              "description": "Server URL"
+            },
+            {
+              "type": 4,
+              "name": "port",
+              "required": false,
+              "description": "Server Port"
+            }
+          ]
         }
       ]
     }

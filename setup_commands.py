@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from pprint import pprint
 
 import dotenv
 import requests
@@ -46,7 +47,10 @@ for name in to_add:
                          headers={"Content-Type": "application/json",
                                   "Authorization": f"Bot {os.getenv('ANSURA')}"})
     print(resp.status_code)
-    resp.raise_for_status()
+    if resp.status_code >= 300:
+        print()
+        pprint(resp.json())
+        resp.raise_for_status()
 
 for name in to_delete:
     print(f"Deleting {name}...", end="")
@@ -54,7 +58,10 @@ for name in to_delete:
                            f"{guild}/commands/{current_commands_indexed[name]['id']}",
                            headers=headers)
     print(resp.status_code)
-    resp.raise_for_status()
+    if resp.status_code >= 300:
+        print()
+        pprint(resp.json())
+        resp.raise_for_status()
 
 for name in to_overwrite:
     print(f"Overwriting {name}...", end="")
@@ -62,4 +69,7 @@ for name in to_overwrite:
                           f"{guild}/commands/{current_commands_indexed[name]['id']}",
                           headers=headers, json=commands_indexed[name])
     print(resp.status_code)
-    resp.raise_for_status()
+    if resp.status_code >= 300:
+        print()
+        pprint(resp.json())
+        resp.raise_for_status()

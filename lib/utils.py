@@ -1,4 +1,7 @@
 import asyncio
+import concurrent.futures
+import platform
+import subprocess
 from typing import Any, List, Tuple
 from typing import Dict
 
@@ -150,3 +153,28 @@ def mk_embed(*,
     for n, r in enumerate(fields or []):
         embed.add_field(name=r[0], value=r[1] or "None", inline=n not in not_inline)
     return embed
+
+
+async def ping(url: str):
+    ping_var = "-n" if platform.system() == "Windows" else "-c"
+
+    def pshell(url: str):
+        return str(subprocess.check_output(["ping", url, ping_var, "2"]), "utf-8")
+
+    try:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            s = await asyncio.get_event_loop().run_in_executor(pool, pshell, url)
+        print(s)
+        try:
+            if platform.system() != "Windows":
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")[-2].split("/")
+                return f"{ar[0]} ms", f"{ar[2]} ms"
+            else:
+                ar = s.strip("\n\r").split("\r\n")[-1].split(" ")
+                return ar[-7].strip(","), ar[-4].strip(",")
+        except Exception as e:
+            print(e)
+    except Exception as e:
+        print(e)
+        print(type(e))
+        return "ERR", "ERR"

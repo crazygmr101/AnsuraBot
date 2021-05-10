@@ -2,11 +2,14 @@ import glob
 import glob
 import io
 import os
+import re
+import socket
 
 import aiohttp
 import discord
 from bs4 import BeautifulSoup
 from discord.ext import commands
+from mcstatus import MinecraftServer
 
 from ansura import AnsuraBot
 from lib.linq import LINQ
@@ -14,7 +17,7 @@ from lib.minecraft import load_recipes, load_tags, ShapedCraftingRecipe, Stonecu
     BlastingRecipe, SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
     CatGift, HeroGift, FishingLoot
 from lib.slash_lib import SlashContext
-from lib.utils import find_text, mk_embed
+from lib.utils import find_text, mk_embed, ping
 
 
 class MinecraftSlash(commands.Cog):
@@ -43,6 +46,44 @@ class MinecraftSlash(commands.Cog):
         self.bot.slashes["minecraft.recipe"] = self._recipe
         self.bot.slashes["minecraft.tag-info"] = self._tag_info
         self.bot.slashes["minecraft.info"] = self._info
+        self.bot.slashes["minecraft.ping"] = self._ping
+
+    async def _ping(self, ctx: SlashContext):
+        await ctx.defer()
+        port = ctx.options.get("port", 25565 if ctx.options["type"] == "java" else 19132)
+        url = f"{ctx.options['url']}:{port}"
+        if ctx.options.get("type", "java") == "java":
+            server = MinecraftServer.lookup(ctx.options["url"])
+            status = server.status()
+            await ctx.reply(f"**{url}**\n"
+                            f"> {re.sub('§.', '', status.description['text'])}\n"
+                            f"> {status.players.online}/{status.players.max}   {status.latency}ms\n"
+                            f"> Minecraft v{status.version.name}   Protocol v{status.version.protocol}")
+        else:
+            try:
+                latency = await ping(url)
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock.setblocking(False)
+                sock.settimeout(10)
+                sock.sendto(bytearray.fromhex(
+                    "0100000000003c6d0d00ffff00fefefefefdfdfdfd12345678"), (url, port))
+                data, addr = sock.recvfrom(255)
+                status = data[35::].decode("ISO-8859-1").split(";")
+                await ctx.reply(f"**{url}**\n"
+                                f"> {re.sub('§.', '', status[7])} - {status[8]}"
+                                f"> {re.sub('[§Â].', '', status[1])}\n"
+                                f"> {status[4]}/{status[3]}   "
+                                f"{(str(round((latency[0] + latency[1]) / 2)) + 'ms') if latency[0] != 'ERR' else ''}\n"
+                                f"> Minecraft v{status[3]}   Protocol v{status[2]}\n")
+            except socket.timeout:
+                await ctx.reply(f"*Oops ):*\n Looks like the ping I made to {url} timed out. "
+                                     f"Either the server is down, not responding, or I was given a wrong URL or port.")
+            except socket.gaierror:
+                await ctx.reply("I can't figure out how to reach that URL. ): Double check that it's correct.")
+                return
+            except Exception as e:
+                await ctx.reply("An error happened while I was pinging the server.")
+                print(e)
 
     async def _mod(self, ctx: SlashContext):
         await ctx.defer()
