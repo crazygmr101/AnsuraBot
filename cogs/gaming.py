@@ -1,16 +1,45 @@
-import asyncio
 import os
+import re
+from typing import Union
 
+import discord
 from discord.ext import commands
 
-from ansura import AnsuraBot
-from cogs.gaming_additions import minecraft
+import lib.hypixel
+import lib.hypixel
+from ansura import AnsuraBot, AnsuraContext
 
 
 class Gaming(commands.Cog):
     def __init__(self, bot: AnsuraBot):
         self.bot = bot
         self.htoken = os.getenv("HYPIXEL")
+
+    async def hypixel(self, ctx: AnsuraContext, player: Union[discord.Member, str], *,
+                      profile_type: str = None):
+        """
+        Checks a player's hypixel profile
+        - player: the minecraft username
+          or a @mention of a user with their
+          mojang profile linked
+        - profile_type:
+          > None - basic hp profile
+          > sb/skyblock
+          > bw/bedwars
+          > uhc
+          > sw/skywars
+          > raw - uploads raw data to pastebin
+        """
+        if isinstance(player, discord.Member):
+            player = self.bot.db.lookup_gaming_record(player.id)[1]
+            if not player:
+                if re.match(r"<@!?\d{17,21}>", ctx.message.content.split()[1]):
+                    await ctx.send(embed=discord.Embed(title="No mojang linked",
+                                                       description="The person mentioned needs to set their mojang "
+                                                                   "tag with `%mojang username`"))
+                    return
+                player = ctx.message.content.split()[1]
+        await lib.hypixel.hypixel(ctx, player, self.bot, self.htoken, profile_type)
 
 
 def setup(bot: AnsuraBot):
