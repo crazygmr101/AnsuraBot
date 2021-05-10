@@ -17,7 +17,7 @@ from lib.minecraft import load_recipes, load_tags, ShapedCraftingRecipe, Stonecu
     BlastingRecipe, SmeltingRecipe, SmithingRecipe, ShapelessCraftingRecipe, BlockDrop, ChestLoot, EntityDrop, Barter, \
     CatGift, HeroGift, FishingLoot
 from lib.slash_lib import SlashContext
-from lib.utils import find_text, mk_embed, ping
+from lib.utils import find_text, ping
 
 
 class MinecraftSlash(commands.Cog):
@@ -55,8 +55,10 @@ class MinecraftSlash(commands.Cog):
         if ctx.options.get("type", "java") == "java":
             server = MinecraftServer.lookup(ctx.options["url"])
             status = server.status()
+            description = re.sub('§.', '', status.description['text'] \
+                if isinstance(status.description, dict) else status.description) # noqa
             await ctx.reply(f"**{url}**\n"
-                            f"> {re.sub('§.', '', status.description['text'])}\n"
+                            f"> {description}\n"
                             f"> {status.players.online}/{status.players.max}   {status.latency}ms\n"
                             f"> Minecraft v{status.version.name}   Protocol v{status.version.protocol}")
         else:
@@ -77,7 +79,7 @@ class MinecraftSlash(commands.Cog):
                                 f"> Minecraft v{status[3]}   Protocol v{status[2]}\n")
             except socket.timeout:
                 await ctx.reply(f"*Oops ):*\n Looks like the ping I made to {url} timed out. "
-                                     f"Either the server is down, not responding, or I was given a wrong URL or port.")
+                                f"Either the server is down, not responding, or I was given a wrong URL or port.")
             except socket.gaierror:
                 await ctx.reply("I can't figure out how to reach that URL. ): Double check that it's correct.")
                 return
