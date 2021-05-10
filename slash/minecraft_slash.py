@@ -29,6 +29,8 @@ class MinecraftSlash(commands.Cog):
             os.mkdir("data/minecraft")
         if not os.path.isdir("data/minecraft/recipes"):
             os.mkdir("data/minecraft/recipes")
+        if not os.path.isdir("data/minecraft/loot_tables"):
+            os.mkdir("data/minecraft/loot_tables")
         if not os.path.isdir("data/minecraft/loot_tables/blocks"):
             os.mkdir("data/minecraft/loot_tables/blocks")
         if not os.path.isdir("data/minecraft/loot_tables/chests"):
