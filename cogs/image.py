@@ -1,4 +1,5 @@
 import asyncio
+import io
 import math
 import os
 
@@ -83,7 +84,6 @@ class ImageManipulation(commands.Cog):
         Do `%ihelp` to view filter list, and `%ihelp filter` to view help for a filter
         """
         message: discord.Message = ctx.message
-        print(message.attachments)
         if filter_list is None:
             await ctx.send("I need a command telling me what to do with the image")
             return
@@ -94,20 +94,18 @@ class ImageManipulation(commands.Cog):
         if not self._is_image(attachment.filename):
             await ctx.send("I don't understand that kind of image ): Give me a jpg, jpeg, png, or gif")
             return
-        f = open("attachments/" + str(message.id) + self._fname(attachment.filename), "wb+")
-        await attachment.save(f)
-        f.close()
-        code = False
+        buf = io.BytesIO()
+        await attachment.save(buf)
         try:
-            code, msg, size = await self._process_commands(" ".join(ctx.message.content.split(" ")[1::]), f.name)
+            code, image, fmt = await self._process_commands(" ".join(ctx.message.content.split(" ")[1::]), buf)
+            buf = io.BytesIO()
+            image.save(buf, fmt)
+            size = buf.getbuffer().nbytes
+            buf.seek(0)
             if code is True:
-                await ctx.send(content=f"{self._fsize(size)}", file=discord.File(msg))
+                await ctx.send(content=f"{self._fsize(size)}", file=(discord.File(buf, filename=f"image.{fmt}")))
         except commands.ConversionError as e:
             await ctx.send(str(e))
-        finally:
-            print(f.name)
-            os.remove(f.name)
-            os.remove(msg)
 
     def _fsize(self, size_bytes: int):
         if size_bytes == 0:
@@ -133,16 +131,15 @@ class ImageManipulation(commands.Cog):
                                        "`rgb` or `rrggbb`",
                                        original=None)
 
-    async def _process_commands(self, command: str, path: str):  # noqa c901
+    async def _process_commands(self, command: str, buf: io.BytesIO):  # noqa c901
         ar = [x.split(" ") for x in [a.strip(" ") for a in command.split(',')]]
-        im: Image = PIL.Image.open(path)
-        # im.load()
+        buf.seek(0)
+        im: Image = PIL.Image.open(buf)
         im = im.convert("RGBA")
-        print(ar)
         fmt = "png"
         for e in ar:
             for i in range(3):
-                e.append(None)
+                e.append("")
             if e[0] == "convert":
                 mode = e[1]
                 if not mode or mode not in "bw,rgb,rgba,luma,web,adaptive":
@@ -239,12 +236,7 @@ class ImageManipulation(commands.Cog):
                 size = (im.width, im.height)
                 im = im.resize((int(e[1]), int(e[2])), PIL.Image.NEAREST)
                 im = im.resize(size, PIL.Image.NEAREST)
-        a = path.split(".")
-        async with self.lock:
-            self.counter += 1
-        b = str(self.counter) + "." + fmt  # + a[-1]
-        im.save(b)
-        return True, b, os.path.getsize(b)
+        return True, im, fmt
 
     def _fname(self, url: str):
         return url.split("/")[-1]

@@ -1,5 +1,6 @@
 import glob
 import io
+import itertools
 import os
 import re
 import socket
@@ -51,6 +52,24 @@ class MinecraftSlash(commands.Cog):
         self.bot.slashes["minecraft.info"] = self._info
         self.bot.slashes["minecraft.ping"] = self._ping
         self.bot.slashes["minecraft.hypixel"] = self._hypixel
+        self.bot.slashes["minecraft.color-codes"] = self._color_codes
+        self.bot.slashes["minecraft.color-code-pattern"] = self._cc_pattern
+
+    async def _cc_pattern(self, ctx: SlashContext):
+        await ctx.defer(True)
+        sep = "&" if ctx.options["character"] == "java" else "§"
+        pattern = ctx.options["pattern"]
+        message = ctx.options["message"]
+        builder = ''
+        cycle = itertools.cycle(pattern.split())
+        for char in message:
+            if char.isspace():
+                builder += char
+            else:
+                for formatting_code in cycle.__next__():
+                    builder += f"{sep}{formatting_code}"
+                builder += char
+        await ctx.reply(f"```{builder}```{'**Over 256 characters' if len(builder) > 256 else ''}")
 
     async def _hypixel(self, ctx: SlashContext):
         await lib.hypixel.hypixel(ctx, ctx.options["player-name"],
@@ -273,6 +292,23 @@ class MinecraftSlash(commands.Cog):
                          f"do `/minecraft recipe ` to view\n" if found_recipes else "") +
                         (f"> {self.bot.inflect.plural('Tag', len(found_tags))}: "
                          + LINQ(found_tags).distinct().format("`%s`").join(" ") if found_tags else ""))
+
+    @commands.command()
+    async def _color_codes(self, ctx: SlashContext):
+        await ctx.defer(True)
+        url = "https://cdn.discordapp.com/attachments/799034707726827561/841481558040248360/200px-Minecraft_Formatting.gif" # noqa
+
+        await ctx.reply(embeds=[discord.Embed(
+            title="Minecraft Color Codes",
+            url="https://minecraft.gamepedia.com/Formatting_codes",
+            description=""
+                        "To type `§`:\n"
+                        "- Windows: `Alt`+`21`, or `Alt`+`0167`, using the numpad\n"
+                        "- Mac (US): `Option`+`6` (`5` for US Extended)\n"
+                        "- Mac (Other): `Option`+`00a7`\n"
+                        "- Linux: `Compose` `s` `o`\n\n"
+                        "[Color code list](https://minecraft.gamepedia.com/Formatting_codes#Color_codes)"
+        ).set_image(url=url)])
 
 
 def setup(bot):

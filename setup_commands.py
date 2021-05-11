@@ -21,7 +21,6 @@ commands = []
 for fn in glob.glob("commands/*.json"):
     with open(fn) as fp:
         commands += json.load(fp)["commands"]
-pprint(commands)
 
 if sys.argv[1] not in ["--global", "--guild"]:
     exit(-1)

@@ -67,8 +67,14 @@
               "required": true,
               "description": "Server type",
               "choices": [
-                {"name":  "Java", "value":  "java"},
-                {"name":  "Bedrock", "value":  "bedrock"}
+                {
+                  "name": "Java",
+                  "value": "java"
+                },
+                {
+                  "name": "Bedrock",
+                  "value": "bedrock"
+                }
               ]
             },
             {
@@ -96,12 +102,30 @@
               "required": true,
               "description": "Profile type",
               "choices": [
-                {"name":  "Profile", "value":  "profile"},
-                {"name":  "Bedwars", "value":  "bedwars"},
-                {"name":  "Skywars", "value":  "skywars"},
-                {"name":  "UHC", "value":  "uhc"},
-                {"name":  "Skyblock", "value":  "skyblock"},
-                {"name":  "Upload to Pastebin", "value":  "raw"}
+                {
+                  "name": "Profile",
+                  "value": "profile"
+                },
+                {
+                  "name": "Bedwars",
+                  "value": "bedwars"
+                },
+                {
+                  "name": "Skywars",
+                  "value": "skywars"
+                },
+                {
+                  "name": "UHC",
+                  "value": "uhc"
+                },
+                {
+                  "name": "Skyblock",
+                  "value": "skyblock"
+                },
+                {
+                  "name": "Upload to Pastebin",
+                  "value": "raw"
+                }
               ]
             },
             {
@@ -109,6 +133,46 @@
               "name": "player-name",
               "required": true,
               "description": "Player name"
+            }
+          ]
+        },
+        {
+          "type": 1,
+          "name": "color-codes",
+          "description": "Explains minecraft color code formatting"
+        },
+        {
+          "type": 1,
+          "name": "color-code-pattern",
+          "description": "Colors a text according to a pattern, for plugins that support & syntax, or bedrock",
+          "options": [
+            {
+              "name": "character",
+              "type": 3,
+              "description": "The character to use as a separator",
+              "required": true,
+              "choices": [
+                {
+                  "name": "& - Java Plugin",
+                  "value": "java"
+                },
+                {
+                  "name": "§ - Bedrock / Java MOTD",
+                  "value": "bedrock"
+                }
+              ]
+            },
+            {
+              "name": "pattern",
+              "type": 3,
+              "description": "The pattern to use",
+              "required": true
+            },
+            {
+              "name": "message",
+              "type": 3,
+              "description": "The message to color-ify",
+              "required": true
             }
           ]
         }
