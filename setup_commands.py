@@ -5,6 +5,7 @@ from pprint import pprint
 
 import dotenv
 import requests
+import glob
 
 dotenv.load_dotenv(".env")
 
@@ -15,9 +16,12 @@ headers = {
 
 # grab bot application id
 application_id = requests.get(f"{api_base}/users/@me", headers=headers).json()["id"]
+commands = []
 
-with open("commands.json") as fp:
-    commands = json.load(fp)["commands"]
+for fn in glob.glob("commands/*.json"):
+    with open(fn) as fp:
+        commands += json.load(fp)["commands"]
+pprint(commands)
 
 if sys.argv[1] not in ["--global", "--guild"]:
     exit(-1)
@@ -30,6 +34,7 @@ else:
 
 # get current commands for the guild
 current_commands = requests.get(url, headers=headers).json()
+
 current_command_names = {command["name"] for command in current_commands}
 current_commands_indexed = {command["name"]: command for command in current_commands}
 
@@ -54,7 +59,7 @@ for name in to_add:
 
 for name in to_delete:
     print(f"Deleting {name}...", end="")
-    resp = requests.delete(url + current_commands_indexed[name]['id'],
+    resp = requests.delete(url + "/" + current_commands_indexed[name]['id'],
                            headers=headers)
     print(resp.status_code)
     if resp.status_code >= 300:
@@ -64,7 +69,7 @@ for name in to_delete:
 
 for name in to_overwrite:
     print(f"Overwriting {name}...", end="")
-    resp = requests.patch(url + current_commands_indexed[name]['id'],
+    resp = requests.patch(url + "/" + current_commands_indexed[name]['id'],
                           headers=headers, json=commands_indexed[name])
     print(resp.status_code)
     if resp.status_code >= 300:
