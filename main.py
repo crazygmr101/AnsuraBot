@@ -38,10 +38,10 @@ bot.initial_extensions = ['cogs.gamertags',
                           'cogs.error-handler',
                           'cogs.streamer',
                           'cogs.confighandler',
-                          'cogs.timezones',
                           'cogs.voice',
                           'cogs.help',
                           'cogs.crosschat',
+                          'slash.time',
                           "slash.minecraft"]
 if __name__ == '__main__':
     for ext in bot.initial_extensions:

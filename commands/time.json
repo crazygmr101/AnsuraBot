@@ -1,0 +1,48 @@
+{
+  "commands": [
+    {
+      "name": "time",
+      "description": "View the time for a user",
+      "options": [
+        {
+          "name": "user",
+          "description": "The user to check",
+          "type": 6,
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "timezone",
+      "description": "Set your timezone",
+      "options": [
+        {
+          "name": "set",
+          "description": "Set your timezone",
+          "type": 1,
+          "options": [
+            {
+              "name": "timezone",
+              "description": "Your timezone",
+              "type": 3,
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "search",
+          "description": "Search for a timezone",
+          "type": 1,
+          "options": [
+            {
+              "name": "text",
+              "description": "Text to search for",
+              "type": 3,
+              "required": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
