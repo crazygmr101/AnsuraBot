@@ -296,8 +296,7 @@ class MinecraftSlash(commands.Cog):
     @commands.command()
     async def _color_codes(self, ctx: SlashContext):
         await ctx.defer(True)
-        url = "https://gamepedia.cursecdn.com/minecraft_gamepedia/thumb/7/7e/Minecraft_Formatting.gif/" \
-              "200px-Minecraft_Formatting.gif?version=14d34015f6cdd3412acabdd0d80764d9"
+        url = "https://cdn.discordapp.com/attachments/799034707726827561/841481558040248360/200px-Minecraft_Formatting.gif" # noqa
 
         await ctx.reply(embeds=[discord.Embed(
             title="Minecraft Color Codes",
@@ -307,7 +306,7 @@ class MinecraftSlash(commands.Cog):
                         "- Windows: `Alt`+`21`, or `Alt`+`0167`, using the numpad\n"
                         "- Mac (US): `Option`+`6` (`5` for US Extended)\n"
                         "- Mac (Other): `Option`+`00a7`\n"
-                        "- Linux: `Compose` `s` `o` or `Ctrl` +`Shift` + `u00a7`\n\n"
+                        "- Linux: `Compose` `s` `o`\n\n"
                         "[Color code list](https://minecraft.gamepedia.com/Formatting_codes#Color_codes)"
         ).set_image(url=url)])
 
