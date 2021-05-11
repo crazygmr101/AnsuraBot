@@ -35,8 +35,7 @@ bot.initial_extensions = ['cogs.fun',
                           'cogs.crosschat',
                           'migrated.time',
                           'migrated.config',
-                          "migrated.minecraft",
-                          'migrated.gamertags']
+                          "migrated.minecraft"]
 
 if __name__ == '__main__':
     for ext in bot.initial_extensions:
