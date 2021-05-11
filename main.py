@@ -26,17 +26,18 @@ bot.remove_command('help')
 
 bot.vm = VoiceManager(bot)
 
-bot.initial_extensions = ['cogs.gamertags',
-                          'cogs.administration',
-                          'cogs.fun',
+bot.initial_extensions = ['cogs.fun',
                           'cogs.owner',
                           'cogs.image',
                           'cogs.error-handler',
                           'cogs.voice',
                           'cogs.help',
                           'cogs.crosschat',
-                          'slash.time',
-                          "slash.minecraft"]
+                          'migrated.time',
+                          'migrated.config',
+                          "migrated.minecraft",
+                          'migrated.gamertags']
+
 if __name__ == '__main__':
     for ext in bot.initial_extensions:
         print(f"[COGS] Loading {ext}")
@@ -58,10 +59,6 @@ for file in filelist:
 
 @bot.event
 async def on_ready():
-    if bot.user.id == 603640674234925107:
-        import cogs.dbl
-        await bot.add_cog(cogs.dbl.DBL(bot))
-
     xchat: Crosschat = bot.get_cog("Crosschat")
     await xchat.init_channels()
     await bot.change_presence(status=discord.Status.online, activity=discord.Game("%help"))
