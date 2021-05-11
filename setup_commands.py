@@ -22,10 +22,27 @@ for fn in glob.glob("commands/*.json"):
     with open(fn) as fp:
         commands += json.load(fp)["commands"]
 
-if sys.argv[1] not in ["--global", "--guild"]:
-    exit(-1)
+if len(sys.argv) == 1 or sys.argv[1] not in ["--global", "--guild", "--clear"]:
+    print("setup_commands.py - Load Ansura's commands from commands/*.json\n"
+          "  --clear - clear all guilds\n"
+          "  --clear 123456789 - clear guild with id 123456789\n"
+          "  --global - deploy commands globally\n"
+          "  --guild 123456789 - deploy commands to guild with id 123456789\n\n"
+          "NOTE:\n"
+          "  - using --global and --guild can lead to command duplication\n"
+          "  - currently, discord only allows 200 command creations per guild per day")
+    exit(0)
 
-if sys.argv[1] == "--global":
+if sys.argv[1] == "--clear":
+    if len(sys.argv) > 2:
+        guild = sys.argv[2]
+        url = f"{api_base}/applications/{application_id}/guilds/{guild}/commands"
+        commands = []
+    else:
+        url = f"{api_base}/applications/{application_id}/commands"
+        commands = []
+
+elif sys.argv[1] == "--global":
     url = f"{api_base}/applications/{application_id}/commands"
 else:
     guild = sys.argv[2]
