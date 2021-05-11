@@ -92,7 +92,7 @@ def process_slash(bot: AnsuraBot, payload) -> SlashContext:
     subcommand = None
     if len(opt) == 1 and opt[0]["type"] == 1:
         subcommand = opt[0]["name"]
-        opt = opt[0]["options"]
+        opt = opt[0].get("options", {})
     for o in opt:
         options[o["name"]] = o["value"]
     return SlashContext(
