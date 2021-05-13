@@ -22,13 +22,13 @@ class Misc(commands.Cog):
         tz = self.bot.db.lookup_timezone(user.id)[1]
         e = discord.Embed()
         if tz is None:
-            await ctx.reply(f"{user.mention} doesn't have their timezone set. "
+            await ctx.reply(f"**{user.display_name}** doesn't have their timezone set. "
                             "Have them set it with `%timezone`")
         else:
             e.title = f"{user.display_name}"
             now_utc = datetime.datetime.now(pytz.timezone("UTC"))
             local = now_utc.astimezone(pytz.timezone(tz)).strftime("%H:%M:%S %a %Z (%z)")
-            await ctx.reply(f"{user.mention}'s time is **{local}**",
+            await ctx.reply(f"**{user.display_name}**'s time is **{local}**",
                             allowed_mentions=discord.AllowedMentions.none())
 
     async def _timezone(self, ctx: SlashContext):
@@ -41,6 +41,7 @@ class Misc(commands.Cog):
         except pytz.UnknownTimeZoneError:
             await ctx.reply(f"{tz} is an invalid timezone. Search for your timezone with `/timezone search location`")
 
+    # noinspection PyMethodMayBeStatic
     async def _timezone_search(self, ctx: SlashContext):
         await ctx.defer(True)
         all_timezones = [str(tz).replace("_", " ") for tz in pytz.all_timezones]
