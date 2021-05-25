@@ -5,6 +5,7 @@ import os
 import discord
 import dotenv
 from discord.ext import commands
+import Levenshtein  # noqa this needs to stay here so i can use remove unused requirements
 
 from ansura import AnsuraBot
 from cogs.crosschat import Crosschat
