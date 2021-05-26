@@ -61,6 +61,7 @@ class SlashContext:
             resp = await sess.post(f"{BASE}/webhooks/{self.bot.user.id}/{self.token}",
                                    json=r)
             resp.raise_for_status()
+            resp.close()
 
     async def edit_original(self,
                             content: str = None,
@@ -82,6 +83,7 @@ class SlashContext:
             resp = await sess.patch(f"{BASE}/webhooks/{self.bot.user.id}/{self.token}/messages/@original",
                                     json=r)
             resp.raise_for_status()
+            resp.close()
 
 
 def process_slash(bot: AnsuraBot, payload) -> SlashContext:
